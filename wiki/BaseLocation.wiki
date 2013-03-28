@@ -1,0 +1,86 @@
+#sidebar TableOfContents
+
+Class header file: [http://code.google.com/p/bwta/source/browse/trunk/include/BWTA/BaseLocation.h# BWTA/BaseLocation.h]
+
+A BaseLocation a position on the map where it makes sense to place a base (i.e. near minerals).
+
+Methods:
+
+  * [#getPosition getPosition]
+  * [#getTilePosition getTilePosition]
+  * [#getRegion getRegion]
+  * [#minerals minerals]
+  * [#gas gas]
+  * [#getMinerals getMinerals]
+  * [#getStaticMinerals getStaticMinerals]
+  * [#getGeysers getGeysers]
+  * [#getGroundDistance getGroundDistance]
+  * [#getAirDistance getAirDistance]
+  * [#isIsland isIsland]
+  * [#isMineralOnly isMineralOnly]
+  * [#isStartLocation isStartLocation]
+
+=== getPosition ===
+[http://code.google.com/p/bwapi/wiki/BWAPIManual BWAPI]::[http://code.google.com/p/bwapi/wiki/Misc#Position Position] getPosition() const;
+
+Returns the position of the center of the base location.
+
+=== getTilePosition ===
+[http://code.google.com/p/bwapi/wiki/BWAPIManual BWAPI]::[http://code.google.com/p/bwapi/wiki/Misc#TilePosition TilePosition] getTilePosition() const;
+
+Returns the tile position of the base location.
+
+=== getRegion ===
+[Region]{{{*}}} getRegion() const;
+
+Returns the region the base location is in.
+
+=== minerals ===
+int minerals() const;
+
+Returns the total mineral resource count of all accessible mineral patches.
+
+=== gas===
+int gas() const;
+
+Returns the total gas resource count of all accessible vespene geysers.
+
+=== getMinerals ===
+const std::set<[http://code.google.com/p/bwapi/wiki/BWAPIManual BWAPI]::[http://code.google.com/p/bwapi/wiki/Unit Unit]{{{*}}}> &getMinerals();
+
+Returns the set of accessible mineral patches near the base location.
+
+=== getStaticMinerals ===
+const std::set<[http://code.google.com/p/bwapi/wiki/BWAPIManual BWAPI]::[http://code.google.com/p/bwapi/wiki/Unit Unit]{{{*}}}> &getStaticMinerals() const;
+
+Returns the set of all mineral patches near the base location, including mined out and invisible ones.
+
+=== getGeysers ===
+const std::set<[http://code.google.com/p/bwapi/wiki/BWAPIManual BWAPI]::[http://code.google.com/p/bwapi/wiki/Unit Unit]{{{*}}}> &getGeysers() const;
+
+Returns the set of vespene geysers near the base location. If the set is empty, the base location is mineral only.
+
+=== getGroundDistance ===
+double getGroundDistance(BaseLocation{{{*}}} other) const;
+
+Returns the ground (walking) distance to the given base location. If its impossible to reach the given base location from the current one, this will return a negative value.
+
+=== getAirDistance ===
+double getAirDistance(BaseLocation{{{*}}} other) const;
+
+Returns the air (flying) distance to the given base location.
+
+=== isIsland ===
+bool isIsland() const;
+
+Returns true if the base location not in not reachable by ground from any other base location.
+
+=== isMineralOnly ===
+bool isMineralOnly() const;
+
+Returns true if the base location is mineral-only.
+
+=== isStartLocation ===
+bool isStartLocation() const;
+
+Returns true if the base location is a start location.

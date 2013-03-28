@@ -1,0 +1,6 @@
+  * [BWTAManual API]
+  * [BWTA]
+  * [BaseLocation]
+  * [Chokepoint]
+  * [Polygon]
+  * [Region]

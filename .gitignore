@@ -1,0 +1,13 @@
+# Temporal project files
+bwta.ncb
+bwta.suo
+src/bwta.vcproj*
+
+
+# Binary folders
+Debug
+Release
+
+# Temporal binary folders
+src/Release
+src/Debug
