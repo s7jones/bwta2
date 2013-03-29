@@ -90,9 +90,9 @@ namespace BWTA
   }
   void analyze()
   {
-    char buf[1000];
-    sprintf(buf,"bwapi-data/BWTA/%s.bwta",BWAPI::Broodwar->mapHash().c_str());
-    std::string filename(buf);
+	std::ofstream logFile( "bwapi-data/logs/BWTA.log");
+	logFile << "Map name: " << BWAPI::Broodwar->mapName() << std::endl;
+    std::string filename = "bwapi-data/BWTA/" + BWAPI::Broodwar->mapHash() + ".bwta";
     if (fileExists(filename) && fileVersion(filename)==BWTA_FILE_VERSION)
     {
       log("Recognized map, loading map data...");
