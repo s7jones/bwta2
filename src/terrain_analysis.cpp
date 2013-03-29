@@ -184,7 +184,7 @@ namespace BWTA
 
 	end = clock();
 	seconds = double(end-start)/CLOCKS_PER_SEC;
-	log("  [Detected polygons in " << seconds << " seconds]");
+	log(" [Detected polygons in " << seconds << " seconds]");
 	start = end;
 
     // Save the remaining polygons in BWTA_Result::unwalkablePolygons
@@ -352,7 +352,7 @@ namespace BWTA
 
 	end = clock();
 	seconds = double(end-start)/CLOCKS_PER_SEC;
-	log("  [Computed Voronoi diagram in " << seconds << " seconds]");
+	log(" [Computed Voronoi diagram in " << seconds << " seconds]");
 	start = end;
 
     #ifdef DEBUG_DRAW
@@ -366,7 +366,7 @@ namespace BWTA
 
 	end = clock();
 	seconds = double(end-start)/CLOCKS_PER_SEC;
-	log("  [Pruned Voronoi diagram in " << seconds << " seconds]");
+	log(" [Pruned Voronoi diagram in " << seconds << " seconds]");
 	start = end;
 
     #ifdef DEBUG_DRAW
@@ -380,7 +380,7 @@ namespace BWTA
 
 	end = clock();
 	seconds = double(end-start)/CLOCKS_PER_SEC;
-	log("  [Identified region nodes in " << seconds << " seconds]");
+	log(" [Identified region nodes in " << seconds << " seconds]");
 	start = end;
 
     #ifdef DEBUG_DRAW
@@ -404,7 +404,7 @@ namespace BWTA
 
 	end = clock();
 	seconds = double(end-start)/CLOCKS_PER_SEC;
-	log("  [Identified choke points nodes in " << seconds << " seconds]");
+	log(" [Identified choke points nodes in " << seconds << " seconds]");
 	start = end;
 
     #ifdef DEBUG_DRAW
@@ -446,7 +446,7 @@ namespace BWTA
 
 	end = clock();
 	seconds = double(end-start)/CLOCKS_PER_SEC;
-	log("  [Merged adjacent regions in " << seconds << " seconds]");
+	log(" [Merged adjacent regions in " << seconds << " seconds]");
 	start = end;
 
     #ifdef DEBUG_DRAW
@@ -497,7 +497,7 @@ namespace BWTA
 
 	end = clock();
 	seconds = double(end-start)/CLOCKS_PER_SEC;
-	log("  [Wall of chokepoints in " << seconds << " seconds]");
+	log(" [Wall of chokepoints in " << seconds << " seconds]");
 	start = end;
 
     #ifdef DEBUG_DRAW
@@ -559,7 +559,7 @@ namespace BWTA
 
 	end = clock();
 	seconds = double(end-start)/CLOCKS_PER_SEC;
-	log("  [Finding regions in " << seconds << " seconds]");
+	log(" [Finding regions in " << seconds << " seconds]");
 	start = end;
 
     #ifdef DEBUG_DRAW
@@ -640,7 +640,7 @@ namespace BWTA
 
 	end = clock();
 	seconds = double(end-start)/CLOCKS_PER_SEC;
-	log("  [Linked chole points wiht regions in " << seconds << " seconds]");
+	log(" [Linked choke points wiht regions in " << seconds << " seconds]");
 	start = end;
 
     calculate_connectivity();
@@ -648,7 +648,7 @@ namespace BWTA
 
 	end = clock();
 	seconds = double(end-start)/CLOCKS_PER_SEC;
-	log("  [Calculated base location properties in " << seconds << " seconds]");
+	log(" [Calculated base location properties in " << seconds << " seconds]");
 	//start = end;
     
 	// This looks like a file output to plot the distance transform of the map using Mathematica

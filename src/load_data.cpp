@@ -61,6 +61,33 @@ namespace BWTA
         MapData::lowResWalkability[x/4][y/4]&=MapData::rawWalkability[x][y];
       }
     }
+
+	//Block static neutral units
+	int x1,y1,x2,y2;
+	std::set<BWAPI::Unit*>::iterator unit;
+	for(unit = Broodwar->getStaticNeutralUnits().begin(); unit != Broodwar->getStaticNeutralUnits().end(); ++unit) {
+		// check if it is a resource container
+		if ((*unit)->getType() == UnitTypes::Resource_Vespene_Geyser || (*unit)->getType().isMineralField()) continue;
+		// get build area
+		x1 = (*unit)->getTilePosition().x()*4;
+		y1 = (*unit)->getTilePosition().y()*4;
+		x2 = (*unit)->getTilePosition().x()*4 + (*unit)->getType().tileWidth()*4;
+		y2 = (*unit)->getTilePosition().y()*4 + (*unit)->getType().tileHeight()*4;
+		// map area
+		for (int x = x1; x <= x2; x++) {
+			for (int y = y1; y <= y2; y++) {
+				if (x >= 0 && x < width && y >= 0 && y < height) {
+					for(int x3=max(x-1,0);x3<=min(x2,x+1);x3++) {
+						for(int y3=max(y-1,0);y3<=min(y2,y+1);y3++) {
+							MapData::walkability[x3][y3] = false;
+						}
+					}
+					MapData::lowResWalkability[x/4][y/4] = false;
+				}
+			}
+		}
+	}
+
     BWTA_Result::getRegion.resize(b_width,b_height);
     BWTA_Result::getChokepoint.resize(b_width,b_height);
     BWTA_Result::getBaseLocation.resize(b_width,b_height);
