@@ -101,7 +101,7 @@ namespace BWTA
         simplify(*h,1.0);
       }
     }
-    log("Simplified polygons.");
+    //log("Simplified polygons.");
   }
 
   void rotate_cw(int &x,int &y) {
