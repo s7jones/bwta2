@@ -16,7 +16,8 @@ namespace BWTA
   }
   PolygonD Node::get_polygon() const
   {
-    log("calling get_polygon from a node at position (%f,%f)",cast_to_double(point.x()),cast_to_double(point.y()));
+	//log("calling get_polygon from a node at position (%f,%f)",cast_to_double(point.x()),cast_to_double(point.y()));
+	log("calling get_polygon from a node at position ("<<point.x()<<","<<point.x()<<")");
     Arrangement_2::Face_const_handle f;
     Arrangement_2::Halfedge_const_handle h;
     Arrangement_2::Vertex_const_handle v;

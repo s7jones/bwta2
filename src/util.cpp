@@ -1,6 +1,5 @@
 #include "functions.h"
-#include <string>
-#include <sstream>
+
 #include "Heap.h"
 #include <stdarg.h>
 #include <sys/stat.h>
@@ -97,38 +96,22 @@ namespace BWTA
     return distance;
   }
 
-  char buffer[1024];
-  void log(const char* text, ...)
-  {
-    FILE * pFile;
-    pFile = fopen ("bwapi-data/logs/BWTA.log","a");
-    
-    va_list ap;
-    va_start(ap, text);
-    vsprintf(buffer,text,ap );
-    va_end(ap);
-    if (pFile!=NULL)
-    {
-      fputs (buffer,pFile);
-      fputs ("\n",pFile);
-      fclose (pFile);
-    }
-  }
-  void writeFile(const char* filename, const char* text, ...)
-  {
-    FILE * pFile;
-    pFile = fopen (filename,"a");
-    
-    va_list ap;
-    va_start(ap, text);
-    vsprintf(buffer,text,ap );
-    va_end(ap);
-    if (pFile!=NULL)
-    {
-      fputs (buffer,pFile);
-      fclose (pFile);
-    }
-  }
+//   char buffer[1024];
+//   void writeFile(const char* filename, const char* text, ...)
+//   {
+//     FILE * pFile;
+//     pFile = fopen (filename,"a");
+//     
+//     va_list ap;
+//     va_start(ap, text);
+//     vsprintf(buffer,text,ap );
+//     va_end(ap);
+//     if (pFile!=NULL)
+//     {
+//       fputs (buffer,pFile);
+//       fclose (pFile);
+//     }
+//   }
 
 
   int get_set(std::vector<int> &a,int i)

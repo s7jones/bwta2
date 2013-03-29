@@ -151,8 +151,10 @@ namespace BWTA
   std::string int2str(int number);
   int max(int a, int b);
   int min(int a, int b);
-  void log(const char* text, ...);
-  void writeFile(const char* filename, const char* text, ...);
+  //void writeFile(const char* filename, const char* text, ...);
+  #define log(message) { \
+	  std::ofstream logFile( "bwapi-data/logs/BWTA.log", std::ios_base::out | std::ios_base::app ); \
+	  logFile << message << std::endl; }
 
   template< class T>
   double get_distance(CGAL::Point_2<T> a, CGAL::Point_2<T> b)

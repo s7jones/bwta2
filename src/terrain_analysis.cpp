@@ -106,7 +106,7 @@ namespace BWTA
       analyze_map();
       time_t t2=clock();
       double seconds = (t2-t1)*1.0/CLOCKS_PER_SEC;
-      log("running time: %f",seconds);
+      log("running time: " << seconds);
       log("Analyzed map.");
       save_data(filename);
       log("Saved map data.");
@@ -141,7 +141,7 @@ namespace BWTA
 
     // Give find_mineral_clusters the walkability data, minerals, and geysers, so it can compute the resource cluters
     find_mineral_clusters(MapData::walkability,MapData::minerals,MapData::geysers,clusters);
-    log("Found %d mineral clusters.",clusters.size());
+    log("Found " << clusters.size() << " mineral clusters.");
 
     // For each build tile, base_build_map[x][y] is true if we can build a base
     // (resource depot) at that position (top left corner being on the given tile)
@@ -601,7 +601,8 @@ namespace BWTA
     calculate_base_location_properties(get_component,components,BWTA_Result::baselocations);
     log("Calculated base location properties.");
     
-    #ifdef DEBUG_DRAW
+	// This looks like a file output to plot the distance transform of the map using Mathematica
+    /*#ifdef DEBUG_DRAW
       writeFile("bwapi-data/logs/heightMap.txt","h={");
       string comma1="";
       string comma2="";
@@ -635,7 +636,7 @@ namespace BWTA
       writeFile("bwapi-data/logs/heightMap.txt","}\n");
       writeFile("bwapi-data/logs/heightMap.txt","p2=ListPointPlot3D[c,PlotStyle -> PointSize[Large]]\n");
       writeFile("bwapi-data/logs/heightMap.txt","Show[p1,p2]\n");
-    #endif
+    #endif*/
     log("Created result sets.");
   }
   #ifdef DEBUG_DRAW
