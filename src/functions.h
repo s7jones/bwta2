@@ -1,7 +1,7 @@
 #pragma once
 
-#define DEBUG_DRAW 1
-#define DRAW_COLOR 1
+// #define DEBUG_DRAW 1
+// #define DRAW_COLOR 1
 
 #include <boost/format.hpp>
 #include <CGAL/MP_Float.h>
