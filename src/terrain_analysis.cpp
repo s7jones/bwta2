@@ -91,7 +91,7 @@ namespace BWTA
   void analyze()
   {
 	std::ofstream logFile( "bwapi-data/logs/BWTA.log");
-	logFile << "Map name: " << BWAPI::Broodwar->mapName() << std::endl;
+	logFile << "Map name: " << BWAPI::Broodwar->mapFileName() << std::endl;
     std::string filename = "bwapi-data/BWTA/" + BWAPI::Broodwar->mapHash() + ".bwta";
     if (fileExists(filename) && fileVersion(filename)==BWTA_FILE_VERSION)
     {
@@ -642,55 +642,37 @@ namespace BWTA
   #ifdef DEBUG_DRAW
     int render(int step)
     {
-      if (step==1 || step==8 || true)
-      {
-        QImage* image = new QImage(BWAPI::Broodwar->mapWidth()*8,BWAPI::Broodwar->mapHeight()*8, QImage::Format::Format_ARGB32_Premultiplied);
+		QImage* image = new QImage(BWAPI::Broodwar->mapWidth()*8,BWAPI::Broodwar->mapHeight()*8, QImage::Format_ARGB32_Premultiplied);
         QPainter* p = new QPainter(image);
         p->setRenderHint(QPainter::Antialiasing);
         scene_ptr->render(p);
         p->end();
         // Save it..
         std::string filename("bwapi-data/BWTA/");
-        filename+=BWAPI::Broodwar->mapFileName();
-        if (step==1)
-          filename+="-1.png";
-        else if (step==2)
-          filename+="-2.png";
-        else if (step==3)
-          filename+="-3.png";
-        else if (step==4)
-          filename+="-4.png";
-        else if (step==5)
-          filename+="-5.png";
-        else if (step==6)
-          filename+="-6.png";
-        else if (step==7)
-          filename+="-7.png";
-        else if (step==8)
-          filename+="-8.png";
+        filename += BWAPI::Broodwar->mapFileName();
+		char numstr[2];
+		sprintf_s(numstr, sizeof(numstr), "%d", step);
+		filename = filename + "-" + numstr + ".png";
         image->save(filename.c_str(), "PNG");
-      }
 
-      // show a GUI with the image
-      /*QGraphicsView* view = new QGraphicsView(scene_ptr);
-      CGAL::Qt::GraphicsViewNavigation navigation;
-      view->installEventFilter(&navigation);
-      view->viewport()->installEventFilter(&navigation);
-      view->setRenderHint(QPainter::Antialiasing);
-      view->show();
-      app_ptr->exec();*/
-      
-      QList<QGraphicsItem *> list = scene_ptr->items();
-      QList<QGraphicsItem *>::Iterator it = list.begin();
-      for ( ; it != list.end(); ++it )
-      {
-        if ( *it )
-        {
-          scene_ptr->removeItem(*it);
-          delete *it;
-        }
-      }
-      return 0;
+		// show a GUI with the image
+		/*QGraphicsView* view = new QGraphicsView(scene_ptr);
+		CGAL::Qt::GraphicsViewNavigation navigation;
+		view->installEventFilter(&navigation);
+		view->viewport()->installEventFilter(&navigation);
+		view->setRenderHint(QPainter::Antialiasing);
+		view->show();
+		app_ptr->exec();*/
+
+		QList<QGraphicsItem *> list = scene_ptr->items();
+		QList<QGraphicsItem *>::Iterator it = list.begin();
+		for ( ; it != list.end(); ++it ) {
+			if ( *it ) {
+				scene_ptr->removeItem(*it);
+				delete *it;
+			}
+		}
+		return 0;
     }
     void draw_arrangement(Arrangement_2* arr_ptr)
     {
