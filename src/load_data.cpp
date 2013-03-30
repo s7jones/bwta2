@@ -64,26 +64,32 @@ namespace BWTA
 
 	//Block static neutral units
 	int x1,y1,x2,y2;
+	BWAPI::UnitType unitType;
 	std::set<BWAPI::Unit*>::iterator unit;
-	for(unit = Broodwar->getStaticNeutralUnits().begin(); unit != Broodwar->getStaticNeutralUnits().end(); ++unit) {
+	std::set<BWAPI::Unit*> neutralUnits = BWAPI::Broodwar->getStaticNeutralUnits();
+	for(unit = neutralUnits.begin(); unit != neutralUnits.end(); ++unit) {
 		// check if it is a resource container
-		if ((*unit)->getType() == UnitTypes::Resource_Vespene_Geyser || (*unit)->getType().isMineralField()) continue;
+		unitType = (*unit)->getType();
+		if (unitType == BWAPI::UnitTypes::Resource_Vespene_Geyser || unitType.isMineralField()) continue;
 		// get build area
 		x1 = (*unit)->getTilePosition().x()*4;
 		y1 = (*unit)->getTilePosition().y()*4;
-		x2 = (*unit)->getTilePosition().x()*4 + (*unit)->getType().tileWidth()*4;
-		y2 = (*unit)->getTilePosition().y()*4 + (*unit)->getType().tileHeight()*4;
+		x2 = x1 + unitType.tileWidth()*4;
+		y2 = y1 + unitType.tileHeight()*4;
+		// sanitize
+		if (x1 < 0) x1 = 0;
+		if (y1 < 0) y1 = 0;
+		if (x2 >= width) x2 = width-1;
+		if (y2 >= height) y2 = height-1;
 		// map area
 		for (int x = x1; x <= x2; x++) {
 			for (int y = y1; y <= y2; y++) {
-				if (x >= 0 && x < width && y >= 0 && y < height) {
-					for(int x3=max(x-1,0);x3<=min(x2,x+1);x3++) {
-						for(int y3=max(y-1,0);y3<=min(y2,y+1);y3++) {
-							MapData::walkability[x3][y3] = false;
-						}
+				for(int x3=max(x-1,0);x3<=min(width-1,x+1);x3++) {
+					for(int y3=max(y-1,0);y3<=min(height-1,y+1);y3++) {
+						MapData::walkability[x3][y3] = false;
 					}
-					MapData::lowResWalkability[x/4][y/4] = false;
 				}
+				MapData::lowResWalkability[x/4][y/4] = false;
 			}
 		}
 	}
