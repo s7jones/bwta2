@@ -1,6 +1,5 @@
 #pragma once
 #include <utility>
-#include <BWAPI.h>
 #include <BWTA/Chokepoint.h>
 namespace BWTA
 {

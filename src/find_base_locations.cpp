@@ -1,5 +1,4 @@
 #include "functions.h"
-#include <BWAPI.h>
 #include <BWTA.h>
 #include "BWTA_Result.h"
 #include "BaseLocationImpl.h"

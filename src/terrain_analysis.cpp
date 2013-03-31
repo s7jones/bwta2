@@ -3,7 +3,6 @@
 #include "functions.h"
 #include "Graph.h"
 #include "Node.h"
-#include <BWAPI.h>
 #include "BWTA.h"
 #include "Globals.h"
 #include "RegionImpl.h"
@@ -15,12 +14,6 @@
 #include "MapData.h"
 #include "Heap.h"
 #include "terrain_analysis.h"
-#ifdef DEBUG_DRAW
-  #include <QtGui>
-  #include <CGAL/Qt/GraphicsViewNavigation.h>
-  #include <QLineF>
-  #include <QRectF>
-#endif
 
 using namespace std;
 namespace BWTA

@@ -1,7 +1,5 @@
 #pragma once
-#include <BWAPI.h>
 #include <BWTA/BaseLocation.h>
-#include <vector>
 namespace BWTA
 {
   class BaseLocationImpl : public BaseLocation

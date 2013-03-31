@@ -3,40 +3,8 @@
 // #define DEBUG_DRAW 1
 // #define DRAW_COLOR 1
 
-#include <boost/format.hpp>
-#include <CGAL/MP_Float.h>
-#include <CGAL/Quotient.h>
-#include <vector>
-#include <map>
-#include <list>
-
-#include <CGAL/basic.h>
-// standard includes
-#include <iostream>
-#include <fstream>
-#include <cassert>
-#include <string>
-#include <sstream>
-// define the kernel
-
-#include <CGAL/Simple_cartesian.h>
-#include <CGAL/Filtered_kernel.h>
-#include <CGAL/Lazy_exact_nt.h>
-#include <CGAL/Segment_Delaunay_graph_traits_2.h>
-#include <CGAL/Segment_Delaunay_graph_2.h>
-#include <CGAL/Line_2.h>
-#include <CGAL/Direction_2.h>
-#include <CGAL/Polygon_2.h>
-#include <CGAL/Point_set_2.h>
-#include <CGAL/Cartesian.h>
-#include <CGAL/Arr_segment_traits_2.h>
-#include <CGAL/Arrangement_2.h>
-#include <CGAL/Arr_simple_point_location.h>
-#include <CGAL/Arr_extended_dcel.h>
-#include <CGAL/Gmpq.h>
 #include "VertexData.h"
 #include <BWTA/RectangleArray.h>
-#include <BWAPI.h>
 #include <BWTA/BaseLocation.h>
 #include <BWTA/Polygon.h>
 #ifdef DEBUG_DRAW
@@ -48,26 +16,15 @@
 #define BWTA_FILE_VERSION 6
 namespace BWTA
 {
-  #define PI 3.1415926
   #define USE_EXACT
   typedef CGAL::Lazy_exact_nt<CGAL::Gmpq > NumberType;
-  #ifdef USE_EXACT
-  #else
-  //  typedef double NumberType;
-  #endif
   typedef CGAL::Simple_cartesian< NumberType >    CK;
   typedef CGAL::Filtered_kernel<CK>         Kernel;
-
   typedef CGAL::Simple_cartesian< double >    CKD;
   typedef CGAL::Filtered_kernel<CKD>         KernelD;
-  // typedefs for the traits and the algorithm
-
   typedef CGAL::Segment_Delaunay_graph_traits_2<Kernel> Gt;
   typedef CGAL::Segment_Delaunay_graph_traits_2<KernelD> GtD;
 
-#if 0
-  typedef CGAL::Segment_Delaunay_graph_2<GtD> SDG2;
-#else
   // This makes some protected members of the base class public because get_voronoi_edges requires these.
   class SDG2: public CGAL::Segment_Delaunay_graph_2<GtD>
   {
@@ -82,7 +39,6 @@ namespace BWTA
         return Base::construct_sdg_bisector_segment_2_object();
       }
   };
-#endif
 
   typedef CGAL::Segment_Delaunay_graph_site_2< CKD > SDGS2;
   typedef CGAL::Point_2<CK> Point;

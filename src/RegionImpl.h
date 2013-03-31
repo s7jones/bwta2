@@ -1,6 +1,4 @@
 #pragma once
-#include <BWAPI.h>
-#include <set>
 #include <BWTA/Polygon.h>
 #include <BWTA/Region.h>
 #include <BWTA/BaseLocation.h>

@@ -1,5 +1,5 @@
 #pragma once
-#include <set>
+
 namespace BWTA
 {
   class Region;

@@ -1,8 +1,4 @@
 #include <BWTA/RectangleArray.h>
-#include <list>
-#include <vector>
-#include <set>
-#include <BWAPI.h>
 #include <BWTA.h>
 #include "ConnectedComponent.h"
 namespace BWTA

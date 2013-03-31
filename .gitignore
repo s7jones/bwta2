@@ -1,7 +1,7 @@
 # Temporal project files
 bwta2.ncb
 bwta2.suo
-src/bwta.vcproj*
+src/bwta.vcproj.*
 
 
 # Binary folders

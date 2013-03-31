@@ -1,5 +1,4 @@
 #pragma once
-#include <BWAPI.h>
 namespace BWTA
 {
   class Region;
