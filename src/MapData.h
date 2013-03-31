@@ -13,9 +13,11 @@ namespace BWTA
 		extern RectangleArray<bool> rawWalkability;
 		extern RectangleArray<bool> lowResWalkability;
 		extern RectangleArray<bool> buildability;
+		extern RectangleArray<int> distanceTransform;
 		extern std::set<BWAPI::TilePosition> startLocations;
 		extern std::string hash;
 		extern int mapWidth;
 		extern int mapHeight;
+		extern int maxDistanceTransform;
 	}
 }

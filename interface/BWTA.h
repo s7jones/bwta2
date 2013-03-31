@@ -8,6 +8,11 @@ namespace BWTA
 {
   void readMap();
   void analyze();
+  void computeDistanceTransform();
+
+  int getMaxDistanceTransform();
+  RectangleArray<int>* getDistanceTransformMap();
+
   const std::set<Region*>& getRegions();
   const std::set<Chokepoint*>& getChokepoints();
   const std::set<BaseLocation*>& getBaseLocations();

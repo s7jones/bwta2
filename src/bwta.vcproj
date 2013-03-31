@@ -264,6 +264,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\distanceTransform.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\extract_polygons.cpp"
 				>
 			</File>

@@ -308,4 +308,14 @@ namespace BWTA
       return path;
     return AstarSearchPath(start,valid_targets);
   }
+
+  int getMaxDistanceTransform()
+  {
+	  return MapData::maxDistanceTransform;
+  }
+
+  RectangleArray<int>* getDistanceTransformMap()
+  {
+	  return &MapData::distanceTransform;
+  }
 }

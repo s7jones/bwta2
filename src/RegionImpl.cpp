@@ -6,6 +6,7 @@ namespace BWTA
   {
     this->_polygon=poly;
     this->_center=poly.getCenter();
+	this->_maxDistance = 0;
   }
   const Polygon& RegionImpl::getPolygon() const
   {
@@ -30,5 +31,10 @@ namespace BWTA
   const std::set<Region*>& RegionImpl::getReachableRegions() const
   {
     return this->reachableRegions;
+  }
+
+  const int RegionImpl::getMaxDistance() const
+  {
+	  return this->_maxDistance;
   }
 }
