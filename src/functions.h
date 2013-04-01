@@ -8,6 +8,7 @@
 #include <BWTA/BaseLocation.h>
 #include <BWTA/Polygon.h>
 #ifdef DEBUG_DRAW
+  // Qt version 4.6.3 
   #include <QtGui>
   #include <CGAL/Qt/GraphicsViewNavigation.h>
   #include <QLineF>

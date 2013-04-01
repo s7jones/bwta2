@@ -264,10 +264,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\distanceTransform.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\extract_polygons.cpp"
 				>
 			</File>
@@ -455,6 +451,18 @@
 			</File>
 			<File
 				RelativePath=".\stdafx.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Balance"
+			>
+			<File
+				RelativePath=".\DistanceTransform.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DistanceTransform.h"
 				>
 			</File>
 		</Filter>

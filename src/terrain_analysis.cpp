@@ -1,36 +1,15 @@
-#include "Color.h"
-#include "VertexData.h"
-#include "functions.h"
-#include "Graph.h"
-#include "Node.h"
-#include "BWTA.h"
-#include "Globals.h"
-#include "RegionImpl.h"
-#include "ChokepointImpl.h"
-#include "BaseLocationImpl.h"
-#include "find_base_locations.h"
-#include "extract_polygons.h"
-#include "BWTA_Result.h"
-#include "MapData.h"
-#include "Heap.h"
 #include "terrain_analysis.h"
 
 using namespace std;
 namespace BWTA
 {
   #ifdef DEBUG_DRAW
-    int render(int step);
-    void draw_border();
-    void draw_arrangement(Arrangement_2* arr_ptr);
-    void draw_polygons(vector<Polygon>* polygons_ptr);
+    QGraphicsScene* scene_ptr;
+    //QApplication* app_ptr;
+	int argc=0;
+    char* argv="";
+    QApplication app(argc,&argv);
   #endif
-  void simplify_voronoi_diagram(Arrangement_2* arr_ptr, std::map<Point, double, ptcmp>* distance);
-  void identify_region_nodes(Arrangement_2* arr_ptr,Graph* g_ptr);
-  void identify_chokepoint_nodes(Graph* g_ptr, std::map<Point, double, ptcmp>* distance, std::map<Point, std::set< Point >, ptcmp >* nearest);
-  double calculate_merge_value(Node* c);
-  void merge_adjacent_regions(Graph* g_ptr);
-  void remove_voronoi_diagram_from_arrangement(Arrangement_2* arr_ptr);
-  void wall_off_chokepoints(Graph* g_ptr,Arrangement_2* arr_ptr);
 
   class My_observer : public CGAL::Arr_observer<Arrangement_2>
   {
@@ -68,10 +47,6 @@ namespace BWTA
     }
   };
 
-  #ifdef DEBUG_DRAW
-    QGraphicsScene* scene_ptr;
-    QApplication* app_ptr;
-  #endif
   void readMap()
   {
     MapData::mapWidth=BWAPI::Broodwar->mapWidth();
@@ -88,7 +63,7 @@ namespace BWTA
 	std::ofstream logFile( "bwapi-data/logs/BWTA.log");
 	logFile << "Map name: " << BWAPI::Broodwar->mapFileName() << std::endl;
     std::string filename = "bwapi-data/BWTA/" + BWAPI::Broodwar->mapHash() + ".bwta";
-#ifndef DEBUG_DRAW
+//#ifndef DEBUG_DRAW
     if (fileExists(filename) && fileVersion(filename)==BWTA_FILE_VERSION)
     {
       log("Recognized map, loading map data...");
@@ -96,7 +71,7 @@ namespace BWTA
       log("Loaded map data.");
     }
     else
-#endif
+//#endif
     {
       log("Analyzing new map...");
       start = clock();
@@ -112,10 +87,7 @@ namespace BWTA
   void analyze_map()
   {
     #ifdef DEBUG_DRAW
-      int argc=0;
-      char* argv="";
-      QApplication app(argc,&argv);
-      app_ptr=&app;
+      //app_ptr=&app;
       QGraphicsScene scene;
       scene_ptr=&scene;
     #endif
@@ -690,6 +662,7 @@ namespace BWTA
         p->setRenderHint(QPainter::Antialiasing);
         scene_ptr->render(p);
         p->end();
+
         // Save it..
         std::string filename("bwapi-data/BWTA/");
         filename += BWAPI::Broodwar->mapFileName();
@@ -707,14 +680,7 @@ namespace BWTA
 		view->show();
 		app_ptr->exec();*/
 
-		QList<QGraphicsItem *> list = scene_ptr->items();
-		QList<QGraphicsItem *>::Iterator it = list.begin();
-		for ( ; it != list.end(); ++it ) {
-			if ( *it ) {
-				scene_ptr->removeItem(*it);
-				delete *it;
-			}
-		}
+		scene_ptr->clear();
 		return 0;
     }
     void draw_arrangement(Arrangement_2* arr_ptr)
