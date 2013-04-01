@@ -9,6 +9,7 @@ namespace BWTA
   void readMap();
   void analyze();
   void computeDistanceTransform();
+  void balanceAnalysis(); 
 
   int getMaxDistanceTransform();
   RectangleArray<int>* getDistanceTransformMap();

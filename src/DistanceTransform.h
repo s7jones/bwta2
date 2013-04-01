@@ -4,19 +4,18 @@
 #include "RegionImpl.h"
 #include "functions.h"
 #include "BWTA_Result.h"
-//#include "terrain_analysis.h"
 
 namespace BWTA
 {
-	void computeDistanceTransform();
+	void	computeDistanceTransform();
 
-	void distanceTransform();
-	int getMaxTransformDistance(int x, int y);
-	void maxDistanceOfRegion();
+	void	distanceTransform();
+	int		getMaxTransformDistance(int x, int y);
+	void	maxDistanceOfRegion();
 
 #ifdef DEBUG_DRAW
-	void getHeatMapColor( float value, float &red, float &green, float &blue );
-	void drawPolygons(std::set<Polygon*>* polygons, QGraphicsScene* scene);
-	void drawPolygon(Polygon& p, QColor qc, QGraphicsScene* scene);
+	void	getHeatMapColor(float value, float &red, float &green, float &blue);
+	void	drawPolygons(std::set<Polygon*>* polygons, QGraphicsScene* scene);
+	void	drawPolygon(Polygon& p, QColor qc, QGraphicsScene* scene);
 #endif
 }

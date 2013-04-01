@@ -458,6 +458,14 @@
 			Name="Balance"
 			>
 			<File
+				RelativePath=".\BalanceMetrics.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\BalanceMetrics.h"
+				>
+			</File>
+			<File
 				RelativePath=".\DistanceTransform.cpp"
 				>
 			</File>
