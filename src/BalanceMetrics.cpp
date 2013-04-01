@@ -6,6 +6,7 @@ namespace BWTA
 	{
 		// TODO check if map is analyzed
 		// TODO check if distance transform is procesed
+		// TODO check if buildChokeNodes was called (MapData::chokeNodes was populated)
 		
 		log("Starting map balance analysis");
 		// **************************************************
@@ -229,25 +230,27 @@ namespace BWTA
 		// **************************************************
 		//log("METRIC 5 ------------------------------");
 
-		/*double meanChokeDis[6] = {0,0,0,0,0,0};
+		double meanChokeDis[6] = {0,0,0,0,0,0};
 		double meanChokeWidth[6] = {0,0,0,0,0,0};
 		id = 0;
 		double dist1;
 		double dist2;
+		std::list<Chokepoint*> path;
+
 
 		for(int i = 0; i < startSize ; i++) {
 			for(int j = 0 ; j < startSize ; j++) {
 				if(i < j) {
-					path = getShortestPath(WalkPosition(startLocations[i]->getPosition()), WalkPosition(startLocations[j]->getPosition()));
+					path = getShortestPath2(BWAPI::TilePosition(startLocations[i]->getPosition()), BWAPI::TilePosition(startLocations[j]->getPosition()));
 					int iterations = (int)floor((float)path.size()/2.0f);
 					//log("Path size: " << path.size() << " Iterations: " << iterations);
-					ChokePath::iterator firstChoke=path.begin();
-					ChokePath::reverse_iterator lastChoke=path.rbegin();
+					std::list<Chokepoint*>::iterator firstChoke=path.begin();
+					std::list<Chokepoint*>::reverse_iterator lastChoke=path.rbegin();
 
 					for (int k=0;k<=iterations;++k) {
 						meanChokeWidth[id] += pow((*firstChoke)->getWidth()- (*lastChoke)->getWidth(),2);
-						dist1 = BWTA::getGroundDistance(TilePosition(startLocations[i]->getPosition()), TilePosition((*firstChoke)->getCenter()));
-						dist2 = BWTA::getGroundDistance(TilePosition(startLocations[j]->getPosition()), TilePosition((*lastChoke)->getCenter()));
+						dist1 = BWTA::getGroundDistance(BWAPI::TilePosition(startLocations[i]->getPosition()), BWAPI::TilePosition((*firstChoke)->getCenter()));
+						dist2 = BWTA::getGroundDistance(BWAPI::TilePosition(startLocations[j]->getPosition()), BWAPI::TilePosition((*lastChoke)->getCenter()));
 						meanChokeDis[id] += pow(dist1-dist2,2);
 						//log("Tmp choke width: " << meanChokeWidth[id] << "\t" << "Tmp choke dist: " << meanChokeDis[id]);
 						firstChoke++;
@@ -287,7 +290,7 @@ namespace BWTA
 // 		log("Standard Deviation of Standad Deviation (dist): " << standardDeviationChokeDist2);
 		log(standardDeviationChokeDist2);
 		log(standardDeviationChokeWidth2);
-*/
+
 		// **************************************************
 		// METRIC 6
 		// --------------------------------------------------

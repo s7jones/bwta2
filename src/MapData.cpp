@@ -17,5 +17,7 @@ namespace BWTA
 		int mapWidth;
 		int mapHeight;
 		int maxDistanceTransform;
+		// data for HPA*
+		ChokepointGraph chokeNodes;
 	}
 }

@@ -49,4 +49,9 @@ namespace BWTA
   std::vector<BWAPI::TilePosition> getShortestPath(BWAPI::TilePosition start, BWAPI::TilePosition end);
   std::vector<BWAPI::TilePosition> getShortestPath(BWAPI::TilePosition start, const std::set<BWAPI::TilePosition>& targets);
 
+   // HPA* implementation
+  void buildChokeNodes();
+  std::list<Chokepoint*> getShortestPath2(BWAPI::TilePosition start, BWAPI::TilePosition target);
+  int getGroundDistance2(BWAPI::TilePosition start, BWAPI::TilePosition end);
+
 }

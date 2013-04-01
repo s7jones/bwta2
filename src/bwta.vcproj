@@ -292,10 +292,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\pathfinding.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\Polygon.cpp"
 				>
 			</File>
@@ -362,10 +358,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Heap.h"
-				>
-			</File>
-			<File
 				RelativePath=".\MapData.h"
 				>
 			</File>
@@ -422,6 +414,10 @@
 			Name="Utils"
 			>
 			<File
+				RelativePath=".\Heap.h"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -471,6 +467,14 @@
 			</File>
 			<File
 				RelativePath=".\DistanceTransform.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Pathfinding"
+			>
+			<File
+				RelativePath=".\pathfinding.cpp"
 				>
 			</File>
 		</Filter>

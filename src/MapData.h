@@ -4,6 +4,10 @@
 
 namespace BWTA
 {
+	typedef std::list<Chokepoint*> ChokePath;
+	typedef std::set< std::pair<Chokepoint*, int> > ChokeCost;
+	typedef std::map<Chokepoint*, ChokeCost> ChokepointGraph;
+
 	namespace MapData
 	{
 		extern std::set<BWAPI::Unit*> minerals;
@@ -19,5 +23,7 @@ namespace BWTA
 		extern int mapWidth;
 		extern int mapHeight;
 		extern int maxDistanceTransform;
+		// data for HPA*
+		extern ChokepointGraph chokeNodes;
 	}
 }
