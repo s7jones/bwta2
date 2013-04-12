@@ -288,7 +288,7 @@ namespace BWTA
 				for (std::set<BWTA::Chokepoint*>::const_iterator choke2 = choke1; choke2 != chokes.end(); ++choke2) {
 					if (choke1 == choke2) continue;
 					// calculate cost between two chokepoints
-					int cost = AstarSearchDistance(BWAPI::TilePosition((*choke1)->getCenter()), BWAPI::TilePosition((*choke2)->getCenter()));
+					int cost = (int)AstarSearchDistance(BWAPI::TilePosition((*choke1)->getCenter()), BWAPI::TilePosition((*choke2)->getCenter()));
 					if (cost != -1) { // save cost
 						MapData::chokeNodes[*choke1].insert(std::make_pair(*choke2, cost));
 						MapData::chokeNodes[*choke2].insert(std::make_pair(*choke1, cost));
@@ -309,7 +309,7 @@ namespace BWTA
 		// get cost to each entrance of the target
 		for (std::set<BWTA::Chokepoint*>::const_iterator it = chokes.begin(); it != chokes.end(); ++it) {
 			// get cost to target
-			int cost = AstarSearchDistance(target, BWAPI::TilePosition((*it)->getCenter()));
+			int cost = (int)AstarSearchDistance(target, BWAPI::TilePosition((*it)->getCenter()));
 			if (cost != -1) tmpChokeNodes[(*it)].insert(std::make_pair((BWTA::Chokepoint *)NULL, cost));
 		}
 
@@ -326,7 +326,7 @@ namespace BWTA
 		// get cost to each entrance of the start
 		for (std::set<BWTA::Chokepoint*>::const_iterator it = chokes.begin(); it != chokes.end(); ++it) {
 			// get cost to start
-			int cost = AstarSearchDistance(start, BWAPI::TilePosition((*it)->getCenter()));
+			int cost = (int)AstarSearchDistance(start, BWAPI::TilePosition((*it)->getCenter()));
 			if (cost != -1) {
 				openNodes.insert(std::make_pair(cost, *it));
 				gmap[*it] = cost;
@@ -401,7 +401,7 @@ namespace BWTA
 		// get cost to each entrance of the target
 		for (std::set<BWTA::Chokepoint*>::const_iterator it = chokes.begin(); it != chokes.end(); ++it) {
 			// get cost to target
-			int cost = AstarSearchDistance(target, BWAPI::TilePosition((*it)->getCenter()));
+			int cost = (int)AstarSearchDistance(target, BWAPI::TilePosition((*it)->getCenter()));
 			if (cost != -1) tmpChokeNodes[(*it)].insert(std::make_pair((BWTA::Chokepoint *)NULL, cost));
 		}
 
@@ -418,7 +418,7 @@ namespace BWTA
 		// get cost to each entrance of the start
 		for (std::set<BWTA::Chokepoint*>::const_iterator it = chokes.begin(); it != chokes.end(); ++it) {
 			// get cost to start
-			int cost = AstarSearchDistance(start, BWAPI::TilePosition((*it)->getCenter()));
+			int cost = (int)AstarSearchDistance(start, BWAPI::TilePosition((*it)->getCenter()));
 			if (cost != -1) {
 				openNodes.insert(std::make_pair(cost, *it));
 				gmap[*it] = cost;

@@ -82,6 +82,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="copy $(OutDir)\BWTAd.lib c:\Nova\nova\lib\"
 			/>
 		</Configuration>
 		<Configuration
@@ -155,6 +156,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="copy $(OutDir)\BWTA.lib c:\Nova\nova\lib\"
 			/>
 		</Configuration>
 		<Configuration
@@ -228,6 +230,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="copy $(OutDir)\BWTA-log.lib c:\Nova\nova\lib\"
 			/>
 		</Configuration>
 	</Configurations>
