@@ -8,8 +8,10 @@ src/bwta.vcproj.*
 Debug
 Release
 Release-Log
+Exe-Release
 
 # Temporal binary folders
 src/Debug
 src/Release
 src/Release-Log
+src/Exe-Release

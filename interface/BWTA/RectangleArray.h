@@ -262,8 +262,8 @@ namespace BWTA
   void RectangleArray<Type>::setRectangleTo(unsigned int xLeft, unsigned int yTop, unsigned int xRight, unsigned int yBottom, const Type& value) {
 	  xLeft = std::max<int>(xLeft,0);
 	  yTop = std::max<int>(yTop,0);
-	  xRight = std::min(xRight,this->width-1);
-	  yBottom = std::min(yBottom,this->height-1);
+	  xRight = std::min<int>(xRight,this->width-1);
+	  yBottom = std::min<int>(yBottom,this->height-1);
 	  for (unsigned int x = xLeft; x <= xRight; x++) {
 		  for (unsigned int y = yTop; y <= yBottom; y++) {
 			  this->getColumn(x)[y] = value;

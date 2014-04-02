@@ -62,7 +62,7 @@ namespace BWTA
 	clock_t end;
 	std::ofstream logFile( "bwapi-data/logs/BWTA.log");
 	logFile << "Map name: " << BWAPI::Broodwar->mapFileName() << std::endl;
-    std::string filename = "bwapi-data/BWTA/" + BWAPI::Broodwar->mapHash() + ".bwta";
+    std::string filename = "bwapi-data/BWTA2/" + BWAPI::Broodwar->mapHash() + ".bwta";
 //#ifndef DEBUG_DRAW
     if (fileExists(filename) && fileVersion(filename)==BWTA_FILE_VERSION)
     {
@@ -664,7 +664,7 @@ namespace BWTA
         p->end();
 
         // Save it..
-        std::string filename("bwapi-data/BWTA/");
+        std::string filename("bwapi-data/BWTA2/");
         filename += BWAPI::Broodwar->mapFileName();
 		char numstr[2];
 		sprintf_s(numstr, sizeof(numstr), "%d", step);
