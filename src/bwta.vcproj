@@ -66,7 +66,7 @@
 				Name="VCLibrarianTool"
 				AdditionalDependencies="CGAL-vc90-mt-gd.lib libboost_thread-vc90-mt-gd-1_40.lib gmp-vc90-mt-gd.lib mpfr-vc90-mt-gd.lib"
 				OutputFile="$(OutDir)\BWTAd.lib"
-				AdditionalLibraryDirectories="..\..\dependencies\lib\"
+				AdditionalLibraryDirectories="..\..\dependencies\lib\;..\lib\"
 			/>
 			<Tool
 				Name="VCALinkTool"

@@ -15,4 +15,5 @@ namespace BWTA
     BWAPI::Position getNearestPoint(BWAPI::Position p) const;
     const std::vector<Polygon>& getHoles() const;
     std::vector<Polygon> holes;
-  }
+  };
+}

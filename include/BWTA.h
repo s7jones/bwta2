@@ -1,5 +1,4 @@
 #pragma once
-#include <BWAPI.h>
 #include <BWTA/Chokepoint.h>
 #include <BWTA/Polygon.h>
 #include <BWTA/Region.h>
@@ -9,6 +8,12 @@ namespace BWTA
 {
   void readMap();
   void analyze();
+  void computeDistanceTransform();
+  void balanceAnalysis(); 
+
+  int getMaxDistanceTransform();
+  RectangleArray<int>* getDistanceTransformMap();
+
   const std::set<Region*>& getRegions();
   const std::set<Chokepoint*>& getChokepoints();
   const std::set<BaseLocation*>& getBaseLocations();
@@ -43,5 +48,10 @@ namespace BWTA
   void getGroundWalkDistanceMap(int walkx, int walky, RectangleArray<double>& distanceMap);
   std::vector<BWAPI::TilePosition> getShortestPath(BWAPI::TilePosition start, BWAPI::TilePosition end);
   std::vector<BWAPI::TilePosition> getShortestPath(BWAPI::TilePosition start, const std::set<BWAPI::TilePosition>& targets);
+
+   // HPA* implementation
+  void buildChokeNodes();
+  std::list<Chokepoint*> getShortestPath2(BWAPI::TilePosition start, BWAPI::TilePosition target);
+  int getGroundDistance2(BWAPI::TilePosition start, BWAPI::TilePosition end);
 
 }

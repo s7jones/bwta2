@@ -25,6 +25,23 @@ void printError(const char * archive, const char * message, const char * file, i
 	std::cout << archive << ": Error: " << message << "(" << file << "): " << error << "\n";
 }
 
+
+bool hasEnding (const char *fullString, const char *ending)
+{
+	int l1 = strlen(fullString);
+	int l2 = strlen(ending);
+    if (l1 >= l2) {
+		int start = l1-l2;
+		for(int idx = 0;idx<l2;idx++) {
+			if (fullString[start+idx] != ending[idx]) return false;
+		}
+		return true;
+    } else {
+        return false;
+    }
+}
+
+
 int main ()
 {
 	std::cout << "Testing standalone BWTA\n";
@@ -45,7 +62,12 @@ int main ()
 	hFileFind = SFileFindFirstFile(hMpq, "*", &SFileFindData, NULL);
 	while ( hFileFind ) {
 		std::cout << SFileFindData.cFileName << "\n";
-		//TODO look for the .chk file
+		if (hasEnding(SFileFindData.cFileName, ".chk")) {
+			std::cout << "CHK file found!\n";
+			// TODO: do something with it
+			// ...
+			break;
+		}
 		if ( ! SFileFindNextFile(hFileFind, &SFileFindData) )
 			break;
 	}
@@ -59,3 +81,4 @@ int main ()
 	return 0;
 
 }
+

@@ -52,6 +52,8 @@ namespace BWTA
        /** Sets all fields of the array to the specified value */
        void setTo(const Type& value);
        void setBorderTo(const Type& value);
+	   /** Set a rectangle area of the array to the specified values */
+	   void setRectangleTo(unsigned int xLeft, unsigned int yTop, unsigned int xRight, unsigned int yBottom, const Type& value);
      private :
        bool owner;
        /** width of array */
@@ -254,6 +256,19 @@ namespace BWTA
       this->getColumn(0)[i] = value;
       this->getColumn(this->width - 1)[i] = value;
     }    
+  }
+  //------------------------------------------- SET RECTANGLE TO ---------------------------------------------
+  template <class Type>
+  void RectangleArray<Type>::setRectangleTo(unsigned int xLeft, unsigned int yTop, unsigned int xRight, unsigned int yBottom, const Type& value) {
+	  xLeft = std::max<int>(xLeft,0);
+	  yTop = std::max<int>(yTop,0);
+	  xRight = std::min<int>(xRight,this->width-1);
+	  yBottom = std::min<int>(yBottom,this->height-1);
+	  for (unsigned int x = xLeft; x <= xRight; x++) {
+		  for (unsigned int y = yTop; y <= yBottom; y++) {
+			  this->getColumn(x)[y] = value;
+		  }
+	  }
   }
   //----------------------------------------------------------------------------------------------------------
 }
