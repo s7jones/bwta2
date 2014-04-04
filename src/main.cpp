@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <StormLib.h>
 
 // TODO we should instantiate a new Game
@@ -41,21 +42,18 @@ bool hasEnding (const char *fullString, const char *ending)
     }
 }
 
-
-int main ()
+unsigned char *extractCHKfile(const char *archive, DWORD *dataSize) 
 {
-	std::cout << "Testing standalone BWTA\n";
-
 	HANDLE hMpq       = NULL;          // Open archive handle
 	HANDLE hFileFind  = NULL;          // Archived file handle
 	SFILE_FIND_DATA SFileFindData;     // Data of the archived file
-
-	const char * archive = (char *)"path01.scx";
+	bool chkFilefound = false;		   // Whether the chk file was found in the archive
+	unsigned char *CHKdata = NULL;
 
 	// Open an archive
 	if(!SFileOpenArchive(archive, 0, 0, &hMpq)) {
 		printError(archive, "Cannot open archive", archive, GetLastError());
-		return -1;
+		return NULL;
 	}
 
 	// List all files in archive
@@ -63,13 +61,31 @@ int main ()
 	while ( hFileFind ) {
 		std::cout << SFileFindData.cFileName << "\n";
 		if (hasEnding(SFileFindData.cFileName, ".chk")) {
-			std::cout << "CHK file found!\n";
-			// TODO: do something with it
-			// ...
+			chkFilefound = true;
 			break;
 		}
 		if ( ! SFileFindNextFile(hFileFind, &SFileFindData) )
 			break;
+	}
+
+	// extract the chk file to a temporary file:
+	// Santi: perhaps there is a better way to extract the CHK file directly form the MPQ
+	// into an array of bytes, but I haven't found it. So, for now, I just use a temporary file...
+	if (chkFilefound) {
+		// std::cout << "CHK file found: " << SFileFindData.cFileName << ", size: " << SFileFindData.dwFileSize << "\n";
+		bool success = SFileExtractFile(hMpq, SFileFindData.cFileName, "tmp.chk", SFILE_OPEN_FROM_MPQ);
+
+		if (success) {
+			// read the CHK file for the required information:
+			CHKdata = new unsigned char[SFileFindData.dwFileSize];
+			std::ifstream file ("tmp.chk", std::ios::in | std::ios::binary);
+			if (file.is_open()) {
+				file.seekg (0, std::ios::beg);
+				file.read ((char *)CHKdata, SFileFindData.dwFileSize);
+				file.close();
+				*dataSize = SFileFindData.dwFileSize;
+			}
+		}
 	}
 
 	// Closing handles
@@ -78,7 +94,51 @@ int main ()
 	if ( hMpq != (HANDLE)0xFFFFFFFF ) 
 		SFileCloseArchive(hMpq);
 
-	return 0;
-
+	return CHKdata;
 }
 
+
+void printCHKchunks(unsigned char *CHKdata, DWORD size) {
+	DWORD position = 0;
+
+	while(position<size) {
+		char chunkName[5];
+		chunkName[0] = CHKdata[position++];
+		chunkName[1] = CHKdata[position++];
+		chunkName[2] = CHKdata[position++];
+		chunkName[3] = CHKdata[position++];
+		chunkName[4] = 0;
+		unsigned long chunkLength = 0;
+		chunkLength +=((unsigned long) CHKdata[position++]) << 0;
+		chunkLength +=((unsigned long) CHKdata[position++]) << 8;
+		chunkLength +=((unsigned long) CHKdata[position++]) << 16;
+		chunkLength +=((unsigned long) CHKdata[position++]) << 24;
+
+		std::cout << "Chunk '" << chunkName << "', size: " << chunkLength << "\n";
+
+		position+=chunkLength;
+	}
+}
+
+
+
+
+int main ()
+{
+	std::cout << "Testing standalone BWTA\n";
+	DWORD dataSize = 0;
+
+	unsigned char *CHKdata = extractCHKfile("path01.scx", &dataSize);
+
+	std::cout << "Successfully extracted the CHK file, of size " << dataSize << "\n";
+
+	printCHKchunks(CHKdata, dataSize);
+
+	// TODO: read the "MTXM" chunk to get the tile information
+	// TODO: read the "UNIT" chunk to get the unit information (e.g. minerals)
+	// TODO: implement an alternative method to "load_map()" in "load_data.cpp" that uses this instead of 
+	//       taking it from the global Broodwar singleton.
+
+	delete CHKdata;
+	return 0;
+}
