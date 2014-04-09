@@ -201,7 +201,8 @@ void getDimensions(unsigned char *CHKdata, DWORD size, unsigned int *width, unsi
 */
 unsigned int *getTerrain(unsigned char *CHKdata, DWORD size, int width, int height) {
 	DWORD chunkSize = 0;
-	unsigned char *TILEdata = getChunkPointer((unsigned char *)"TILE", CHKdata, size, &chunkSize);
+//	unsigned char *TILEdata = getChunkPointer((unsigned char *)"TILE", CHKdata, size, &chunkSize);
+	unsigned char *TILEdata = getChunkPointer((unsigned char *)"MTXM", CHKdata, size, &chunkSize);
 	
 	if (TILEdata!=NULL) {
 		std::cout<< "Decoding terrain information...\n";
@@ -209,9 +210,9 @@ unsigned int *getTerrain(unsigned char *CHKdata, DWORD size, int width, int heig
 		for(int i = 0, offset = 0;i<height;i++) {
 			for(int j = 0;j<width;j++,offset+=2) {
 				terrain[i] = decode2ByteUnsigned(TILEdata+offset);
-				std::cout << terrain[i] << " ";
+//				std::cout << terrain[i] << " ";
 			}
-				std::cout << "\n";
+//				std::cout << "\n";
 		}
 		return terrain;
 	}
@@ -251,7 +252,7 @@ void getUnits(unsigned char *CHKdata, DWORD size) {
 			int playerIsValid = mapEditorFlags & 0x0001;	// If this is 0, it is a neutral unit/critter/start location/etc.
 			position+=2;	
 			int player = (playerIsValid==1 ? UNITdata[position] : neutralPlayer);
-			std::cout << "Unit(" << unitClass << ") at " << x << "," << y << " player " << player << "\n";
+			std::cout << "Unit(" << unitClass << ") ID=" << ID << " at " << x << "," << y << " player " << player << "\n";
 
 			// TODO: how do we translate from the unitClass to a unit type? I have not been able to find information online...
 			// ...
