@@ -82,24 +82,25 @@ unsigned char *extractCHKfile(const char *archive, DWORD *dataSize)
 			break;
 	}
 
-	// extract the chk file to a temporary file:
-	// Santi: perhaps there is a better way to extract the CHK file directly form the MPQ
-	// into an array of bytes, but I haven't found it. So, for now, I just use a temporary file...
 	if (chkFilefound) {
 		// std::cout << "CHK file found: " << SFileFindData.cFileName << ", size: " << SFileFindData.dwFileSize << "\n";
-		bool success = SFileExtractFile(hMpq, SFileFindData.cFileName, "tmp.chk", SFILE_OPEN_FROM_MPQ);
+		
+		// Closing previous file handle
+		if ( hFileFind != (HANDLE)0xFFFFFFFF ) 
+			SFileFindClose(hFileFind);
 
-		if (success) {
-			// read the CHK file for the required information:
-			CHKdata = new unsigned char[SFileFindData.dwFileSize];
-			std::ifstream file ("tmp.chk", std::ios::in | std::ios::binary);
-			if (file.is_open()) {
-				file.seekg (0, std::ios::beg);
-				file.read ((char *)CHKdata, SFileFindData.dwFileSize);
-				file.close();
-				*dataSize = SFileFindData.dwFileSize;
-			}
+		// Open (extract) chk file
+		if(!SFileOpenFileEx(hMpq, SFileFindData.cFileName, 0, &hFileFind)) {
+			printError(archive, "Cannot extract chk file", archive, GetLastError());
+			return NULL;
 		}
+
+		// Read chk
+		CHKdata = new unsigned char[SFileFindData.dwFileSize];
+		DWORD dwBytes = 0;
+		SFileReadFile(hFileFind, CHKdata, SFileFindData.dwFileSize, &dwBytes, NULL);
+		// std::cout << "Read " << dwBytes << " of " << SFileFindData.dwFileSize << " bytes\n";
+		*dataSize = SFileFindData.dwFileSize;
 	}
 
 	// Closing handles
