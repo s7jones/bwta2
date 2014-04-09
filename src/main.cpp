@@ -267,13 +267,19 @@ void getUnits(unsigned char *CHKdata, DWORD size) {
 }
 
 
-int main ()
+int main (int argc, char * argv[])
 {
+	// Check the number of parameters
+    if (argc < 2) {
+        // Tell the user how to run the program
+        std::cerr << "Usage: " << argv[0] << " [mapFile]" << std::endl;
+        return 1;
+    }
+
 	std::cout << "Testing standalone BWTA\n";
 	DWORD dataSize = 0;
 
-//	unsigned char *CHKdata = extractCHKfile("path01.scx", &dataSize);
-	unsigned char *CHKdata = extractCHKfile("(2)Breaking Point.scx", &dataSize);
+	unsigned char *CHKdata = extractCHKfile(argv[1], &dataSize);
 	if (CHKdata==NULL) return 0;
 
 	std::cout << "Successfully extracted the CHK file, of size " << dataSize << "\n";
