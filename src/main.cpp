@@ -1,6 +1,5 @@
-#include <iostream>
-#include <fstream>
 #include <StormLib.h>
+#include <direct.h>
 
 // TODO we should instantiate a new Game
 namespace BWAPI { Game* Broodwar; }
@@ -9,21 +8,27 @@ namespace BWAPI { Game* Broodwar; }
 void printError(const char * archive, const char * message, const char * file, int errnum) {
 
 	char * error = NULL;
+	char cCurrentPath[FILENAME_MAX];
+	_getcwd(cCurrentPath, sizeof(cCurrentPath));
 
-	if ( errnum < 105 )
-		error = strerror(errnum); //TODO strerror deprecated?
-	else if ( errnum == 105 )
-		error = (char *)"Bad format";
-	else if ( errnum == 106 )
-		error = (char *)"No more files";
-	else if ( errnum == 107 )
-		error = (char *)"Handle EOF";
-	else if ( errnum == 108 )
-		error = (char *)"Cannot compile";
-	else if ( errnum == 109 )
-		error = (char *)"File corrupted";
+	switch(errnum) {
+		case 105:
+			error = (char *)"Bad format"; break;
+		case 106:
+			error = (char *)"No more files"; break;
+		case 107:
+			error = (char *)"Handle EOF"; break;
+		case 108:
+			error = (char *)"Cannot compile"; break;
+		case 109:
+			error = (char *)"File corrupted"; break;
+		default:
+			char msg[128];
+			strerror_s(msg, sizeof(msg), errnum);
+			error = msg;
+	}
 
-	std::cout << archive << ": Error: " << message << "(" << file << "): " << error << "\n";
+	std::cout << archive << ": Error: " << message << " \"" << cCurrentPath  << "\\" << file << "\": " << error << "\n";
 }
 
 
@@ -269,6 +274,8 @@ int main ()
 
 //	unsigned char *CHKdata = extractCHKfile("path01.scx", &dataSize);
 	unsigned char *CHKdata = extractCHKfile("(2)Breaking Point.scx", &dataSize);
+	if (CHKdata==NULL) return 0;
+
 	std::cout << "Successfully extracted the CHK file, of size " << dataSize << "\n";
 	printCHKchunks(CHKdata, dataSize);
 
