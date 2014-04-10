@@ -37,7 +37,7 @@ namespace BWTA
         MapData::rawWalkability[x][y]=BWAPI::Broodwar->isWalkable(x,y);
         MapData::walkability[x][y]=true;
 		
-		    if (BWAPI::Broodwar->isWalkable(x, y)) {
+		    if (MapData::rawWalkability[x][y]) {
 			    if (x==0 || x==width-1 || y==0 || y==height-1){
 				MapData::distanceTransform[x][y] = 1;
 			} else {

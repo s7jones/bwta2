@@ -6,8 +6,8 @@ namespace BWTA
 {
 	void distanceTransform()
 	{
-		int mapW = Broodwar->mapWidth()*4;
-		int mapH = Broodwar->mapHeight()*4;
+		int mapW = MapData::mapWidth*4;
+    int mapH = MapData::mapHeight*4;
 
 		bool finish = false;
 		int maxDistance = 0;
@@ -67,8 +67,8 @@ namespace BWTA
 	void maxDistanceOfRegion()
 	{
 		int maxDistance;
-		for(int x=0; x < Broodwar->mapWidth(); ++x) {
-			for(int y=0; y < Broodwar->mapHeight(); ++y) {
+		for(int x=0; x < MapData::mapWidth; ++x) {
+			for(int y=0; y < MapData::mapHeight; ++y) {
 				Region* region = getRegion(x, y);
 				if (region != NULL) {
 					maxDistance = getMaxTransformDistance(x, y);
@@ -113,7 +113,7 @@ namespace BWTA
 			drawPolygons(&BWTA_Result::unwalkablePolygons,&dtScene);
 
 			// Render
-			QImage* image = new QImage(BWAPI::Broodwar->mapWidth()*8,BWAPI::Broodwar->mapHeight()*8, QImage::Format_ARGB32_Premultiplied);
+      QImage* image = new QImage(BWTA::MapData::mapWidth*8,BWTA::MapData::mapHeight*8, QImage::Format_ARGB32_Premultiplied);
 			QPainter* p = new QPainter(image);
 			p->setRenderHint(QPainter::Antialiasing);
 			dtScene.render(p);
@@ -121,7 +121,7 @@ namespace BWTA
 
 			// Save it
 			std::string filename("bwapi-data/BWTA2/");
-			filename += BWAPI::Broodwar->mapFileName();
+			filename += MapData::mapFileName;
 			filename += "-TD.png";
 			image->save(filename.c_str(), "PNG");
 		#endif

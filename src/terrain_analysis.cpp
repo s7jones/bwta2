@@ -49,28 +49,28 @@ namespace BWTA
 
   void readMap()
   {
-    MapData::mapWidth=BWAPI::Broodwar->mapWidth();
-    MapData::mapHeight=BWAPI::Broodwar->mapHeight();
+    MapData::mapWidth = BWAPI::Broodwar->mapWidth();
+    MapData::mapHeight = BWAPI::Broodwar->mapHeight();
+    MapData::hash = BWAPI::Broodwar->mapHash();
+    MapData::mapFileName = BWAPI::Broodwar->mapFileName();
     load_map();
     load_resources();
-    MapData::hash=BWAPI::Broodwar->mapHash();
-    MapData::startLocations=BWAPI::Broodwar->getStartLocations();
+    
+    MapData::startLocations = BWAPI::Broodwar->getStartLocations();
   }
   void analyze()
   {
     clock_t start;
-	clock_t end;
-	std::ofstream logFile( "bwapi-data/logs/BWTA.log");
-	logFile << "Map name: " << BWAPI::Broodwar->mapFileName() << std::endl;
-    std::string filename = "bwapi-data/BWTA2/" + BWAPI::Broodwar->mapHash() + ".bwta";
+    clock_t end;
+    std::ofstream logFile( "bwapi-data/logs/BWTA.log");
+    logFile << "Map name: " << MapData::mapFileName << std::endl;
+    std::string filename = "bwapi-data/BWTA2/" + MapData::hash + ".bwta";
 //#ifndef DEBUG_DRAW
-    if (fileExists(filename) && fileVersion(filename)==BWTA_FILE_VERSION)
-    {
+    if (fileExists(filename) && fileVersion(filename)==BWTA_FILE_VERSION) {
       log("Recognized map, loading map data...");
       load_data(filename);
       log("Loaded map data.");
-    }
-    else
+    } else
 //#endif
     {
       log("Analyzing new map...");
@@ -621,12 +621,12 @@ namespace BWTA
       writeFile("bwapi-data/logs/heightMap.txt","h={");
       string comma1="";
       string comma2="";
-      for(int x=0;x<BWAPI::Broodwar->mapWidth();x++)
+      for(int x=0;x<MapData::mapWidth;x++)
       {
         writeFile("bwapi-data/logs/heightMap.txt","%s{",comma1.c_str());
         comma1=",";
         comma2="";
-        for(int y=0;y<BWAPI::Broodwar->mapHeight();y++)
+        for(int y=0;y<MapData::mapHeight;y++)
         {
           BWAPI::Position p(x*32+16,y*32+16);
           double dist=p.getDistance(BWTA::getNearestUnwalkablePosition(p));
@@ -657,7 +657,7 @@ namespace BWTA
   #ifdef DEBUG_DRAW
     int render(int step)
     {
-		QImage* image = new QImage(BWAPI::Broodwar->mapWidth()*8,BWAPI::Broodwar->mapHeight()*8, QImage::Format_ARGB32_Premultiplied);
+		QImage* image = new QImage(MapData::mapWidth*8,MapData::mapHeight*8, QImage::Format_ARGB32_Premultiplied);
         QPainter* p = new QPainter(image);
         p->setRenderHint(QPainter::Antialiasing);
         scene_ptr->render(p);
@@ -665,7 +665,7 @@ namespace BWTA
 
         // Save it..
         std::string filename("bwapi-data/BWTA2/");
-        filename += BWAPI::Broodwar->mapFileName();
+        filename += MapData::mapFileName;
 		char numstr[2];
 		sprintf_s(numstr, sizeof(numstr), "%d", step);
 		filename = filename + "-" + numstr + ".png";

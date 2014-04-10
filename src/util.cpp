@@ -194,9 +194,9 @@ namespace BWTA
       int y=(int)pos.y();
       if (distance>max_distance && max_distance>0) break;
       int min_x=max(x-1,0);
-      int max_x=min(x+1,BWAPI::Broodwar->mapWidth()*4-1);
+      int max_x=min(x+1,MapData::mapWidth*4-1);
       int min_y=max(y-1,0);
-      int max_y=min(y+1,BWAPI::Broodwar->mapHeight()*4-1);
+      int max_y=min(y+1,MapData::mapHeight*4-1);
       for(int ix=min_x;ix<=max_x;ix++) {
         for(int iy=min_y;iy<=max_y;iy++) {
           int f=abs(ix-x)*10+abs(iy-y)*10;

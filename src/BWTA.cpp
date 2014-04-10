@@ -43,10 +43,10 @@ namespace BWTA
       nearest=BWAPI::Position(0,position.y());
     if (position.y()<position.getDistance(nearest))
       nearest=BWAPI::Position(position.x(),0);
-    if (BWAPI::Broodwar->mapWidth()*32-position.x()<position.getDistance(nearest))
-      nearest=BWAPI::Position(BWAPI::Broodwar->mapWidth()*32,position.y());
-    if (BWAPI::Broodwar->mapHeight()*32-position.y()<position.getDistance(nearest))
-      nearest=BWAPI::Position(position.x(),BWAPI::Broodwar->mapHeight()*32);
+    if (MapData::mapWidth*32-position.x()<position.getDistance(nearest))
+      nearest=BWAPI::Position(MapData::mapWidth*32,position.y());
+    if (MapData::mapHeight*32-position.y()<position.getDistance(nearest))
+      nearest=BWAPI::Position(position.x(),MapData::mapHeight*32);
     return nearest;
   }
   BaseLocation* getStartLocation(BWAPI::Player* player)
@@ -199,7 +199,7 @@ namespace BWTA
   }
   void getGroundDistanceMap(BWAPI::TilePosition start, RectangleArray<double>& distanceMap)
   {
-    distanceMap.resize(BWAPI::Broodwar->mapWidth(),BWAPI::Broodwar->mapHeight());
+    distanceMap.resize(MapData::mapWidth,MapData::mapHeight);
     Heap< BWAPI::TilePosition , int > heap(true);
     for(unsigned int x=0;x<distanceMap.getWidth();x++) {
       for(unsigned int y=0;y<distanceMap.getHeight();y++) {
@@ -240,7 +240,7 @@ namespace BWTA
   }
   void getGroundWalkDistanceMap(int walkx, int walky, RectangleArray<double>& distanceMap)
   {
-    distanceMap.resize(BWAPI::Broodwar->mapWidth()*4,BWAPI::Broodwar->mapHeight()*4);
+    distanceMap.resize(MapData::mapWidth*4,MapData::mapHeight*4);
     Heap< BWAPI::TilePosition , int > heap(true);
     for(unsigned int x=0;x<distanceMap.getWidth();x++)
     {

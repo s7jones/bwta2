@@ -87,15 +87,15 @@ namespace BWTA
         BWTA::BWTA_Result::getUnwalkablePolygon[x][y]=closestUnwalkablePolygon;
       }
     }
-    RectangleArray<double> minDistanceMap(BWAPI::Broodwar->mapWidth()*4,BWAPI::Broodwar->mapHeight()*4);
+    RectangleArray<double> minDistanceMap(MapData::mapWidth*4,MapData::mapHeight*4);
     minDistanceMap.setTo(-1);
     RectangleArray<double> distanceMap;
     for (std::set<BaseLocation*>::iterator i=BWTA::BWTA_Result::baselocations.begin();i!=BWTA::BWTA_Result::baselocations.end();i++)
     {
       BWTA::getGroundWalkDistanceMap((*i)->getTilePosition().x()*4+8,(*i)->getTilePosition().y()*4+6,distanceMap);
-      for(int x=0;x<BWAPI::Broodwar->mapWidth()*4;x++)
+      for(int x=0;x<MapData::mapWidth*4;x++)
       {
-        for(int y=0;y<BWAPI::Broodwar->mapHeight()*4;y++)
+        for(int y=0;y<MapData::mapHeight*4;y++)
         {
           if (distanceMap[x][y]==-1) continue;
           if (minDistanceMap[x][y]==-1 || distanceMap[x][y]<minDistanceMap[x][y])
@@ -106,9 +106,9 @@ namespace BWTA
         }
       }
     }
-    for(int x=0;x<BWAPI::Broodwar->mapWidth();x++)
+    for(int x=0;x<MapData::mapWidth;x++)
     {
-      for(int y=0;y<BWAPI::Broodwar->mapHeight();y++)
+      for(int y=0;y<MapData::mapHeight;y++)
       {
         Heap<BaseLocation*,int> h;
         for(int xi=0;xi<4;xi++)
@@ -134,9 +134,9 @@ namespace BWTA
     for (std::set<Chokepoint*>::iterator i=BWTA::BWTA_Result::chokepoints.begin();i!=BWTA::BWTA_Result::chokepoints.end();i++)
     {
       BWTA::getGroundWalkDistanceMap((*i)->getCenter().x()/8,(*i)->getCenter().y()/8,distanceMap);
-      for(int x=0;x<BWAPI::Broodwar->mapWidth()*4;x++)
+      for(int x=0;x<MapData::mapWidth*4;x++)
       {
-        for(int y=0;y<BWAPI::Broodwar->mapHeight()*4;y++)
+        for(int y=0;y<MapData::mapHeight*4;y++)
         {
           if (distanceMap[x][y]==-1) continue;
           if (minDistanceMap[x][y]==-1 || distanceMap[x][y]<minDistanceMap[x][y])
@@ -147,9 +147,9 @@ namespace BWTA
         }
       }
     }
-    for(int x=0;x<BWAPI::Broodwar->mapWidth();x++)
+    for(int x=0;x<MapData::mapWidth;x++)
     {
-      for(int y=0;y<BWAPI::Broodwar->mapHeight();y++)
+      for(int y=0;y<MapData::mapHeight;y++)
       {
         Heap<Chokepoint*,int> h;
         for(int xi=0;xi<4;xi++)

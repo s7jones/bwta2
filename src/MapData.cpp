@@ -14,6 +14,7 @@ namespace BWTA
 		RectangleArray<int> distanceTransform;
 		std::set<BWAPI::TilePosition> startLocations;
 		std::string hash;
+    std::string mapFileName;
 		int mapWidth;
 		int mapHeight;
 		int maxDistanceTransform;
