@@ -353,10 +353,9 @@ void setBuildability(BWTA::RectangleArray<bool> &buildability)
   u16 w = BWTA::MapData::mapWidth;
   for (unsigned int y = 0; y < h; ++y)
     for (unsigned int x = 0; x < w; ++x) {
-      //buildability[x][y] = (*this->activeTiles)[y][x].bAlwaysUnbuildable == 0;
       TileID tileID = getTile(x, y);
 	    TileType* tile = TileSet::getTileType(tileID);
-      std::cout << "Tile (" << x << "," << y << ") buildable: " << tile->buildability << "\n";
+      buildability[x][y] = (tile->buildability & (1 << 7)) == 0; 
     }
 }
 //-------------------------------------------- SET WALKABILITY ---------------------------------------------
@@ -440,7 +439,6 @@ int main (int argc, char * argv[])
 	BWTA::RectangleArray<bool> walkability;
 	walkability.resize(BWTA::MapData::mapWidth*4, BWTA::MapData::mapHeight*4);
   setWalkability(walkability);
-
   // Test walkability data
 //   std::ofstream fileTxt("map.txt");
 //   u16 h = BWTA::MapData::mapHeight * 4;
@@ -453,11 +451,21 @@ int main (int argc, char * argv[])
 // 	}
 // 	fileTxt.close();
 
-  // TODO Set buildability
-//   BWTA::RectangleArray<bool> buildability;
-//   buildability.resize(BWTA::MapData::mapWidth, BWTA::MapData::mapHeight);
-//   setBuildability(buildability);
-
+  // Set buildability
+  BWTA::RectangleArray<bool> buildability;
+  buildability.resize(BWTA::MapData::mapWidth, BWTA::MapData::mapHeight);
+  setBuildability(buildability);
+  // Test buildability data
+//   std::ofstream fileTxt("map.txt");
+//   u16 h = BWTA::MapData::mapHeight;
+// 	u16 w = BWTA::MapData::mapWidth;
+//   for (unsigned int y = 0; y < h; ++y) {
+//     for (unsigned int x = 0; x < w; ++x) {
+//       fileTxt << buildability[x][y];
+// 		}
+// 		fileTxt << std::endl;
+// 	}
+// 	fileTxt.close();
 
 
 
