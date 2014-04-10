@@ -299,6 +299,28 @@ unsigned int getTileset(unsigned char *CHKdata, DWORD size) {
   return 8;
 }
 
+/*
+	Finds a given chunk inside CHK data and returns a pointer to it, and its length (in 'desiredChunkLength')
+*/
+unsigned char *getFileBuffer(const char *filename) {
+  unsigned char *buffer = NULL;
+	std::ifstream file(filename, std::ios::in | std::ios::binary);
+	if (file.is_open()) {
+    file.seekg(0, std::ios::end);
+    std::streamsize size = file.tellg();
+    file.seekg(0, std::ios::beg);
+
+    buffer = new unsigned char[size];
+    if(!file.read((char *)buffer, size)) {
+      printError(filename, "Error reading file", filename, GetLastError());
+    }
+		file.close();
+  } else {
+    printError(filename, "Cannot open file", filename, GetLastError());
+  }
+  return buffer;
+}
+
 //------------------------------------------------ GET TILE ------------------------------------------------
 TileID getTile(int x, int y)
 {
@@ -324,7 +346,46 @@ u16 getMiniTile(int x, int y)
 		return BWTA::MapData::MiniTileFlags->tile[tile->miniTile[getTileVariation(tileID)]].miniTile[mx + my*4];
 	return 0;
 }
-
+//-------------------------------------------- SET BUILDABILITY --------------------------------------------
+void setBuildability(BWTA::RectangleArray<bool> &buildability)
+{
+  u16 h = BWTA::MapData::mapHeight;
+  u16 w = BWTA::MapData::mapWidth;
+  for (unsigned int y = 0; y < h; ++y)
+    for (unsigned int x = 0; x < w; ++x) {
+      //buildability[x][y] = (*this->activeTiles)[y][x].bAlwaysUnbuildable == 0;
+      TileID tileID = getTile(x, y);
+	    TileType* tile = TileSet::getTileType(tileID);
+      std::cout << "Tile (" << x << "," << y << ") buildable: " << tile->buildability << "\n";
+    }
+}
+//-------------------------------------------- SET WALKABILITY ---------------------------------------------
+void setWalkability(BWTA::RectangleArray<bool> &walkability)
+{
+	u16 h = BWTA::MapData::mapHeight * 4;
+	u16 w = BWTA::MapData::mapWidth * 4;
+	for (unsigned int y = 0; y < h; ++y)
+		for (unsigned int x = 0; x < w; ++x)
+			walkability[x][y] = (getMiniTile(x, y) & MiniTileFlags::Walkable) != 0;
+	int y = h - 1;
+	for(unsigned int x = 0; x < w; ++x) {
+		walkability[x][y]   = false;
+		walkability[x][y-1] = false;
+		walkability[x][y-2] = false;
+		walkability[x][y-3] = false;
+	}
+	y -= 4;
+	for(int x = 0; x < 20; ++x) {
+		walkability[x][y]   = false;
+		walkability[x][y-1] = false;
+		walkability[x][y-2] = false;
+		walkability[x][y-3] = false;
+		walkability[w - x - 1][y]   = false;
+		walkability[w - x - 1][y-1] = false;
+		walkability[w - x - 1][y-2] = false;
+		walkability[w - x - 1][y-3] = false;
+	}
+}
 
 int main (int argc, char * argv[])
 {
@@ -354,45 +415,48 @@ int main (int argc, char * argv[])
   // TODO: Load neutral units
 	getUnits(CHKdata, dataSize);
 
-  // Load map tileset
+  // Get map tileset ID
   unsigned int tileset = getTileset(CHKdata, dataSize);
+  if (tileset > 7) {
+    std::cout << "Tileset Unknown\n";
+    return 0;
+  }
   std::cout << "Map's tilset: " << tileSetName[tileset] << "\n";
-  // TODO: Load TileSet file (tileSetName[tileset].cv5) into BWTA::MapData::TileSet
-  // TODO: Load MiniTileFlags file (tileSetName[tileset].vf4) into BWTA::MapData::MiniTileFlags
+  
+  // Load TileSet file (tileSetName[tileset].cv5) into BWTA::MapData::TileSet
+  std::string cv5FileName = "tileset/"+tileSetName[tileset]+".cv5";
+  BWTA::MapData::TileSet = (TileType*)getFileBuffer(cv5FileName.c_str());
+
+  // Load MiniTileFlags file (tileSetName[tileset].vf4) into BWTA::MapData::MiniTileFlags
+  std::string vf4FileName = "tileset/"+tileSetName[tileset]+".vf4";
+  BWTA::MapData::MiniTileFlags = (BWTA::MapData::MiniTileMaps_type*)getFileBuffer(vf4FileName.c_str());
 
 
-  // TODO: Load Map Tiles
-  //unsigned int *terrain = getTerrain(CHKdata, dataSize, width, height);
+  // Load Map Tiles
   DWORD chunkSize = 0;
-  //BWTA::MapData::TileArray = getChunkPointer((unsigned char *)"MTXM", CHKdata, dataSize, &chunkSize);
+  BWTA::MapData::TileArray = (TileID*)getChunkPointer((unsigned char *)"MTXM", CHKdata, dataSize, &chunkSize);
 
 	// Set walkability
-	/*BWTA::RectangleArray<bool> walkability;
+	BWTA::RectangleArray<bool> walkability;
 	walkability.resize(BWTA::MapData::mapWidth*4, BWTA::MapData::mapHeight*4);
+  setWalkability(walkability);
 
-	u16 h = BWTA::MapData::mapHeight * 4;
-	u16 w = BWTA::MapData::mapWidth * 4;
-	for (unsigned int y = 0; y < h; ++y)
-		for (unsigned int x = 0; x < w; ++x)
-			walkability[x][y] = (getMiniTile(x, y) & MiniTileFlags::Walkable) != 0;
-	int y = h - 1;
-	for(unsigned int x = 0; x < w; ++x) {
-		walkability[x][y]   = false;
-		walkability[x][y-1] = false;
-		walkability[x][y-2] = false;
-		walkability[x][y-3] = false;
-	}
-	y -= 4;
-	for(int x = 0; x < 20; ++x) {
-		walkability[x][y]   = false;
-		walkability[x][y-1] = false;
-		walkability[x][y-2] = false;
-		walkability[x][y-3] = false;
-		walkability[w - x - 1][y]   = false;
-		walkability[w - x - 1][y-1] = false;
-		walkability[w - x - 1][y-2] = false;
-		walkability[w - x - 1][y-3] = false;
-	}*/
+  // Test walkability data
+//   std::ofstream fileTxt("map.txt");
+//   u16 h = BWTA::MapData::mapHeight * 4;
+// 	u16 w = BWTA::MapData::mapWidth * 4;
+//   for (unsigned int y = 0; y < h; ++y) {
+//     for (unsigned int x = 0; x < w; ++x) {
+//       fileTxt << walkability[x][y];
+// 		}
+// 		fileTxt << std::endl;
+// 	}
+// 	fileTxt.close();
+
+  // TODO Set buildability
+//   BWTA::RectangleArray<bool> buildability;
+//   buildability.resize(BWTA::MapData::mapWidth, BWTA::MapData::mapHeight);
+//   setBuildability(buildability);
 
 
 

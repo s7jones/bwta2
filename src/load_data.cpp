@@ -21,27 +21,24 @@ namespace BWTA
     MapData::lowResWalkability.resize(b_width,b_height);
     MapData::walkability.resize(width,height);
     MapData::rawWalkability.resize(width,height);
-	MapData::distanceTransform.resize(width, height);
+    MapData::distanceTransform.resize(width, height);
 
-    //copy buildability data into buildability array
-    for(int x=0;x<b_width;x++)
-    {
-      for(int y=0;y<b_height;y++)
-      {
+    // copy buildability data into buildability array
+    for(int x=0;x<b_width;x++) {
+      for(int y=0;y<b_height;y++) {
         MapData::buildability[x][y]=BWAPI::Broodwar->isBuildable(x,y);
         MapData::lowResWalkability[x][y]=true;
       }
     }
-    //copy and simplify walkability data as it is copies into walkability array
-	// init distance transform map
-    for(int x=0;x<width;x++)
-    {
+    // copy and simplify walkability data as it is copies into walkability array
+	  // init distance transform map
+    for(int x=0;x<width;x++) {
       for(int y=0;y<height;y++) {
         MapData::rawWalkability[x][y]=BWAPI::Broodwar->isWalkable(x,y);
         MapData::walkability[x][y]=true;
 		
-		if (BWAPI::Broodwar->isWalkable(x, y)) {
-			if (x==0 || x==width-1 || y==0 || y==height-1){
+		    if (BWAPI::Broodwar->isWalkable(x, y)) {
+			    if (x==0 || x==width-1 || y==0 || y==height-1){
 				MapData::distanceTransform[x][y] = 1;
 			} else {
 				MapData::distanceTransform[x][y] = -1;
