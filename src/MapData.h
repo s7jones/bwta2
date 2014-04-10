@@ -1,6 +1,7 @@
 #pragma once
 
 #include <BWTA.h>
+#include "offline/TileType.h"
 
 namespace BWTA
 {
@@ -25,5 +26,20 @@ namespace BWTA
 		extern int maxDistanceTransform;
 		// data for HPA*
 		extern ChokepointGraph chokeNodes;
+    // offline map load
+    extern TileID   *TileArray;
+	  extern TileType *TileSet;
+     /** Direct mapping of minitile flags array */
+    struct MiniTileMaps_type
+    {
+      struct MiniTileFlagArray
+      {
+        u16 miniTile[16];
+      };
+      MiniTileFlagArray tile[0x10000];
+    };
+    extern MiniTileMaps_type *MiniTileFlags;
 	}
 }
+
+

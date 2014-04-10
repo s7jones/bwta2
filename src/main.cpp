@@ -1,6 +1,25 @@
 #include <StormLib.h>
 #include <direct.h>
 
+#include "MapData.h"
+#include "offline/TileSet.h"
+#include "offline/TileType.h"
+#include "offline/MiniTileFlags.h"
+
+
+const std::string tileSetName[9] = {
+  "badlands",
+  "platform",
+  "install",
+  "ashworld",
+  "jungle",
+  "desert",
+  "ice",
+  "twilight",
+  "Unknown"
+};
+
+
 // TODO we should instantiate a new Game
 namespace BWAPI { Game* Broodwar; }
 
@@ -267,6 +286,45 @@ void getUnits(unsigned char *CHKdata, DWORD size) {
 	}
 }
 
+/*
+	This function returns the tilset ID of a StarCraft map from the CHKdata
+*/
+unsigned int getTileset(unsigned char *CHKdata, DWORD size) {
+	DWORD chunkSize = 0;
+	unsigned char *ERAdata = getChunkPointer((unsigned char *)"ERA ", CHKdata, size, &chunkSize);
+	
+	if (ERAdata!=NULL) {
+		return decode2ByteUnsigned(ERAdata);
+	}
+  return 8;
+}
+
+//------------------------------------------------ GET TILE ------------------------------------------------
+TileID getTile(int x, int y)
+{
+  if ( BWTA::MapData::TileArray )
+    return *(BWTA::MapData::TileArray + x + y * BWTA::MapData::mapWidth);
+	return 0;
+}
+//------------------------------------------- GET TILE VARIATION -------------------------------------------
+u8 getTileVariation(TileID tileType)
+{
+  return tileType & 0xF;
+}
+//--------------------------------------------- GET MINITILE -----------------------------------------------
+u16 getMiniTile(int x, int y)
+{
+	int tx = x / 4;
+	int ty = y / 4;
+	int mx = x % 4;
+	int my = y % 4;
+	TileID tileID = getTile(tx, ty);
+	TileType* tile = TileSet::getTileType(tileID);
+	if ( tile && BWTA::MapData::MiniTileFlags )
+		return BWTA::MapData::MiniTileFlags->tile[tile->miniTile[getTileVariation(tileID)]].miniTile[mx + my*4];
+	return 0;
+}
+
 
 int main (int argc, char * argv[])
 {
@@ -286,17 +344,58 @@ int main (int argc, char * argv[])
 	std::cout << "Successfully extracted the CHK file, of size " << dataSize << "\n";
 	printCHKchunks(CHKdata, dataSize);
 
+	// Load map dimensions
 	unsigned int width = 0, height = 0;
 	getDimensions(CHKdata, dataSize, &width, &height);
 	std::cout << "Map is " << width << "x" << height << "\n";
+	BWTA::MapData::mapWidth = width;
+	BWTA::MapData::mapHeight = height;
 
-	unsigned int *terrain = getTerrain(CHKdata, dataSize, width, height);
+  // TODO: Load neutral units
 	getUnits(CHKdata, dataSize);
 
-	// TODO: implement an alternative method to "load_map()" in "load_data.cpp" that uses this instead of 
-	//       taking it from the global Broodwar singleton.
-	//		 Something that we need to figure out is how to translate the tile information to what is "walkable" or not
-	//       and what is "buildable" or not...
+  // Load map tileset
+  unsigned int tileset = getTileset(CHKdata, dataSize);
+  std::cout << "Map's tilset: " << tileSetName[tileset] << "\n";
+  // TODO: Load TileSet file (tileSetName[tileset].cv5) into BWTA::MapData::TileSet
+  // TODO: Load MiniTileFlags file (tileSetName[tileset].vf4) into BWTA::MapData::MiniTileFlags
+
+
+  // TODO: Load Map Tiles
+  //unsigned int *terrain = getTerrain(CHKdata, dataSize, width, height);
+  DWORD chunkSize = 0;
+  //BWTA::MapData::TileArray = getChunkPointer((unsigned char *)"MTXM", CHKdata, dataSize, &chunkSize);
+
+	// Set walkability
+	/*BWTA::RectangleArray<bool> walkability;
+	walkability.resize(BWTA::MapData::mapWidth*4, BWTA::MapData::mapHeight*4);
+
+	u16 h = BWTA::MapData::mapHeight * 4;
+	u16 w = BWTA::MapData::mapWidth * 4;
+	for (unsigned int y = 0; y < h; ++y)
+		for (unsigned int x = 0; x < w; ++x)
+			walkability[x][y] = (getMiniTile(x, y) & MiniTileFlags::Walkable) != 0;
+	int y = h - 1;
+	for(unsigned int x = 0; x < w; ++x) {
+		walkability[x][y]   = false;
+		walkability[x][y-1] = false;
+		walkability[x][y-2] = false;
+		walkability[x][y-3] = false;
+	}
+	y -= 4;
+	for(int x = 0; x < 20; ++x) {
+		walkability[x][y]   = false;
+		walkability[x][y-1] = false;
+		walkability[x][y-2] = false;
+		walkability[x][y-3] = false;
+		walkability[w - x - 1][y]   = false;
+		walkability[w - x - 1][y-1] = false;
+		walkability[w - x - 1][y-2] = false;
+		walkability[w - x - 1][y-3] = false;
+	}*/
+
+
+
 
 	delete CHKdata;
 	return 0;

@@ -596,6 +596,26 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="offline"
+			>
+			<File
+				RelativePath=".\offline\MiniTileFlags.h"
+				>
+			</File>
+			<File
+				RelativePath=".\offline\TileSet.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\offline\TileSet.h"
+				>
+			</File>
+			<File
+				RelativePath=".\offline\TileType.h"
+				>
+			</File>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>

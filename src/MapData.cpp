@@ -19,5 +19,9 @@ namespace BWTA
 		int maxDistanceTransform;
 		// data for HPA*
 		ChokepointGraph chokeNodes;
+    // offline map load
+    TileID   *TileArray = NULL;
+	  TileType *TileSet   = NULL;
+    MiniTileMaps_type *MiniTileFlags = NULL;
 	}
 }
