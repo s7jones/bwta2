@@ -120,7 +120,7 @@ namespace BWTA
 			p->end();
 
 			// Save it
-			std::string filename("bwapi-data/BWTA2/");
+			std::string filename(BWTA_PATH);
 			filename += MapData::mapFileName;
 			filename += "-TD.png";
 			image->save(filename.c_str(), "PNG");

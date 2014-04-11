@@ -69,8 +69,9 @@ namespace BWTA
       }
     }
 
+#ifndef OFFLINE
 	//Block static neutral units
-  log("***Block static neutral units***");
+  //log("***Block static neutral units***");
 	int x1,y1,x2,y2;
 	BWAPI::UnitType unitType;
 	std::set<BWAPI::Unit*>::iterator unit;
@@ -80,7 +81,7 @@ namespace BWTA
 		unitType = (*unit)->getType();
 		if (unitType == BWAPI::UnitTypes::Resource_Vespene_Geyser || unitType.isMineralField()) continue;
 		// get build area
-    log("  (" << unitType << ") " << unitType.getName() << " at " << (*unit)->getTilePosition().x() << "," << (*unit)->getTilePosition().y());
+    //log("  (" << unitType << ") " << unitType.getName() << " at " << (*unit)->getTilePosition().x() << "," << (*unit)->getTilePosition().y());
 		x1 = (*unit)->getTilePosition().x()*4;
 		y1 = (*unit)->getTilePosition().y()*4;
 		x2 = x1 + unitType.tileWidth()*4;
@@ -103,6 +104,7 @@ namespace BWTA
 			}
 		}
 	}
+#endif
 
     BWTA_Result::getRegion.resize(b_width,b_height);
     BWTA_Result::getChokepoint.resize(b_width,b_height);

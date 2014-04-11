@@ -109,9 +109,17 @@ namespace BWTA
   int max(int a, int b);
   int min(int a, int b);
   //void writeFile(const char* filename, const char* text, ...);
+#ifdef OFFLINE
+  #define BWTA_PATH "logs/"
+  #define log(message) { \
+	  std::ofstream logFile( "logs/BWTA.log", std::ios_base::out | std::ios_base::app ); \
+	  logFile << message << std::endl; }
+#else
+  #define BWTA_PATH "bwapi-data/BWTA2/"
   #define log(message) { \
 	  std::ofstream logFile( "bwapi-data/logs/BWTA.log", std::ios_base::out | std::ios_base::app ); \
 	  logFile << message << std::endl; }
+#endif
 
   template< class T>
   double get_distance(CGAL::Point_2<T> a, CGAL::Point_2<T> b)

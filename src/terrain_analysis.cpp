@@ -49,24 +49,32 @@ namespace BWTA
 
   void readMap()
   {
+#ifdef OFFLINE
+    // Clean previous logfile
+    std::ofstream logFile( "logs/BWTA.log");
+    logFile << "Map name: " << MapData::mapFileName << std::endl;
+
+    load_map();
+#else
     MapData::mapWidth = BWAPI::Broodwar->mapWidth();
     MapData::mapHeight = BWAPI::Broodwar->mapHeight();
     MapData::hash = BWAPI::Broodwar->mapHash();
     MapData::mapFileName = BWAPI::Broodwar->mapFileName();
 
-    // Clean previoys logfile
+    // Clean previous logfile
     std::ofstream logFile( "bwapi-data/logs/BWTA.log");
     logFile << "Map name: " << MapData::mapFileName << std::endl;
 
     load_map();
     load_resources();
     MapData::startLocations = BWAPI::Broodwar->getStartLocations();
+#endif
   }
   void analyze()
   {
     clock_t start;
     clock_t end;
-    std::string filename = "bwapi-data/BWTA2/" + MapData::hash + ".bwta";
+    std::string filename = BWTA_PATH + MapData::hash + ".bwta";
 //#ifndef DEBUG_DRAW
     if (fileExists(filename) && fileVersion(filename)==BWTA_FILE_VERSION) {
       log("Recognized map, loading map data...");
@@ -666,7 +674,7 @@ namespace BWTA
         p->end();
 
         // Save it..
-        std::string filename("bwapi-data/BWTA2/");
+        std::string filename(BWTA_PATH);
         filename += MapData::mapFileName;
 		char numstr[2];
 		sprintf_s(numstr, sizeof(numstr), "%d", step);

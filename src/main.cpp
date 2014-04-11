@@ -7,6 +7,7 @@
 #include "offline/TileType.h"
 #include "offline/MiniTileFlags.h"
 #include "offline/MyUnitType.h"
+#include "offline/sha1.h"
 
 
 const std::string tileSetName[9] = {
@@ -375,11 +376,13 @@ void setWalkability(BWTA::RectangleArray<bool> &walkability)
 int main (int argc, char * argv[])
 {
 	// Check the number of parameters
-    if (argc < 2) {
-        // Tell the user how to run the program
-        std::cerr << "Usage: " << argv[0] << " [mapFile]" << std::endl;
-        return 1;
-    }
+  if (argc < 2) {
+    // Tell the user how to run the program
+    std::cerr << "Usage: " << argv[0] << " [mapFile]" << std::endl;
+    return 1;
+  }
+
+  BWTA::MapData::mapFileName = argv[1];
 
 	std::cout << "Testing standalone BWTA\n";
 	DWORD dataSize = 0;
@@ -389,6 +392,13 @@ int main (int argc, char * argv[])
 
 	std::cout << "Successfully extracted the CHK file, of size " << dataSize << "\n";
 	printCHKchunks(CHKdata, dataSize);
+
+  // Calculate hash
+  unsigned char hash[20];
+  char hexstring[42];
+  sha1::calc(CHKdata, dataSize, hash);
+  sha1::toHexString(hash, hexstring);
+  BWTA::MapData::hash = std::string(hexstring);
 
 	// Load map dimensions
 	unsigned int width = 0, height = 0;
@@ -460,7 +470,7 @@ int main (int argc, char * argv[])
 	delete CHKdata;
 
   // Normal procedure to analyze map
-  //BWTA::readMap();
+  BWTA::readMap();
   //BWTA::analyze();
 	return 0;
 }

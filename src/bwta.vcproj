@@ -703,6 +703,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\offline\sha1.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\offline\sha1.h"
+				>
+			</File>
+			<File
 				RelativePath=".\offline\TileSet.cpp"
 				>
 			</File>
