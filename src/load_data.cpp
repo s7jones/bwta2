@@ -24,38 +24,44 @@ namespace BWTA
     MapData::distanceTransform.resize(width, height);
 
     // copy buildability data into buildability array
+#ifdef OFFLINE
+    MapData::lowResWalkability = MapData::buildability;
+#else
     for(int x=0;x<b_width;x++) {
       for(int y=0;y<b_height;y++) {
         MapData::buildability[x][y]=BWAPI::Broodwar->isBuildable(x,y);
         MapData::lowResWalkability[x][y]=true;
       }
     }
+#endif
     // copy and simplify walkability data as it is copies into walkability array
 	  // init distance transform map
+#ifdef OFFLINE
+    MapData::rawWalkability = MapData::walkability;
+#endif
     for(int x=0;x<width;x++) {
       for(int y=0;y<height;y++) {
-        MapData::rawWalkability[x][y]=BWAPI::Broodwar->isWalkable(x,y);
-        MapData::walkability[x][y]=true;
+#ifndef OFFLINE
+        MapData::rawWalkability[x][y] = BWAPI::Broodwar->isWalkable(x,y);
+#endif
+        MapData::walkability[x][y] = true;
 		
 		    if (MapData::rawWalkability[x][y]) {
-			    if (x==0 || x==width-1 || y==0 || y==height-1){
-				MapData::distanceTransform[x][y] = 1;
-			} else {
-				MapData::distanceTransform[x][y] = -1;
-			}
-		} else {
-			MapData::distanceTransform[x][y] = 0;
-		}
+          if (x==0 || x==width-1 || y==0 || y==height-1){
+            MapData::distanceTransform[x][y] = 1;
+          } else {
+            MapData::distanceTransform[x][y] = -1;
+          }
+        } else {
+          MapData::distanceTransform[x][y] = 0;
+        }
       }
     }
-    for(int x=0;x<width;x++)
-    {
-      for(int y=0;y<height;y++)
-      {
-        for(int x2=max(x-1,0);x2<=min(width-1,x+1);x2++)
-        {
-          for(int y2=max(y-1,0);y2<=min(height-1,y+1);y2++)
-          {
+
+    for(int x=0;x<width;x++) {
+      for(int y=0;y<height;y++) {
+        for(int x2=max(x-1,0);x2<=min(width-1,x+1);x2++) {
+          for(int y2=max(y-1,0);y2<=min(height-1,y+1);y2++) {
             MapData::walkability[x2][y2]&=MapData::rawWalkability[x][y];
           }
         }
@@ -64,6 +70,7 @@ namespace BWTA
     }
 
 	//Block static neutral units
+  log("***Block static neutral units***");
 	int x1,y1,x2,y2;
 	BWAPI::UnitType unitType;
 	std::set<BWAPI::Unit*>::iterator unit;
@@ -73,6 +80,7 @@ namespace BWTA
 		unitType = (*unit)->getType();
 		if (unitType == BWAPI::UnitTypes::Resource_Vespene_Geyser || unitType.isMineralField()) continue;
 		// get build area
+    log("  (" << unitType << ") " << unitType.getName() << " at " << (*unit)->getTilePosition().x() << "," << (*unit)->getTilePosition().y());
 		x1 = (*unit)->getTilePosition().x()*4;
 		y1 = (*unit)->getTilePosition().y()*4;
 		x2 = x1 + unitType.tileWidth()*4;

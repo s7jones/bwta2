@@ -53,17 +53,19 @@ namespace BWTA
     MapData::mapHeight = BWAPI::Broodwar->mapHeight();
     MapData::hash = BWAPI::Broodwar->mapHash();
     MapData::mapFileName = BWAPI::Broodwar->mapFileName();
+
+    // Clean previoys logfile
+    std::ofstream logFile( "bwapi-data/logs/BWTA.log");
+    logFile << "Map name: " << MapData::mapFileName << std::endl;
+
     load_map();
     load_resources();
-    
     MapData::startLocations = BWAPI::Broodwar->getStartLocations();
   }
   void analyze()
   {
     clock_t start;
     clock_t end;
-    std::ofstream logFile( "bwapi-data/logs/BWTA.log");
-    logFile << "Map name: " << MapData::mapFileName << std::endl;
     std::string filename = "bwapi-data/BWTA2/" + MapData::hash + ".bwta";
 //#ifndef DEBUG_DRAW
     if (fileExists(filename) && fileVersion(filename)==BWTA_FILE_VERSION) {

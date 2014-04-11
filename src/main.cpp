@@ -1,10 +1,12 @@
 #include <StormLib.h>
 #include <direct.h>
+#include <bitset>
 
 #include "MapData.h"
 #include "offline/TileSet.h"
 #include "offline/TileType.h"
 #include "offline/MiniTileFlags.h"
+#include "offline/MyUnitType.h"
 
 
 const std::string tileSetName[9] = {
@@ -222,30 +224,6 @@ void getDimensions(unsigned char *CHKdata, DWORD size, unsigned int *width, unsi
 
 
 /*
-	This function decodes the terrain information from a CHK map:
-*/
-unsigned int *getTerrain(unsigned char *CHKdata, DWORD size, int width, int height) {
-	DWORD chunkSize = 0;
-//	unsigned char *TILEdata = getChunkPointer((unsigned char *)"TILE", CHKdata, size, &chunkSize);
-	unsigned char *TILEdata = getChunkPointer((unsigned char *)"MTXM", CHKdata, size, &chunkSize);
-	
-	if (TILEdata!=NULL) {
-		std::cout<< "Decoding terrain information...\n";
-		unsigned int *terrain = new unsigned int[width*height];
-		for(int i = 0, offset = 0;i<height;i++) {
-			for(int j = 0;j<width;j++,offset+=2) {
-				terrain[i] = decode2ByteUnsigned(TILEdata+offset);
-//				std::cout << terrain[i] << " ";
-			}
-//				std::cout << "\n";
-		}
-		return terrain;
-	}
-	return NULL;
-}
-
-
-/*
 	*** This function is not finished ***
 
 	This function will decode the unit information from a CHK map, and return a list of all the units with their
@@ -271,13 +249,14 @@ void getUnits(unsigned char *CHKdata, DWORD size) {
 			position+=2;
 			unsigned int ID = decode2ByteUnsigned(UNITdata+position);
 			position+=2;
-			position+=2;	//skip relation to another building
+			position+=2;	// skip relation to another building
 			position+=2;	// skip special property flags
 			unsigned int mapEditorFlags = decode2ByteUnsigned(UNITdata+position);
 			int playerIsValid = mapEditorFlags & 0x0001;	// If this is 0, it is a neutral unit/critter/start location/etc.
 			position+=2;	
 			int player = (playerIsValid==1 ? UNITdata[position] : neutralPlayer);
-			std::cout << "Unit(" << unitClass << ") ID=" << ID << " at " << x << "," << y << " player " << player << "\n";
+			//std::cout << "Unit(" << unitClass << ") ID=" << ID << " at " << x << "," << y << " player " << player << "\n";
+      std::cout << "Unit(" << unitClass << ") type=" << BWTA::UnitType::getName(ID) << " at " << x << "," << y << " player " << player << "\n";
 
 			// TODO: how do we translate from the unitClass to a unit type? I have not been able to find information online...
 			// ...
@@ -292,9 +271,16 @@ void getUnits(unsigned char *CHKdata, DWORD size) {
 unsigned int getTileset(unsigned char *CHKdata, DWORD size) {
 	DWORD chunkSize = 0;
 	unsigned char *ERAdata = getChunkPointer((unsigned char *)"ERA ", CHKdata, size, &chunkSize);
-	
+
 	if (ERAdata!=NULL) {
-		return decode2ByteUnsigned(ERAdata);
+    // StarCraft masks the tileset indicator's bit value, 
+    // so bits after the third place (anything after the value "7") are removed. 
+    // Thus, 9 (1001 in binary) is interpreted as 1 (0001), 10 (1010) as 2 (0010), etc. 
+    unsigned char tileset = ERAdata[0];
+    //std::cout << "ERAdata = " << (std::bitset<8>) tileset << std::endl;
+    tileset &= 7;
+    //std::cout << "ERAdata = " << (std::bitset<8>) tileset << std::endl;
+		return (unsigned int) tileset;
 	}
   return 8;
 }
@@ -417,7 +403,7 @@ int main (int argc, char * argv[])
   // Get map tileset ID
   unsigned int tileset = getTileset(CHKdata, dataSize);
   if (tileset > 7) {
-    std::cout << "Tileset Unknown\n";
+    std::cout << "Tileset Unknown (" << tileset << ")\n";
     return 0;
   }
   std::cout << "Map's tilset: " << tileSetName[tileset] << "\n";
@@ -439,6 +425,7 @@ int main (int argc, char * argv[])
 	BWTA::RectangleArray<bool> walkability;
 	walkability.resize(BWTA::MapData::mapWidth*4, BWTA::MapData::mapHeight*4);
   setWalkability(walkability);
+  BWTA::MapData::walkability = walkability;
   // Test walkability data
 //   std::ofstream fileTxt("map.txt");
 //   u16 h = BWTA::MapData::mapHeight * 4;
@@ -455,6 +442,7 @@ int main (int argc, char * argv[])
   BWTA::RectangleArray<bool> buildability;
   buildability.resize(BWTA::MapData::mapWidth, BWTA::MapData::mapHeight);
   setBuildability(buildability);
+  BWTA::MapData::buildability = buildability;
   // Test buildability data
 //   std::ofstream fileTxt("map.txt");
 //   u16 h = BWTA::MapData::mapHeight;
@@ -470,5 +458,9 @@ int main (int argc, char * argv[])
 
 
 	delete CHKdata;
+
+  // Normal procedure to analyze map
+  //BWTA::readMap();
+  //BWTA::analyze();
 	return 0;
 }
