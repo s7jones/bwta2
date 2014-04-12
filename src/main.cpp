@@ -387,14 +387,16 @@ int main (int argc, char * argv[])
   unsigned found = strName.find_last_of("/\\");
   BWTA::MapData::mapFileName = strName.substr(found+1);
 
-	std::cout << "Testing standalone BWTA\n";
+  std::cout << "=======================\n";
+  std::cout << "Testing standalone BWTA\n";
+  std::cout << "=======================\n";
 	DWORD dataSize = 0;
 
 	unsigned char *CHKdata = extractCHKfile(argv[1], &dataSize);
 	if (CHKdata==NULL) return 0;
 
 	std::cout << "Successfully extracted the CHK file, of size " << dataSize << "\n";
-	printCHKchunks(CHKdata, dataSize);
+	//printCHKchunks(CHKdata, dataSize);
 
   // Calculate hash
   unsigned char hash[20];
@@ -410,8 +412,8 @@ int main (int argc, char * argv[])
 	BWTA::MapData::mapWidth = width;
 	BWTA::MapData::mapHeight = height;
 
-  // TODO: Load neutral units
-	getUnits(CHKdata, dataSize);
+  // TODO: Load neutral units (minerasl, gas, and starting locations)
+	//getUnits(CHKdata, dataSize);
 
   // Get map tileset ID
   unsigned int tileset = getTileset(CHKdata, dataSize);
@@ -438,14 +440,14 @@ int main (int argc, char * argv[])
 	BWTA::RectangleArray<bool> walkability;
 	walkability.resize(BWTA::MapData::mapWidth*4, BWTA::MapData::mapHeight*4);
   setWalkability(walkability);
-  BWTA::MapData::walkability = walkability;
+  BWTA::MapData::isWalkable = walkability;
   // Test walkability data
-//   std::ofstream fileTxt("map.txt");
+//   std::ofstream fileTxt("logs/map.txt");
 //   u16 h = BWTA::MapData::mapHeight * 4;
 // 	u16 w = BWTA::MapData::mapWidth * 4;
 //   for (unsigned int y = 0; y < h; ++y) {
 //     for (unsigned int x = 0; x < w; ++x) {
-//       fileTxt << walkability[x][y];
+//       fileTxt << walkability;
 // 		}
 // 		fileTxt << std::endl;
 // 	}
@@ -457,7 +459,7 @@ int main (int argc, char * argv[])
   setBuildability(buildability);
   BWTA::MapData::buildability = buildability;
   // Test buildability data
-//   std::ofstream fileTxt("map.txt");
+//   std::ofstream fileTxt("logs/map.txt");
 //   u16 h = BWTA::MapData::mapHeight;
 // 	u16 w = BWTA::MapData::mapWidth;
 //   for (unsigned int y = 0; y < h; ++y) {
@@ -468,12 +470,15 @@ int main (int argc, char * argv[])
 // 	}
 // 	fileTxt.close();
 
-
-
-	delete CHKdata;
+  delete CHKdata;
 
   // Normal procedure to analyze map
+  std::cout << "Reading map info (low resolution walkable map, ...)\n";
   BWTA::readMap();
+  std::cout << "Analyzing map...";
   BWTA::analyze();
+  std::cout << "DONE\n";
+
+
 	return 0;
 }

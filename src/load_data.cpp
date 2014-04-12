@@ -36,12 +36,11 @@ namespace BWTA
 #endif
     // copy and simplify walkability data as it is copies into walkability array
 	  // init distance transform map
-#ifdef OFFLINE
-    MapData::rawWalkability = MapData::walkability;
-#endif
     for(int x=0;x<width;x++) {
       for(int y=0;y<height;y++) {
-#ifndef OFFLINE
+#ifdef OFFLINE
+        MapData::rawWalkability[x][y] = MapData::isWalkable[x][y];
+#else
         MapData::rawWalkability[x][y] = BWAPI::Broodwar->isWalkable(x,y);
 #endif
         MapData::walkability[x][y] = true;

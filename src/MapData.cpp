@@ -21,6 +21,7 @@ namespace BWTA
 		// data for HPA*
 		ChokepointGraph chokeNodes;
     // offline map load
+    RectangleArray<bool> isWalkable;
     TileID   *TileArray = NULL;
 	  TileType *TileSet   = NULL;
     MiniTileMaps_type *MiniTileFlags = NULL;

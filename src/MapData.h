@@ -28,6 +28,7 @@ namespace BWTA
 		// data for HPA*
 		extern ChokepointGraph chokeNodes;
     // offline map load
+    extern RectangleArray<bool> isWalkable;
     extern TileID   *TileArray;
 	  extern TileType *TileSet;
      /** Direct mapping of minitile flags array */

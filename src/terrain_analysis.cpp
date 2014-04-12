@@ -683,7 +683,6 @@ namespace BWTA
 		char numstr[2];
 		sprintf_s(numstr, sizeof(numstr), "%d", step);
 		filename = filename + "-" + numstr + ".png";
-    log("Saving to: " << filename);
         image->save(filename.c_str(), "PNG");
 
 		// show a GUI with the image
