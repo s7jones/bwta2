@@ -372,6 +372,39 @@ void setWalkability(BWTA::RectangleArray<bool> &walkability)
 		walkability[w - x - 1][y-3] = false;
 	}
 }
+/*
+  Given a center and a offset, it returns the buildability grid around the center
+*/
+BWTA::RectangleArray<bool> getChokeGrid(BWAPI::TilePosition center, int offset)
+{
+  BWTA::RectangleArray<bool> grid;
+  unsigned int gridSize = (offset*2)+1;
+  grid.resize(gridSize, gridSize);
+  //TODO we don't check offset out of range!!
+  for (unsigned int y = 0; y < gridSize; ++y) {
+    for (unsigned int x = 0; x < gridSize; ++x) {
+      //std::cout << "Check buildability on (" << center.x()-offset+x << "," << center.y()-offset+y << ")\n";
+      grid[x][y] = BWTA::MapData::buildability[center.x()-offset+x][center.y()-offset+y];
+    }
+  }
+  return grid;
+}
+/*
+  Given a chokepoint, it returns the buildability grid around the center of the choke
+  and using the width as an offset
+*/
+BWTA::RectangleArray<bool> getChokeGrid(BWTA::Chokepoint* chokepoint)
+{
+  BWAPI::Position center = chokepoint->getCenter();
+  double chokeWidth = chokepoint->getWidth();
+  std::cout << "Choke pixel center (" << center.x() << "," << center.y() << ") width " << chokeWidth << "\n";
+  // Translate from pixel position to tile position
+  BWAPI::TilePosition centerTile(center);
+  int chokeWidthTiles = (int)(chokeWidth/TILE_SIZE);
+  std::cout << "Choke tile center (" << centerTile.x() << "," << centerTile.y() << ") width " << chokeWidthTiles << "\n";
+  // generate grid
+  return getChokeGrid(centerTile, chokeWidthTiles);
+}
 
 int main (int argc, char * argv[])
 {
@@ -478,6 +511,21 @@ int main (int argc, char * argv[])
   std::cout << "Analyzing map...";
   BWTA::analyze();
   std::cout << "DONE\n";
+
+  // Example to get a grid around a chokepoint
+  const std::set<BWTA::Chokepoint*> chokePoints = BWTA::getChokepoints();
+  std::set<BWTA::Chokepoint*>::const_iterator c = chokePoints.begin();
+  // Just get the first chokepoint
+  BWTA::RectangleArray<bool> chokeGrid = getChokeGrid(*c);
+
+   // Print gird
+  std::cout << "Grid around first chokepoint:\n";
+  for (unsigned int y = 0; y < chokeGrid.getHeight(); ++y) {
+    for (unsigned int x = 0; x < chokeGrid.getWidth(); ++x) {
+      std::cout << chokeGrid[x][y];
+    }
+    std::cout << "\n";
+  }
 
 
 	return 0;
