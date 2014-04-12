@@ -2,7 +2,7 @@
 bwta2.ncb
 bwta2.suo
 src/bwta.vcproj.*
-
+src/logs/*
 
 # Binary folders
 Debug

@@ -119,507 +119,511 @@ namespace BWTA
 	double seconds;
 
 	start = clock();
-    // Give find_mineral_clusters the walkability data, minerals, and geysers, so it can compute the resource clutters
+#ifndef OFFLINE
+  // Give find_mineral_clusters the walkability data, minerals, and geysers, so it can compute the resource clutters
 	std::vector< std::vector< BWAPI::Unit* > > clusters;
-    find_mineral_clusters(MapData::walkability,MapData::minerals,MapData::geysers,clusters);
-    log("  Found " << clusters.size() << " mineral clusters.");
+  find_mineral_clusters(MapData::walkability,MapData::minerals,MapData::geysers,clusters);
+  log("  Found " << clusters.size() << " mineral clusters.");
 
-    // For each build tile, base_build_map[x][y] is true if we can build a base
-    // (resource depot) at that position (top left corner being on the given tile)
-    RectangleArray<bool> base_build_map;
+  // For each build tile, base_build_map[x][y] is true if we can build a base
+  // (resource depot) at that position (top left corner being on the given tile)
+  RectangleArray<bool> base_build_map;
 
-    // Give calculate_base_build_map the buildability data and clusters so it can compute the base_build_map
-    calculate_base_build_map(MapData::buildability,clusters,base_build_map);
-    log("  Calculated base build map.");
+  // Give calculate_base_build_map the buildability data and clusters so it can compute the base_build_map
+  calculate_base_build_map(MapData::buildability,clusters,base_build_map);
+  log("  Calculated base build map.");
+#endif
 
-    // Give find_connected_components the walkability data so it can compute the list of connected components,
-    // and determine which component each tile belongs to
+  // Give find_connected_components the walkability data so it can compute the list of connected components,
+  // and determine which component each tile belongs to
 	RectangleArray<ConnectedComponent*> get_component;
 	std::list<ConnectedComponent> components;
-    find_connected_components(MapData::walkability,get_component,components);
-    log("  Calculated connected components.");
+  find_connected_components(MapData::walkability,get_component,components);
+  log("  Calculated connected components.");
 
-    // Give calculate_base_locations the walkability data, base_build_map, and clusters so it can compute the base locations
-    calculate_base_locations(MapData::walkability,base_build_map,clusters,BWTA_Result::baselocations);
-    log("  Calculated base locations.");
+#ifndef OFFLINE
+  // Give calculate_base_locations the walkability data, base_build_map, and clusters so it can compute the base locations
+  calculate_base_locations(MapData::walkability,base_build_map,clusters,BWTA_Result::baselocations);
+  log("  Calculated base locations.");
+#endif
 
-    // Give extract_polygons the walkability data and connected components so it can compute the polygonal obstacles
-    vector<Polygon> polygons;
+  // Give extract_polygons the walkability data and connected components so it can compute the polygonal obstacles
+  vector<Polygon> polygons;
 	extract_polygons(MapData::walkability,components,polygons);
-    log("  Extracted polygons.");
+  log("  Extracted polygons.");
 
-    // Discard polygons that are too small
-    for(unsigned int p=0;p<polygons.size();) {
-      if (abs(polygons[p].getArea())<=256 && distance_to_border(polygons[p],MapData::walkability.getWidth(),MapData::walkability.getHeight())>1) {
-        polygons.erase(polygons.begin()+p);
-      } else {
-        p++;
-      }
+  // Discard polygons that are too small
+  for(unsigned int p=0;p<polygons.size();) {
+    if (abs(polygons[p].getArea())<=256 && distance_to_border(polygons[p],MapData::walkability.getWidth(),MapData::walkability.getHeight())>1) {
+      polygons.erase(polygons.begin()+p);
+    } else {
+      p++;
     }
+  }
 
 	end = clock();
 	seconds = double(end-start)/CLOCKS_PER_SEC;
 	log(" [Detected polygons in " << seconds << " seconds]");
 	start = end;
 
-    // Save the remaining polygons in BWTA_Result::unwalkablePolygons
-    for(size_t i=0;i<polygons.size();i++) {
-      BWTA_Result::unwalkablePolygons.insert(new Polygon(polygons[i]));
-    }
+  // Save the remaining polygons in BWTA_Result::unwalkablePolygons
+  for(size_t i=0;i<polygons.size();i++) {
+    BWTA_Result::unwalkablePolygons.insert(new Polygon(polygons[i]));
+  }
 
-    #ifdef DEBUG_DRAW
-      log("Drawing results of step 1");
-      draw_border();
-      draw_polygons(&polygons);
-      render(1);
-    #endif
+  #ifdef DEBUG_DRAW
+    log("Drawing results of step 1");
+    draw_border();
+    draw_polygons(&polygons);
+    render(1);
+  #endif
 
-    // All line segments we create we will store in the sites vector and also insert into the 2d segmented delaunay graph object sdg
+  // All line segments we create we will store in the sites vector and also insert into the 2d segmented delaunay graph object sdg
 
-    // Create the sites vector and 2d segmented delaunary graph
-    vector<SDGS2> sites;
-    SDG2 sdg;
+  // Create the sites vector and 2d segmented delaunary graph
+  vector<SDGS2> sites;
+  SDG2 sdg;
 
-    // Add line segments of the 4 edges of the map to the sites vector
-    sites.push_back(SDGS2::construct_site_2(PointD(0,0),PointD(0,MapData::walkability.getHeight()-1)));
-    sites.push_back(SDGS2::construct_site_2(PointD(0,MapData::walkability.getHeight()-1),PointD(MapData::walkability.getWidth()-1,MapData::walkability.getHeight()-1)));
-    sites.push_back(SDGS2::construct_site_2(PointD(MapData::walkability.getWidth()-1,MapData::walkability.getHeight()-1),PointD(MapData::walkability.getWidth()-1,0)));
-    sites.push_back(SDGS2::construct_site_2(PointD(MapData::walkability.getWidth()-1,0),PointD(0,0)));
+  // Add line segments of the 4 edges of the map to the sites vector
+  sites.push_back(SDGS2::construct_site_2(PointD(0,0),PointD(0,MapData::walkability.getHeight()-1)));
+  sites.push_back(SDGS2::construct_site_2(PointD(0,MapData::walkability.getHeight()-1),PointD(MapData::walkability.getWidth()-1,MapData::walkability.getHeight()-1)));
+  sites.push_back(SDGS2::construct_site_2(PointD(MapData::walkability.getWidth()-1,MapData::walkability.getHeight()-1),PointD(MapData::walkability.getWidth()-1,0)));
+  sites.push_back(SDGS2::construct_site_2(PointD(MapData::walkability.getWidth()-1,0),PointD(0,0)));
 
-    // Add these same line segments to the sdg
-    for(unsigned int i=0;i<sites.size();i++) {
-      sdg.insert(sites[i]);
-    }
-    // Add the line segments of each polygon to sites and sdg
-    for(unsigned int p=0;p<polygons.size();p++)
+  // Add these same line segments to the sdg
+  for(unsigned int i=0;i<sites.size();i++) {
+    sdg.insert(sites[i]);
+  }
+  // Add the line segments of each polygon to sites and sdg
+  for(unsigned int p=0;p<polygons.size();p++)
+  {
+    SDG2::Vertex_handle h;
+    // Add the edges of the border of polygons[p] to sites and sdg
+    for(size_t i=0;i<polygons[p].size();i++)
     {
-      SDG2::Vertex_handle h;
-      // Add the edges of the border of polygons[p] to sites and sdg
-      for(size_t i=0;i<polygons[p].size();i++)
+      int j=(i+1)%polygons[p].size();
+      PointD a(polygons[p][i].x(),polygons[p][i].y());
+      PointD b(polygons[p][j].x(),polygons[p][j].y());
+      sites.push_back(SDGS2::construct_site_2(b,a));
+      if (i==0)
       {
-        int j=(i+1)%polygons[p].size();
-        PointD a(polygons[p][i].x(),polygons[p][i].y());
-        PointD b(polygons[p][j].x(),polygons[p][j].y());
+        // This is the first vertex of this polygon, so don't specify a vertex handle
+        h=sdg.insert(sites[sites.size()-1]);
+      }
+      else
+      {
+        // This vertex is probably close to the previous vertex of this polygon so give the insert
+        // function the handle of the previous vertex as a hint for where to insert this vertex
+        h=sdg.insert(sites[sites.size()-1],h);
+      }
+    }
+    // Add the edges of each hole in polygons[p] to sites and sdg
+    for(std::vector<Polygon>::iterator hole=polygons[p].holes.begin();hole!=polygons[p].holes.end();hole++)
+    {
+      // Add the edges of this hole to sites and sdg
+      for(size_t i=0;i<hole->size();i++)
+      {
+        int j=(i+1)%hole->size();
+        PointD a((*hole)[i].x(),(*hole)[i].y());
+        PointD b((*hole)[j].x(),(*hole)[j].y());
         sites.push_back(SDGS2::construct_site_2(b,a));
-        if (i==0)
-        {
-          // This is the first vertex of this polygon, so don't specify a vertex handle
-          h=sdg.insert(sites[sites.size()-1]);
-        }
-        else
-        {
-          // This vertex is probably close to the previous vertex of this polygon so give the insert
-          // function the handle of the previous vertex as a hint for where to insert this vertex
-          h=sdg.insert(sites[sites.size()-1],h);
-        }
-      }
-      // Add the edges of each hole in polygons[p] to sites and sdg
-      for(std::vector<Polygon>::iterator hole=polygons[p].holes.begin();hole!=polygons[p].holes.end();hole++)
-      {
-        // Add the edges of this hole to sites and sdg
-        for(size_t i=0;i<hole->size();i++)
-        {
-          int j=(i+1)%hole->size();
-          PointD a((*hole)[i].x(),(*hole)[i].y());
-          PointD b((*hole)[j].x(),(*hole)[j].y());
-          sites.push_back(SDGS2::construct_site_2(b,a));
-          h=sdg.insert(sites[sites.size()-1],h);
-        }
+        h=sdg.insert(sites[sites.size()-1],h);
       }
     }
-    log("  Created voronoi diagram.");
-    // The sites vector and sdg object not contain all of the edges of each polygon as well as
-    // the four edges that form the border of the map
-    // Check to see if the 2d segmented delaunay graph is still valid
-    assert( sdg.is_valid(true, 1) );
-    //cout << endl << endl;
-    log("  Verified voronoi diagram.");
+  }
+  log("  Created voronoi diagram.");
+  // The sites vector and sdg object not contain all of the edges of each polygon as well as
+  // the four edges that form the border of the map
+  // Check to see if the 2d segmented delaunay graph is still valid
+  assert( sdg.is_valid(true, 1) );
+  //cout << endl << endl;
+  log("  Verified voronoi diagram.");
 
-    vector< Segment > voronoi_diagram_edges;
-    std::map<Point, std::set< Point >, ptcmp > nearest;
-    std::map<Point, double, ptcmp> distance;
-    get_voronoi_edges(sdg,voronoi_diagram_edges,nearest,distance,polygons);
-    log("  Got voronoi edges.");
-    Arrangement_2 arr;
-    My_observer obs(arr);
-    Graph g(&arr);
+  vector< Segment > voronoi_diagram_edges;
+  std::map<Point, std::set< Point >, ptcmp > nearest;
+  std::map<Point, double, ptcmp> distance;
+  get_voronoi_edges(sdg,voronoi_diagram_edges,nearest,distance,polygons);
+  log("  Got voronoi edges.");
+  Arrangement_2 arr;
+  My_observer obs(arr);
+  Graph g(&arr);
 
-    // Insert all line segments from polygons into arrangement
-    for(unsigned int i=0;i<sites.size();i++)
+  // Insert all line segments from polygons into arrangement
+  for(unsigned int i=0;i<sites.size();i++)
+  {
+    NumberType x0(sites[i].segment().vertex(0).x());
+    NumberType y0(sites[i].segment().vertex(0).y());
+    NumberType x1(sites[i].segment().vertex(1).x());
+    NumberType y1(sites[i].segment().vertex(1).y());
+    if (x0!=x1 || y0!=y1)
     {
-      NumberType x0(sites[i].segment().vertex(0).x());
-      NumberType y0(sites[i].segment().vertex(0).y());
-      NumberType x1(sites[i].segment().vertex(1).x());
-      NumberType y1(sites[i].segment().vertex(1).y());
-      if (x0!=x1 || y0!=y1)
+      if (is_real(x0)!=0 && is_real(y0)!=0
+       && is_real(x1)!=0 && is_real(y1)!=0)
       {
-        if (is_real(x0)!=0 && is_real(y0)!=0
-         && is_real(x1)!=0 && is_real(y1)!=0)
-        {
-          CGAL::insert(arr,Segment_2(Point_2(sites[i].segment().vertex(0).x(),sites[i].segment().vertex(0).y()),Point_2(sites[i].segment().vertex(1).x(),sites[i].segment().vertex(1).y())));
-        }
+        CGAL::insert(arr,Segment_2(Point_2(sites[i].segment().vertex(0).x(),sites[i].segment().vertex(0).y()),Point_2(sites[i].segment().vertex(1).x(),sites[i].segment().vertex(1).y())));
       }
     }
-    log("  Inserted polygons into arrangement.");
-    //color all initial segments and vertices from the polygons BLACK
-    for (Arrangement_2::Edge_iterator eit = arr.edges_begin(); eit != arr.edges_end(); ++eit)
-    {
-      eit->data()=BLACK;
-    }
-    for (Arrangement_2::Vertex_iterator vit = arr.vertices_begin(); vit != arr.vertices_end(); ++vit)
-    {
-      vit->data().c=BLACK;
-    }
+  }
+  log("  Inserted polygons into arrangement.");
+  //color all initial segments and vertices from the polygons BLACK
+  for (Arrangement_2::Edge_iterator eit = arr.edges_begin(); eit != arr.edges_end(); ++eit)
+  {
+    eit->data()=BLACK;
+  }
+  for (Arrangement_2::Vertex_iterator vit = arr.vertices_begin(); vit != arr.vertices_end(); ++vit)
+  {
+    vit->data().c=BLACK;
+  }
 
-    // Insert into arrangement all segments from voronoi diagram which are not bounded by any polygon
-    for(unsigned int i=0;i<voronoi_diagram_edges.size();i++)
+  // Insert into arrangement all segments from voronoi diagram which are not bounded by any polygon
+  for(unsigned int i=0;i<voronoi_diagram_edges.size();i++)
+  {
+    NumberType x0(voronoi_diagram_edges[i].vertex(0).x());
+    NumberType y0(voronoi_diagram_edges[i].vertex(0).y());
+    NumberType x1(voronoi_diagram_edges[i].vertex(1).x());
+    NumberType y1(voronoi_diagram_edges[i].vertex(1).y());
+    if (x0!=x1 || y0!=y1)
     {
-      NumberType x0(voronoi_diagram_edges[i].vertex(0).x());
-      NumberType y0(voronoi_diagram_edges[i].vertex(0).y());
-      NumberType x1(voronoi_diagram_edges[i].vertex(1).x());
-      NumberType y1(voronoi_diagram_edges[i].vertex(1).y());
-      if (x0!=x1 || y0!=y1)
+      if (is_real(x0)!=0 && is_real(y0)!=0
+       && is_real(x1)!=0 && is_real(y1)!=0)
       {
-        if (is_real(x0)!=0 && is_real(y0)!=0
-         && is_real(x1)!=0 && is_real(y1)!=0)
+        bool add=true;
+        for(unsigned int p=0;p<polygons.size();p++)
         {
-          bool add=true;
-          for(unsigned int p=0;p<polygons.size();p++)
+          if (polygons[p].isInside(BWAPI::Position(int(cast_to_double(voronoi_diagram_edges[i].vertex(0).x())),int(cast_to_double(voronoi_diagram_edges[i].vertex(0).y())))))
           {
-            if (polygons[p].isInside(BWAPI::Position(int(cast_to_double(voronoi_diagram_edges[i].vertex(0).x())),int(cast_to_double(voronoi_diagram_edges[i].vertex(0).y())))))
-            {
-              // First end point of this line segment is inside polygons[p], so don't add it to the arrangement
-              add=false;
-              break;
-            }
-            if (polygons[p].isInside(BWAPI::Position(int(cast_to_double(voronoi_diagram_edges[i].vertex(1).x())),int(cast_to_double(voronoi_diagram_edges[i].vertex(1).y())))))
-            {
-              // Second end point of this line segment is inside polygons[p], so don't add it to the arrangement
-              add=false;
-              break;
-            }
+            // First end point of this line segment is inside polygons[p], so don't add it to the arrangement
+            add=false;
+            break;
           }
-          if (add)
+          if (polygons[p].isInside(BWAPI::Position(int(cast_to_double(voronoi_diagram_edges[i].vertex(1).x())),int(cast_to_double(voronoi_diagram_edges[i].vertex(1).y())))))
           {
-            CGAL::insert(arr,Segment_2(Point_2(x0,y0),Point_2(x1,y1)));
+            // Second end point of this line segment is inside polygons[p], so don't add it to the arrangement
+            add=false;
+            break;
           }
         }
+        if (add)
+        {
+          CGAL::insert(arr,Segment_2(Point_2(x0,y0),Point_2(x1,y1)));
+        }
       }
     }
-    log("  Added voronoi edges.");
-    // Color all the new edges BLUE
-    for (Arrangement_2::Edge_iterator eit = arr.edges_begin(); eit != arr.edges_end(); ++eit)
+  }
+  log("  Added voronoi edges.");
+  // Color all the new edges BLUE
+  for (Arrangement_2::Edge_iterator eit = arr.edges_begin(); eit != arr.edges_end(); ++eit)
+  {
+    if (eit->data()!=BLACK)
     {
-      if (eit->data()!=BLACK)
-      {
-        eit->data()=BLUE;
-        eit->twin()->data()=BLUE;
-      }
+      eit->data()=BLUE;
+      eit->twin()->data()=BLUE;
     }
-    // Color all the new verties BlUE
-    for (Arrangement_2::Vertex_iterator vit = arr.vertices_begin(); vit != arr.vertices_end(); ++vit)
+  }
+  // Color all the new verties BlUE
+  for (Arrangement_2::Vertex_iterator vit = arr.vertices_begin(); vit != arr.vertices_end(); ++vit)
+  {
+    if (vit->data().c!=BLACK)
     {
-      if (vit->data().c!=BLACK)
-      {
-        vit->data().c=BLUE;
-      }
+      vit->data().c=BLUE;
     }
+  }
 
 	end = clock();
 	seconds = double(end-start)/CLOCKS_PER_SEC;
 	log(" [Computed Voronoi diagram in " << seconds << " seconds]");
 	start = end;
 
-    #ifdef DEBUG_DRAW
-      log("Drawing results of step 2");
-      draw_polygons(&polygons);
-      draw_arrangement(&arr);
-      render(2);
-    #endif
+  #ifdef DEBUG_DRAW
+    log("Drawing results of step 2");
+    draw_polygons(&polygons);
+    draw_arrangement(&arr);
+    render(2);
+  #endif
 
-    simplify_voronoi_diagram(&arr,&distance);
+  simplify_voronoi_diagram(&arr,&distance);
 
 	end = clock();
 	seconds = double(end-start)/CLOCKS_PER_SEC;
 	log(" [Pruned Voronoi diagram in " << seconds << " seconds]");
 	start = end;
 
-    #ifdef DEBUG_DRAW
-      log("Drawing results of step 3");
-      draw_polygons(&polygons);
-      draw_arrangement(&arr);
-      render(3);
-    #endif
+  #ifdef DEBUG_DRAW
+    log("Drawing results of step 3");
+    draw_polygons(&polygons);
+    draw_arrangement(&arr);
+    render(3);
+  #endif
 
-    identify_region_nodes(&arr,&g);
+  identify_region_nodes(&arr,&g);
 
 	end = clock();
 	seconds = double(end-start)/CLOCKS_PER_SEC;
 	log(" [Identified region nodes in " << seconds << " seconds]");
 	start = end;
 
-    #ifdef DEBUG_DRAW
-      log("Drawing results of step 4");
-      draw_polygons(&polygons);
-      draw_arrangement(&arr);
-      for(std::set<Node*>::iterator r=g.regions_begin();r!=g.regions_end();r++)
-      {
-        double x0=cast_to_double((*r)->point.x());
-        double y0=cast_to_double((*r)->point.y());
-        #ifdef DRAW_COLOR
-          scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(0,0,255)),QBrush(QColor(0,0,255)));
-        #else
-          scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(0,0,0)),QBrush(QColor(0,0,0)));
-        #endif
-      }
-      render(4);
-    #endif
+  #ifdef DEBUG_DRAW
+    log("Drawing results of step 4");
+    draw_polygons(&polygons);
+    draw_arrangement(&arr);
+    for(std::set<Node*>::iterator r=g.regions_begin();r!=g.regions_end();r++)
+    {
+      double x0=cast_to_double((*r)->point.x());
+      double y0=cast_to_double((*r)->point.y());
+      #ifdef DRAW_COLOR
+        scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(0,0,255)),QBrush(QColor(0,0,255)));
+      #else
+        scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(0,0,0)),QBrush(QColor(0,0,0)));
+      #endif
+    }
+    render(4);
+  #endif
 
-    identify_chokepoint_nodes(&g,&distance,&nearest);
+  identify_chokepoint_nodes(&g,&distance,&nearest);
 
 	end = clock();
 	seconds = double(end-start)/CLOCKS_PER_SEC;
 	log(" [Identified choke points nodes in " << seconds << " seconds]");
 	start = end;
 
-    #ifdef DEBUG_DRAW
-      log("Drawing results of step 5");
-      draw_polygons(&polygons);
-      draw_arrangement(&arr);
-      for(std::set<Node*>::iterator r=g.regions_begin();r!=g.regions_end();r++)
-      {
-        double x0=cast_to_double((*r)->point.x());
-        double y0=cast_to_double((*r)->point.y());
-        #ifdef DRAW_COLOR
-          scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(0,0,255)),QBrush(QColor(0,0,255)));
-        #else
-          scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(0,0,0)),QBrush(QColor(0,0,0)));
-        #endif
-      }
-      for(std::set<Node*>::iterator c=g.chokepoints_begin();c!=g.chokepoints_end();c++)
-      {
-        double x0=cast_to_double((*c)->point.x());
-        double y0=cast_to_double((*c)->point.y());
-        #ifdef DRAW_COLOR
-          scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(255,0,0)),QBrush(QColor(255,0,0)));
-        #else
-          QVector<QPointF> qp;
-          qp.push_back(QPointF(x0,y0-6));
-          qp.push_back(QPointF(x0-7,y0+6));
-          qp.push_back(QPointF(x0+7,y0+6));
-          scene_ptr->addPolygon(QPolygonF(qp),QPen(QColor(0,0,0)),QBrush(QColor(0,0,0)));  
-        #endif
-      }
-      render(5);
-    #endif
+  #ifdef DEBUG_DRAW
+    log("Drawing results of step 5");
+    draw_polygons(&polygons);
+    draw_arrangement(&arr);
+    for(std::set<Node*>::iterator r=g.regions_begin();r!=g.regions_end();r++)
+    {
+      double x0=cast_to_double((*r)->point.x());
+      double y0=cast_to_double((*r)->point.y());
+      #ifdef DRAW_COLOR
+        scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(0,0,255)),QBrush(QColor(0,0,255)));
+      #else
+        scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(0,0,0)),QBrush(QColor(0,0,0)));
+      #endif
+    }
+    for(std::set<Node*>::iterator c=g.chokepoints_begin();c!=g.chokepoints_end();c++)
+    {
+      double x0=cast_to_double((*c)->point.x());
+      double y0=cast_to_double((*c)->point.y());
+      #ifdef DRAW_COLOR
+        scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(255,0,0)),QBrush(QColor(255,0,0)));
+      #else
+        QVector<QPointF> qp;
+        qp.push_back(QPointF(x0,y0-6));
+        qp.push_back(QPointF(x0-7,y0+6));
+        qp.push_back(QPointF(x0+7,y0+6));
+        scene_ptr->addPolygon(QPolygonF(qp),QPen(QColor(0,0,0)),QBrush(QColor(0,0,0)));  
+      #endif
+    }
+    render(5);
+  #endif
 
-    merge_adjacent_regions(&g);
-    log("  Merged regions.");
+  merge_adjacent_regions(&g);
+  log("  Merged regions.");
     
-	remove_voronoi_diagram_from_arrangement(&arr);
-    log("  Removed voronoi edges.");
+  remove_voronoi_diagram_from_arrangement(&arr);
+  log("  Removed voronoi edges.");
 
 	end = clock();
 	seconds = double(end-start)/CLOCKS_PER_SEC;
 	log(" [Merged adjacent regions in " << seconds << " seconds]");
 	start = end;
 
-    #ifdef DEBUG_DRAW
-      log("Drawing results of step 6");
-      draw_polygons(&polygons);
-      draw_arrangement(&arr);
-      for(std::set<Node*>::iterator r=g.regions_begin();r!=g.regions_end();r++)
+  #ifdef DEBUG_DRAW
+    log("Drawing results of step 6");
+    draw_polygons(&polygons);
+    draw_arrangement(&arr);
+    for(std::set<Node*>::iterator r=g.regions_begin();r!=g.regions_end();r++)
+    {
+      double x0=cast_to_double((*r)->point.x());
+      double y0=cast_to_double((*r)->point.y());  
+      for(std::set<Node*>::iterator n=(*r)->neighbors.begin();n!=(*r)->neighbors.end();n++)
       {
-        double x0=cast_to_double((*r)->point.x());
-        double y0=cast_to_double((*r)->point.y());  
-        for(std::set<Node*>::iterator n=(*r)->neighbors.begin();n!=(*r)->neighbors.end();n++)
-        {
-          double x1=cast_to_double((*n)->point.x());
-          double y1=cast_to_double((*n)->point.y());
-          QPen qp(QColor(0,0,0));
-          qp.setWidth(2);
-          scene.addLine(QLineF(x0,y0,x1,y1),qp);
-        }
-        #ifdef DRAW_COLOR
-          scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(0,0,255)),QBrush(QColor(0,0,255)));
-        #else
-          scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(0,0,0)),QBrush(QColor(0,0,0)));
-        #endif
-        //scene.addEllipse(QRectF(x0-(*r)->radius,y0-(*r)->radius,2*(*r)->radius,2*(*r)->radius),QPen(QColor(0,0,255)));
+        double x1=cast_to_double((*n)->point.x());
+        double y1=cast_to_double((*n)->point.y());
+        QPen qp(QColor(0,0,0));
+        qp.setWidth(2);
+        scene.addLine(QLineF(x0,y0,x1,y1),qp);
       }
-      for(std::set<Node*>::iterator c=g.chokepoints_begin();c!=g.chokepoints_end();c++)
-      {
-        double x0=cast_to_double((*c)->point.x());
-        double y0=cast_to_double((*c)->point.y());
-        //scene.addEllipse(QRectF(x0-3,y0-3,6,6),QPen(QColor(255,0,0)),QBrush(QColor(255,0,0)));
-//        scene.addRect(QRectF(x0-5,y0-5,10,10),QPen(QColor(0,0,0)),QBrush(QColor(0,0,0)));
-        #ifdef DRAW_COLOR
-          scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(255,0,0)),QBrush(QColor(255,0,0)));
-        #else
-          QVector<QPointF> qp;
-          qp.push_back(QPointF(x0,y0-6));
-          qp.push_back(QPointF(x0-7,y0+6));
-          qp.push_back(QPointF(x0+7,y0+6));
-          scene_ptr->addPolygon(QPolygonF(qp),QPen(QColor(0,0,0)),QBrush(QColor(0,0,0)));  
-        #endif
-        if (calculate_merge_value(*c)>0)
-          scene.addEllipse(QRectF(x0-(*c)->radius,y0-(*c)->radius,2*(*c)->radius,2*(*c)->radius));
-      }
-      render(6);
-    #endif
+      #ifdef DRAW_COLOR
+        scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(0,0,255)),QBrush(QColor(0,0,255)));
+      #else
+        scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(0,0,0)),QBrush(QColor(0,0,0)));
+      #endif
+      //scene.addEllipse(QRectF(x0-(*r)->radius,y0-(*r)->radius,2*(*r)->radius,2*(*r)->radius),QPen(QColor(0,0,255)));
+    }
+    for(std::set<Node*>::iterator c=g.chokepoints_begin();c!=g.chokepoints_end();c++)
+    {
+      double x0=cast_to_double((*c)->point.x());
+      double y0=cast_to_double((*c)->point.y());
+//       scene.addEllipse(QRectF(x0-3,y0-3,6,6),QPen(QColor(255,0,0)),QBrush(QColor(255,0,0)));
+//       scene.addRect(QRectF(x0-5,y0-5,10,10),QPen(QColor(0,0,0)),QBrush(QColor(0,0,0)));
+      #ifdef DRAW_COLOR
+        scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(255,0,0)),QBrush(QColor(255,0,0)));
+      #else
+        QVector<QPointF> qp;
+        qp.push_back(QPointF(x0,y0-6));
+        qp.push_back(QPointF(x0-7,y0+6));
+        qp.push_back(QPointF(x0+7,y0+6));
+        scene_ptr->addPolygon(QPolygonF(qp),QPen(QColor(0,0,0)),QBrush(QColor(0,0,0)));  
+      #endif
+      if (calculate_merge_value(*c)>0)
+        scene.addEllipse(QRectF(x0-(*c)->radius,y0-(*c)->radius,2*(*c)->radius,2*(*c)->radius));
+    }
+    render(6);
+  #endif
 
-    wall_off_chokepoints(&g,&arr);
+  wall_off_chokepoints(&g,&arr);
 
 	end = clock();
 	seconds = double(end-start)/CLOCKS_PER_SEC;
 	log(" [Wall of chokepoints in " << seconds << " seconds]");
 	start = end;
 
-    #ifdef DEBUG_DRAW
-      log("Drawing results of step 7");
-      draw_polygons(&polygons);
-      draw_arrangement(&arr);
-      for(std::set<Node*>::iterator r=g.regions_begin();r!=g.regions_end();r++)
-      {
-        double x0=cast_to_double((*r)->point.x());
-        double y0=cast_to_double((*r)->point.y());  
-        for(std::set<Node*>::iterator n=(*r)->neighbors.begin();n!=(*r)->neighbors.end();n++)
-        {
-          double x1=cast_to_double((*n)->point.x());
-          double y1=cast_to_double((*n)->point.y());
-          QPen qp(QColor(0,0,0));
-          qp.setWidth(2);
-          scene.addLine(QLineF(x0,y0,x1,y1),qp);
-        }
-        #ifdef DRAW_COLOR
-          scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(0,0,255)),QBrush(QColor(0,0,255)));
-        #else
-          scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(0,0,0)),QBrush(QColor(0,0,0)));
-        #endif
-      }
-      for(std::set<Node*>::iterator c=g.chokepoints_begin();c!=g.chokepoints_end();c++)
-      {
-        double x0=cast_to_double((*c)->point.x());
-        double y0=cast_to_double((*c)->point.y());
-//        scene.addEllipse(QRectF(x0-3,y0-3,6,6),QPen(QColor(255,0,0)),QBrush(QColor(255,0,0)));
-//        scene.addRect(QRectF(x0-5,y0-5,10,10),QPen(QColor(0,0,0)),QBrush(QColor(0,0,0)));
-        #ifdef DRAW_COLOR
-          scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(255,0,0)),QBrush(QColor(255,0,0)));
-        #else
-          QVector<QPointF> qp;
-          qp.push_back(QPointF(x0,y0-6));
-          qp.push_back(QPointF(x0-7,y0+6));
-          qp.push_back(QPointF(x0+7,y0+6));
-          scene_ptr->addPolygon(QPolygonF(qp),QPen(QColor(0,0,0)),QBrush(QColor(0,0,0)));  
-        #endif
-
-      }
-      render(7);
-    #endif
-
-    BWTA_Result::chokepoints.clear();
-    std::map<Node*,Region*> node2region;
+  #ifdef DEBUG_DRAW
+    log("Drawing results of step 7");
+    draw_polygons(&polygons);
+    draw_arrangement(&arr);
     for(std::set<Node*>::iterator r=g.regions_begin();r!=g.regions_end();r++)
     {
-      Polygon poly;
-      PolygonD pd=(*r)->get_polygon();
-      for(int i=0;i<pd.size();i++)
+      double x0=cast_to_double((*r)->point.x());
+      double y0=cast_to_double((*r)->point.y());  
+      for(std::set<Node*>::iterator n=(*r)->neighbors.begin();n!=(*r)->neighbors.end();n++)
       {
-        poly.push_back(BWAPI::Position((int)(pd[i].x()*8),(int)(pd[i].y()*8)));
+        double x1=cast_to_double((*n)->point.x());
+        double y1=cast_to_double((*n)->point.y());
+        QPen qp(QColor(0,0,0));
+        qp.setWidth(2);
+        scene.addLine(QLineF(x0,y0,x1,y1),qp);
       }
-      Region* new_region= new RegionImpl(poly);
-      BWTA_Result::regions.insert(new_region);
-      node2region.insert(std::make_pair(*r,new_region));
+      #ifdef DRAW_COLOR
+        scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(0,0,255)),QBrush(QColor(0,0,255)));
+      #else
+        scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(0,0,0)),QBrush(QColor(0,0,0)));
+      #endif
     }
+    for(std::set<Node*>::iterator c=g.chokepoints_begin();c!=g.chokepoints_end();c++)
+    {
+      double x0=cast_to_double((*c)->point.x());
+      double y0=cast_to_double((*c)->point.y());
+//      scene.addEllipse(QRectF(x0-3,y0-3,6,6),QPen(QColor(255,0,0)),QBrush(QColor(255,0,0)));
+//      scene.addRect(QRectF(x0-5,y0-5,10,10),QPen(QColor(0,0,0)),QBrush(QColor(0,0,0)));
+      #ifdef DRAW_COLOR
+        scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(255,0,0)),QBrush(QColor(255,0,0)));
+      #else
+        QVector<QPointF> qp;
+        qp.push_back(QPointF(x0,y0-6));
+        qp.push_back(QPointF(x0-7,y0+6));
+        qp.push_back(QPointF(x0+7,y0+6));
+        scene_ptr->addPolygon(QPolygonF(qp),QPen(QColor(0,0,0)),QBrush(QColor(0,0,0)));  
+      #endif
+
+    }
+    render(7);
+  #endif
+
+  BWTA_Result::chokepoints.clear();
+  std::map<Node*,Region*> node2region;
+  for(std::set<Node*>::iterator r=g.regions_begin();r!=g.regions_end();r++)
+  {
+    Polygon poly;
+    PolygonD pd=(*r)->get_polygon();
+    for(int i=0;i<pd.size();i++)
+    {
+      poly.push_back(BWAPI::Position((int)(pd[i].x()*8),(int)(pd[i].y()*8)));
+    }
+    Region* new_region= new RegionImpl(poly);
+    BWTA_Result::regions.insert(new_region);
+    node2region.insert(std::make_pair(*r,new_region));
+  }
 
 	end = clock();
 	seconds = double(end-start)/CLOCKS_PER_SEC;
 	log(" [Finding regions in " << seconds << " seconds]");
 	start = end;
 
-    #ifdef DEBUG_DRAW
-      log("Drawing results of step 8");
-      draw_polygons(&polygons);
-      #ifdef DRAW_COLOR
-      
-        for(std::set<Node*>::iterator r=g.regions_begin();r!=g.regions_end();r++)
-        {
-          (*r)->hue=rand()*1.0/RAND_MAX;
-        }
-        for(int l=0;l<6;l++)
-        {
-          for(std::set<Node*>::iterator r=g.regions_begin();r!=g.regions_end();r++)
-          {
-            for(std::set<Node*>::iterator n=(*r)->neighbors.begin();n!=(*r)->neighbors.end();n++)
-            {
-              Node* r2=(*n)->other_neighbor(*r);
-              double d=r2->hue-(*r)->hue;
-              if (d>0.5) d=d-1.0;
-              if (d<-0.5) d=d+1.0;
-              double s=d-0.5;
-              if (d<0) s+=1.0;
-              s*=0.05;
-              (*r)->hue+=s;
-              r2->hue-=s;
-              while ((*r)->hue<0) (*r)->hue+=1.0;
-              while ((*r)->hue>=1.0) (*r)->hue-=1.0;
-              while (r2->hue<0) r2->hue+=1.0;
-              while (r2->hue>=1.0) r2->hue-=1.0;
-            }
-          }
-        }
-        for(std::set<Node*>::iterator r=g.regions_begin();r!=g.regions_end();r++)
-        {
-          double x0=cast_to_double((*r)->point.x());
-          double y0=cast_to_double((*r)->point.y());
-          PolygonD boundary=(*r)->get_polygon();
-          QVector<QPointF> qp;
-          for(int i=0;i<boundary.size();i++)
-          {
-            qp.push_back(QPointF(boundary.vertex(i).x(),boundary.vertex(i).y()));
-          }
-          scene.addPolygon(QPolygonF(qp),QPen(QColor(0,0,0)),QBrush(hsl2rgb((*r)->hue,1.0,0.75)));    
-  //        scene.addPolygon(QPolygonF(qp),QPen(QColor(0,0,0)),QBrush(QColor(255,255,255)));    
-        }
-      
-      #endif
-      draw_arrangement(&arr);
-      render(8);
-    #endif
-
-    log("  Finding chokepoints and linking them to regions.");
-    std::map<Node*,Chokepoint*> node2chokepoint;
-    for(std::set<Node*>::iterator c=g.chokepoints_begin();c!=g.chokepoints_end();c++)
-    {
-      std::set<Node*>::iterator i=(*c)->neighbors.begin();
-      Region* r1=node2region[*i];
-      i++;
-      Region* r2=node2region[*i];
-      BWAPI::Position side1((int)(cast_to_double((*c)->side1.x())*8),(int)(cast_to_double((*c)->side1.y())*8));
-      BWAPI::Position side2((int)(cast_to_double((*c)->side2.x())*8),(int)(cast_to_double((*c)->side2.y())*8));
-      Chokepoint* new_chokepoint= new ChokepointImpl(std::make_pair(r1,r2),std::make_pair(side1,side2));
-      BWTA_Result::chokepoints.insert(new_chokepoint);
-      node2chokepoint.insert(std::make_pair(*c,new_chokepoint));
-    }
-    log("  Linking regions to chokepoints.");
-    for(std::set<Node*>::iterator r=g.regions_begin();r!=g.regions_end();r++)
-    {
-      Region* region=node2region[*r];
-      std::set<Chokepoint*> chokepoints;
-      for(std::set<Node*>::iterator i=(*r)->neighbors.begin();i!=(*r)->neighbors.end();i++)
+  #ifdef DEBUG_DRAW
+    log("Drawing results of step 8");
+    draw_polygons(&polygons);
+    #ifdef DRAW_COLOR
+    
+      for(std::set<Node*>::iterator r=g.regions_begin();r!=g.regions_end();r++)
       {
-        chokepoints.insert(node2chokepoint[*i]);
+        (*r)->hue=rand()*1.0/RAND_MAX;
       }
-      ((RegionImpl*)region)->_chokepoints=chokepoints;
+      for(int l=0;l<6;l++)
+      {
+        for(std::set<Node*>::iterator r=g.regions_begin();r!=g.regions_end();r++)
+        {
+          for(std::set<Node*>::iterator n=(*r)->neighbors.begin();n!=(*r)->neighbors.end();n++)
+          {
+            Node* r2=(*n)->other_neighbor(*r);
+            double d=r2->hue-(*r)->hue;
+            if (d>0.5) d=d-1.0;
+            if (d<-0.5) d=d+1.0;
+            double s=d-0.5;
+            if (d<0) s+=1.0;
+            s*=0.05;
+            (*r)->hue+=s;
+            r2->hue-=s;
+            while ((*r)->hue<0) (*r)->hue+=1.0;
+            while ((*r)->hue>=1.0) (*r)->hue-=1.0;
+            while (r2->hue<0) r2->hue+=1.0;
+            while (r2->hue>=1.0) r2->hue-=1.0;
+          }
+        }
+      }
+      for(std::set<Node*>::iterator r=g.regions_begin();r!=g.regions_end();r++)
+      {
+        double x0=cast_to_double((*r)->point.x());
+        double y0=cast_to_double((*r)->point.y());
+        PolygonD boundary=(*r)->get_polygon();
+        QVector<QPointF> qp;
+        for(int i=0;i<boundary.size();i++)
+        {
+          qp.push_back(QPointF(boundary.vertex(i).x(),boundary.vertex(i).y()));
+        }
+        scene.addPolygon(QPolygonF(qp),QPen(QColor(0,0,0)),QBrush(hsl2rgb((*r)->hue,1.0,0.75)));    
+//        scene.addPolygon(QPolygonF(qp),QPen(QColor(0,0,0)),QBrush(QColor(255,255,255)));    
+      }
+    
+    #endif
+  draw_arrangement(&arr);
+  render(8);
+  #endif
+
+  log("  Finding chokepoints and linking them to regions.");
+  std::map<Node*,Chokepoint*> node2chokepoint;
+  for(std::set<Node*>::iterator c=g.chokepoints_begin();c!=g.chokepoints_end();c++)
+  {
+    std::set<Node*>::iterator i=(*c)->neighbors.begin();
+    Region* r1=node2region[*i];
+    i++;
+    Region* r2=node2region[*i];
+    BWAPI::Position side1((int)(cast_to_double((*c)->side1.x())*8),(int)(cast_to_double((*c)->side1.y())*8));
+    BWAPI::Position side2((int)(cast_to_double((*c)->side2.x())*8),(int)(cast_to_double((*c)->side2.y())*8));
+    Chokepoint* new_chokepoint= new ChokepointImpl(std::make_pair(r1,r2),std::make_pair(side1,side2));
+    BWTA_Result::chokepoints.insert(new_chokepoint);
+    node2chokepoint.insert(std::make_pair(*c,new_chokepoint));
+  }
+  log("  Linking regions to chokepoints.");
+  for(std::set<Node*>::iterator r=g.regions_begin();r!=g.regions_end();r++)
+  {
+    Region* region=node2region[*r];
+    std::set<Chokepoint*> chokepoints;
+    for(std::set<Node*>::iterator i=(*r)->neighbors.begin();i!=(*r)->neighbors.end();i++)
+    {
+      chokepoints.insert(node2chokepoint[*i]);
     }
+    ((RegionImpl*)region)->_chokepoints=chokepoints;
+  }
 
 	end = clock();
 	seconds = double(end-start)/CLOCKS_PER_SEC;
 	log(" [Linked choke points wiht regions in " << seconds << " seconds]");
 	start = end;
 
-    calculate_connectivity();
-    calculate_base_location_properties(get_component,components,BWTA_Result::baselocations);
+  calculate_connectivity();
+  calculate_base_location_properties(get_component,components,BWTA_Result::baselocations);
 
 	end = clock();
 	seconds = double(end-start)/CLOCKS_PER_SEC;
@@ -679,6 +683,7 @@ namespace BWTA
 		char numstr[2];
 		sprintf_s(numstr, sizeof(numstr), "%d", step);
 		filename = filename + "-" + numstr + ".png";
+    log("Saving to: " << filename);
         image->save(filename.c_str(), "PNG");
 
 		// show a GUI with the image

@@ -59,17 +59,17 @@ void printError(const char * archive, const char * message, const char * file, i
 */
 bool hasEnding (const char *fullString, const char *ending)
 {
-	int l1 = strlen(fullString);
-	int l2 = strlen(ending);
-    if (l1 >= l2) {
-		int start = l1-l2;
-		for(int idx = 0;idx<l2;idx++) {
-			if (fullString[start+idx] != ending[idx]) return false;
-		}
-		return true;
-    } else {
-        return false;
+  int l1 = strlen(fullString);
+  int l2 = strlen(ending);
+  if (l1 >= l2) {
+    int start = l1-l2;
+    for(int idx = 0;idx<l2;idx++) {
+      if (fullString[start+idx] != ending[idx]) return false;
     }
+    return true;
+  } else {
+    return false;
+  }
 }
 
 
@@ -382,7 +382,10 @@ int main (int argc, char * argv[])
     return 1;
   }
 
-  BWTA::MapData::mapFileName = argv[1];
+  // Save map name
+  std::string strName = argv[1];
+  unsigned found = strName.find_last_of("/\\");
+  BWTA::MapData::mapFileName = strName.substr(found+1);
 
 	std::cout << "Testing standalone BWTA\n";
 	DWORD dataSize = 0;
@@ -471,6 +474,6 @@ int main (int argc, char * argv[])
 
   // Normal procedure to analyze map
   BWTA::readMap();
-  //BWTA::analyze();
+  BWTA::analyze();
 	return 0;
 }

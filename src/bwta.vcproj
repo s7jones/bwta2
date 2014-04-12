@@ -264,7 +264,7 @@
 				FavorSizeOrSpeed="0"
 				WholeProgramOptimization="false"
 				AdditionalIncludeDirectories="../include;../include/Qt/include/QtCore;../include/Qt/include/QtGui;../include/Qt/include/ActiveQt;../include/Qt/include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_SECURE_SCL 0;OFFLINE"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_SECURE_SCL 0;DEBUG_DRAW;DRAW_COLOR;OFFLINE"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -285,91 +285,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CGAL-vc90-mt.lib libboost_thread-vc90-mt-1_40.lib gmp-vc90-mt.lib BWAPI.lib StormLibRAD.lib"
-				AdditionalLibraryDirectories="..\lib"
-				LinkTimeCodeGeneration="1"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-				CommandLine=""
-			/>
-		</Configuration>
-		<Configuration
-			Name="Exe-Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
-			CharacterSet="2"
-			WholeProgramOptimization="0"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				InlineFunctionExpansion="0"
-				EnableIntrinsicFunctions="false"
-				FavorSizeOrSpeed="0"
-				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="../include;../include/Qt/include/QtCore;../include/Qt/include/QtGui;../include/Qt/include/ActiveQt;../include/Qt/include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_SECURE_SCL 0;OFFLINE"
-				StringPooling="true"
-				MinimalRebuild="true"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
-				EnableFunctionLevelLinking="false"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="stdafx.h"
-				ProgramDataBaseFileName="$(OutDir)\BWTAd.pdb"
-				WarningLevel="3"
-				DebugInformationFormat="3"
-				ForcedIncludeFiles="stdafx.h"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="CGAL-vc90-mt-gd.lib libboost_thread-vc90-mt-gd-1_40.lib gmp-vc90-mt-gd.lib mpfr-vc90-mt-gd.lib BWAPI.lib"
-				AdditionalLibraryDirectories="..\lib"
-				GenerateDebugInformation="true"
+				AdditionalDependencies="CGAL-vc90-mt.lib libboost_thread-vc90-mt-1_40.lib gmp-vc90-mt.lib BWAPI.lib StormLibRAD.lib QtCore4.lib QtGui4.lib"
+				AdditionalLibraryDirectories="../lib/;&quot;$(QTDIR)\lib&quot;"
 				LinkTimeCodeGeneration="1"
 			/>
 			<Tool
