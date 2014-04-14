@@ -115,7 +115,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="0"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="../include;../include/Qt/include/QtCore;../include/Qt/include/QtGui;../include/Qt/include/ActiveQt;../include/Qt/include"
+				AdditionalIncludeDirectories="../include;../include/Qt/include/QtCore;../include/Qt/include/QtGui;../include/Qt/include/ActiveQt;../include/Qt/include;../interface"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_SECURE_SCL 0"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -263,7 +263,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="0"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="../include;../include/Qt/include/QtCore;../include/Qt/include/QtGui;../include/Qt/include/ActiveQt;../include/Qt/include"
+				AdditionalIncludeDirectories="../interface;../include;../include/Qt/include/QtCore;../include/Qt/include/QtGui;../include/Qt/include/ActiveQt;../include/Qt/include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_SECURE_SCL 0;DEBUG_DRAW;DRAW_COLOR;OFFLINE"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -287,6 +287,87 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="CGAL-vc90-mt.lib libboost_thread-vc90-mt-1_40.lib gmp-vc90-mt.lib BWAPI.lib StormLibRAD.lib QtCore4.lib QtGui4.lib"
 				AdditionalLibraryDirectories="../lib/;&quot;$(QTDIR)\lib&quot;"
+				LinkTimeCodeGeneration="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine=""
+			/>
+		</Configuration>
+		<Configuration
+			Name="Exe-Debug|Win32"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="2"
+			WholeProgramOptimization="0"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="0"
+				WholeProgramOptimization="false"
+				AdditionalIncludeDirectories="../interface;../include;../include/Qt/include/QtCore;../include/Qt/include/QtGui;../include/Qt/include/ActiveQt;../include/Qt/include"
+				PreprocessorDefinitions="WIN32;DEBUG;_CONSOLE;_SECURE_SCL 0;DEBUG_DRAW;DRAW_COLOR;OFFLINE"
+				StringPooling="true"
+				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="true"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="stdafx.h"
+				WarningLevel="3"
+				DebugInformationFormat="0"
+				ForcedIncludeFiles="stdafx.h"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="CGAL-vc90-mt.lib libboost_thread-vc90-mt-1_40.lib gmp-vc90-mt.lib BWAPI.lib StormLibRAD.lib QtCore4.lib QtGui4.lib"
+				AdditionalLibraryDirectories="../lib/;&quot;$(QTDIR)\lib&quot;"
+				GenerateDebugInformation="true"
+				GenerateMapFile="true"
 				LinkTimeCodeGeneration="1"
 			/>
 			<Tool
@@ -556,6 +637,14 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Exe-Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Exe-Debug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"

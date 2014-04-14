@@ -375,16 +375,29 @@ void setWalkability(BWTA::RectangleArray<bool> &walkability)
 /*
   Given a center and a offset, it returns the buildability grid around the center
 */
-BWTA::RectangleArray<bool> getChokeGrid(BWAPI::TilePosition center, int offset)
+BWTA::RectangleArray<int> getChokeGrid(BWAPI::TilePosition center, int offset)
 {
-  BWTA::RectangleArray<bool> grid;
+  BWTA::RectangleArray<int> grid;
   unsigned int gridSize = (offset*2)+1;
+  int BUILD_TO_WALK_TILE = 4;
   grid.resize(gridSize, gridSize);
+//  std::cout << BWTA::MapData::walkability.getWidth() << "," << BWTA::MapData::buildability.getWidth() << std::endl;
   //TODO we don't check offset out of range!!
   for (unsigned int y = 0; y < gridSize; ++y) {
+    unsigned int ay = center.y()-offset+y;
     for (unsigned int x = 0; x < gridSize; ++x) {
-      //std::cout << "Check buildability on (" << center.x()-offset+x << "," << center.y()-offset+y << ")\n";
-      grid[x][y] = BWTA::MapData::buildability[center.x()-offset+x][center.y()-offset+y];
+	  unsigned int ax = center.x()-offset+x;
+	  if (ax >= 0 && ay >= 0 &&
+		  ax < BWTA::MapData::buildability.getWidth() && 
+		  ay < BWTA::MapData::buildability.getHeight()) {
+	      grid[x][y] = BWTA::MapData::walkability[(center.x()-offset+x)*BUILD_TO_WALK_TILE]
+												 [(center.y()-offset+y)*BUILD_TO_WALK_TILE]
+												 +
+					   BWTA::MapData::buildability[center.x()-offset+x]
+												  [center.y()-offset+y];
+	  } else {
+		  grid[x][y] = 4;
+	  }
     }
   }
   return grid;
@@ -393,15 +406,15 @@ BWTA::RectangleArray<bool> getChokeGrid(BWAPI::TilePosition center, int offset)
   Given a chokepoint, it returns the buildability grid around the center of the choke
   and using the width as an offset
 */
-BWTA::RectangleArray<bool> getChokeGrid(BWTA::Chokepoint* chokepoint)
+BWTA::RectangleArray<int> getChokeGrid(BWTA::Chokepoint* chokepoint)
 {
   BWAPI::Position center = chokepoint->getCenter();
   double chokeWidth = chokepoint->getWidth();
-  std::cout << "Choke pixel center (" << center.x() << "," << center.y() << ") width " << chokeWidth << "\n";
+//  std::cout << "Choke pixel center (" << center.x() << "," << center.y() << ") width " << chokeWidth << "\n";
   // Translate from pixel position to tile position
   BWAPI::TilePosition centerTile(center);
   int chokeWidthTiles = (int)(chokeWidth/TILE_SIZE);
-  std::cout << "Choke tile center (" << centerTile.x() << "," << centerTile.y() << ") width " << chokeWidthTiles << "\n";
+//  std::cout << "Choke tile center (" << centerTile.x() << "," << centerTile.y() << ") width " << chokeWidthTiles << "\n";
   // generate grid
   return getChokeGrid(centerTile, chokeWidthTiles);
 }
@@ -475,16 +488,18 @@ int main (int argc, char * argv[])
   setWalkability(walkability);
   BWTA::MapData::isWalkable = walkability;
   // Test walkability data
-//   std::ofstream fileTxt("logs/map.txt");
-//   u16 h = BWTA::MapData::mapHeight * 4;
-// 	u16 w = BWTA::MapData::mapWidth * 4;
-//   for (unsigned int y = 0; y < h; ++y) {
-//     for (unsigned int x = 0; x < w; ++x) {
-//       fileTxt << walkability;
-// 		}
-// 		fileTxt << std::endl;
-// 	}
-// 	fileTxt.close();
+  {
+    std::ofstream fileTxt("logs/walkable.txt");
+    u16 h = BWTA::MapData::mapHeight * 4;
+    u16 w = BWTA::MapData::mapWidth * 4;
+    for (unsigned int y = 0; y < h; ++y) {
+      for (unsigned int x = 0; x < w; ++x) {
+        fileTxt << walkability[x][y];
+      }
+ 	  fileTxt << std::endl;
+    }
+    fileTxt.close();
+  }
 
   // Set buildability
   BWTA::RectangleArray<bool> buildability;
@@ -492,17 +507,18 @@ int main (int argc, char * argv[])
   setBuildability(buildability);
   BWTA::MapData::buildability = buildability;
   // Test buildability data
-//   std::ofstream fileTxt("logs/map.txt");
-//   u16 h = BWTA::MapData::mapHeight;
-// 	u16 w = BWTA::MapData::mapWidth;
-//   for (unsigned int y = 0; y < h; ++y) {
-//     for (unsigned int x = 0; x < w; ++x) {
-//       fileTxt << buildability[x][y];
-// 		}
-// 		fileTxt << std::endl;
-// 	}
-// 	fileTxt.close();
-
+  {
+    std::ofstream fileTxt("logs/buildable.txt");
+    u16 h = BWTA::MapData::mapHeight;
+    u16 w = BWTA::MapData::mapWidth;
+    for (unsigned int y = 0; y < h; ++y) {
+      for (unsigned int x = 0; x < w; ++x) {
+        fileTxt << buildability[x][y];
+  	  }
+ 	  fileTxt << std::endl;
+    }
+    fileTxt.close();
+  }
   delete CHKdata;
 
   // Normal procedure to analyze map
@@ -512,21 +528,35 @@ int main (int argc, char * argv[])
   BWTA::analyze();
   std::cout << "DONE\n";
 
-  // Example to get a grid around a chokepoint
+  // Generatethe grids around all chokepoints:
+  std::ofstream fileTxt("logs/output.txt");
   const std::set<BWTA::Chokepoint*> chokePoints = BWTA::getChokepoints();
-  std::set<BWTA::Chokepoint*>::const_iterator c = chokePoints.begin();
-  // Just get the first chokepoint
-  BWTA::RectangleArray<bool> chokeGrid = getChokeGrid(*c);
-
-   // Print gird
-  std::cout << "Grid around first chokepoint:\n";
-  for (unsigned int y = 0; y < chokeGrid.getHeight(); ++y) {
-    for (unsigned int x = 0; x < chokeGrid.getWidth(); ++x) {
-      std::cout << chokeGrid[x][y];
-    }
-    std::cout << "\n";
+  for(std::set<BWTA::Chokepoint*>::const_iterator c = chokePoints.begin();
+	  c!=chokePoints.end();++c) {
+	  BWTA::Chokepoint *cp = (*c);
+	  BWTA::RectangleArray<int> chokeGrid = getChokeGrid(cp);
+	   // Print grid
+	  BWAPI::TilePosition center = BWAPI::TilePosition(cp->getCenter());
+	  int radius = int(cp->getWidth()/TILE_SIZE);
+	  BWAPI::TilePosition region1 = BWAPI::TilePosition(cp->getRegions().first->getCenter());
+	  BWAPI::TilePosition region2 = BWAPI::TilePosition(cp->getRegions().second->getCenter());
+	  fileTxt << "Chokepoint:\n";
+	  fileTxt << "Region 1: " << radius+region1.x()-center.x() << "," << 
+								  radius+region1.y()-center.y() << std::endl;
+	  fileTxt << "Region 2: " << radius+region2.x()-center.x() << "," << 
+								  radius+region2.y()-center.y() << std::endl;
+	  BWAPI::TilePosition side1 = BWAPI::TilePosition(cp->getSides().first);
+	  BWAPI::TilePosition side2 = BWAPI::TilePosition(cp->getSides().second);
+	  fileTxt << "Side 1: " << radius+side1.x()-center.x() << "," << radius+side1.y()-center.y() << std::endl;
+	  fileTxt << "Side 2: " << radius+side2.x()-center.x() << "," << radius+side2.y()-center.y() << std::endl;
+	  for (unsigned int y = 0; y < chokeGrid.getHeight(); ++y) {
+		for (unsigned int x = 0; x < chokeGrid.getWidth(); ++x) {
+		  fileTxt << chokeGrid[x][y];
+		}
+		fileTxt << "\n";
+	  }
   }
+  fileTxt.close();
 
-
-	return 0;
+  return 0;
 }
