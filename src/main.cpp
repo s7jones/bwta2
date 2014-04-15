@@ -9,6 +9,8 @@
 #include "offline/MyUnitType.h"
 #include "offline/sha1.h"
 
+#include "offline/wallingAnalysis.h"
+
 
 const std::string tileSetName[9] = {
   "badlands",
@@ -420,107 +422,6 @@ BWTA::RectangleArray<int> getChokeGrid(BWTA::Chokepoint* chokepoint)
 }
 
 
-void generateWallStartingPointsNoRamp(BWTA::RectangleArray<int> chokeGrid, int s1x, int s1y, int s2x, int s2y, std::ofstream *out) 
-{
-	int centerx = (s1x + s2x)/2;
-	int centery = (s1y + s2y)/2;
-	int dx = abs(s2x - s1x);
-	int dy = abs(s2y - s1y);
-	int sx = 0;
-	int sy = 0;
-
-	// Do Bresenham towards each side until a non buildable is found:
-	{
-		int x = centerx;
-		int y = centery;
-		int oldx = centerx;
-		int oldy = centery;
-		if (centerx < s1x) sx = 1;
-			  		  else sx = -1;
-		if (centery < s1y) sy = 1;
-			  		  else sy = -1;
-		int err = dx - dy;
-//		std::cout << "line " << centerx << "," << centery << " to " << s1x << "," << s1y << std::endl;
-		do {
-//			std::cout << x << "," << y << std::endl;
-			// check for a wall
-			if (chokeGrid[x][y]!=2) {
-				// extreme 1 found:
-				s1x = oldx;
-				s1y = oldy;
-				break;
-			}
-			oldx = x;
-			oldy = y;
-//			if (x==s1x && y==s1y) break;
-			int e2 = 2*err;
-			if (e2 > -dy) {
-				err -= dy;
-				x+=sx;
-			}
-			if (e2<dx) {
-				err += dx;
-				y+=sy;
-			}
-			if (x<0 || x>=(int)chokeGrid.getWidth()) break;
-			if (y<0 || y>=(int)chokeGrid.getHeight()) break;
-		} while(true);
-	}
-	{
-		int x = centerx;
-		int y = centery;
-		int oldx = centerx;
-		int oldy = centery;
-		if (centerx < s2x) sx = 1;
-			  		  else sx = -1;
-		if (centery < s2y) sy = 1;
-			  		  else sy = -1;
-		int err = dx - dy;
-		do {
-			// check for a wall
-			if (chokeGrid[x][y]!=2) {
-				// extreme 2 found:
-				s2x = oldx;
-				s2y = oldy;
-				break;
-			}
-			oldx = x;
-			oldy = y;
-//			if (x==s2x && y==s2y) break;
-			int e2 = 2*err;
-			if (e2 > -dy) {
-				err -= dy;
-				x+=sx;
-			}
-			if (e2<dx) {
-				err += dx;
-				y+=sy;
-			}
-			if (x<0 || x>=(int)chokeGrid.getWidth()) break;
-			if (y<0 || y>=(int)chokeGrid.getHeight()) break;
-		} while(true);
-	}
-	*out << "wall from " << s1x << "," << s1y << " to " << s2x << "," << s2y << std::endl;
-}
-
-
-void generateWallStartingPointsRamp(BWTA::RectangleArray<int> chokeGrid, int s1x, int s1y, int s2x, int s2y, std::ofstream *out)
-{
-}
-
-
-
-void generateWallStartingPoints(BWTA::RectangleArray<int> chokeGrid, int s1x, int s1y, int s2x, int s2y, std::ofstream *out) 
-{
-	int centerx = (s1x + s2x)/2;
-	int centery = (s1y + s2y)/2;
-	int centerType = chokeGrid[centerx][centery];
-
-	if (centerType==2) generateWallStartingPointsNoRamp(chokeGrid, s1x, s1y, s2x, s2y, out);
-	if (centerType==1) generateWallStartingPointsRamp(chokeGrid, s1x, s1y, s2x, s2y, out);
-}
-
-
 
 int main (int argc, char * argv[])
 {
@@ -652,10 +553,10 @@ int main (int argc, char * argv[])
 	  BWAPI::TilePosition side2 = BWAPI::TilePosition(cp->getSides().second);
 	  int s1x = radius+side1.x()-center.x();
 	  int s1y = radius+side1.y()-center.y();
-	  fileTxt << "Side 1: " << s1x << "," << s1y << " is " << chokeGrid[s1x][s1y] << std::endl;
+//	  fileTxt << "Side 1: " << s1x << "," << s1y << " is " << chokeGrid[s1x][s1y] << std::endl;
 	  int s2x = radius+side2.x()-center.x();
 	  int s2y = radius+side2.y()-center.y();
-	  fileTxt << "Side 2: " << s2x << "," << s2y << " is " << chokeGrid[s2x][s2y] << std::endl;
+//	  fileTxt << "Side 2: " << s2x << "," << s2y << " is " << chokeGrid[s2x][s2y] << std::endl;
 	  generateWallStartingPoints(chokeGrid, s1x, s1y, s2x, s2y, &fileTxt);
 	  for (unsigned int y = 0; y < chokeGrid.getHeight(); ++y) {
 		for (unsigned int x = 0; x < chokeGrid.getWidth(); ++x) {

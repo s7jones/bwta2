@@ -651,14 +651,6 @@
 						UsePrecompiledHeader="1"
 					/>
 				</FileConfiguration>
-				<FileConfiguration
-					Name="Exe-Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\stdafx.h"
@@ -726,6 +718,14 @@
 			</File>
 			<File
 				RelativePath=".\offline\TileType.h"
+				>
+			</File>
+			<File
+				RelativePath=".\offline\wallingAnalysis.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\offline\wallingAnalysis.h"
 				>
 			</File>
 		</Filter>
