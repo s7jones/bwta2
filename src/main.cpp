@@ -533,7 +533,7 @@ int main (int argc, char * argv[])
   std::cout << "DONE\n";
 
   // Generatethe grids around all chokepoints:
-  std::ofstream fileTxt("logs/output.txt");
+  std::ofstream fileTxt("logs/output.txt"); 
   const std::set<BWTA::Chokepoint*> chokePoints = BWTA::getChokepoints();
   for(std::set<BWTA::Chokepoint*>::const_iterator c = chokePoints.begin();
 	  c!=chokePoints.end();++c) {

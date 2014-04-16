@@ -231,18 +231,20 @@ void generateWallStartingPointsRamp(BWTA::RectangleArray<int> chokeGrid, int s1x
 				bestd = d;
 			}
 		}
-		int best2 = -1;
-		bestd = 0;
-		for(unsigned int i = 0;i<border.size();i++) {
-			std::pair<int,int> p = border[i];
-			double d = sqrt(double((border[best1].first-p.first)*(border[best1].first-p.first)+(border[best1].second-p.second)*(border[best1].second-p.second)));
-			if (best2==-1 || d>bestd) {
-				best2 = i;
-				bestd = d;
+		if (best1!=-1) {
+			int best2 = -1;
+			bestd = 0;
+			for(unsigned int i = 0;i<border.size();i++) {
+				std::pair<int,int> p = border[i];
+				double d = sqrt(double((border[best1].first-p.first)*(border[best1].first-p.first)+(border[best1].second-p.second)*(border[best1].second-p.second)));
+				if (best2==-1 || d>bestd) {
+					best2 = i;
+					bestd = d;
+				}
 			}
+			(*out) << "wall from " << border[best1].first << "," << border[best1].second << " to " <<
+									  border[best2].first << "," << border[best2].second << std::endl;
 		}
-		(*out) << "wall from " << border[best1].first << "," << border[best1].second << " to " <<
-								  border[best2].first << "," << border[best2].second << std::endl;
 	}
 
 	if (edges[2]!=-1 && edges[3]!=-1) {
@@ -290,18 +292,20 @@ void generateWallStartingPointsRamp(BWTA::RectangleArray<int> chokeGrid, int s1x
 				bestd = d;
 			}
 		}
-		int best2 = -1;
-		bestd = 0;
-		for(unsigned int i = 0;i<border.size();i++) {
-			std::pair<int,int> p = border[i];
-			double d = sqrt(double((border[best1].first-p.first)*(border[best1].first-p.first)+(border[best1].second-p.second)*(border[best1].second-p.second)));
-			if (best2==-1 || d>bestd) {
-				best2 = i;
-				bestd = d;
+		if (best1!=-1) {
+			int best2 = -1;
+			bestd = 0;
+			for(unsigned int i = 0;i<border.size();i++) {
+				std::pair<int,int> p = border[i];
+				double d = sqrt(double((border[best1].first-p.first)*(border[best1].first-p.first)+(border[best1].second-p.second)*(border[best1].second-p.second)));
+				if (best2==-1 || d>bestd) {
+					best2 = i;
+					bestd = d;
+				}
 			}
+			(*out) << "wall from " << border[best1].first << "," << border[best1].second << " to " <<
+									  border[best2].first << "," << border[best2].second << std::endl;
 		}
-		(*out) << "wall from " << border[best1].first << "," << border[best1].second << " to " <<
-								  border[best2].first << "," << border[best2].second << std::endl;
 	}
 
 	delete []edges;
