@@ -268,6 +268,34 @@ void getUnits(unsigned char *CHKdata, DWORD size) {
 	}
 }
 
+// TODO this function is not finished
+void getDoodads(unsigned char *CHKdata, DWORD size) {
+  DWORD chunkSize = 0;
+  unsigned char *UNITdata = getChunkPointer((unsigned char *)"THG2", CHKdata, size, &chunkSize);
+
+  if (UNITdata!=NULL) {
+    int bytesPerUnit = 8;
+
+    int nDoodads = chunkSize/bytesPerUnit;
+    std::cout << "THG2 chunk successfully found, with information about " << nDoodads << " doodads\n";
+    for(int i = 0;i<nDoodads;i++) {
+      int position = (i*bytesPerUnit);
+      unsigned long unitNumber = decode2ByteUnsigned(UNITdata+position);
+      if (unitNumber > 227) continue; // ignore units out of range
+      position+=2;
+      unsigned int x = decode2ByteUnsigned(UNITdata+position);
+      position+=2;
+      unsigned int y = decode2ByteUnsigned(UNITdata+position);
+      position+=2;
+      unsigned int ID = decode2ByteUnsigned(UNITdata+position);
+      position+=2;
+      int player = UNITdata[position];
+      std::cout << "Doodad (" << unitNumber << ":" << BWTA::UnitType::getName(unitNumber) << ") \tat " << x << "," << y << " player " << player << "\n";
+    }
+
+  }
+}
+
 /*
 	This function returns the tilset ID of a StarCraft map from the CHKdata
 */
@@ -462,8 +490,9 @@ int main (int argc, char * argv[])
 	BWTA::MapData::mapWidth = width;
 	BWTA::MapData::mapHeight = height;
 
-  // TODO: Load neutral units (minerasl, gas, and starting locations)
+  // TODO: Load neutral units (minerals, gas, and starting locations)
 	//getUnits(CHKdata, dataSize);
+  getDoodads(CHKdata, dataSize);
 
   // Get map tileset ID
   unsigned int tileset = getTileset(CHKdata, dataSize);
