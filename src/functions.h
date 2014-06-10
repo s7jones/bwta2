@@ -8,40 +8,46 @@
 #include <BWTA/BaseLocation.h>
 #include <BWTA/Polygon.h>
 #ifdef DEBUG_DRAW
-  // Qt version 4.6.3 
+  // Qt version 4.6.3 // 5.3.0
   #include <QtGui>
-  #include <CGAL/Qt/GraphicsViewNavigation.h>
-  #include <QLineF>
-  #include <QRectF>
+  #include <QtWidgets/QApplication>
+  #include <QtWidgets/QGraphicsScene>
 #endif
 #define BWTA_FILE_VERSION 6
 namespace BWTA
 {
   #define USE_EXACT
-  typedef CGAL::Lazy_exact_nt<CGAL::Gmpq > NumberType;
-  typedef CGAL::Simple_cartesian< NumberType >    CK;
-  typedef CGAL::Filtered_kernel<CK>         Kernel;
-  typedef CGAL::Simple_cartesian< double >    CKD;
-  typedef CGAL::Filtered_kernel<CKD>         KernelD;
-  typedef CGAL::Segment_Delaunay_graph_traits_2<Kernel> Gt;
-  typedef CGAL::Segment_Delaunay_graph_traits_2<KernelD> GtD;
 
-  // This makes some protected members of the base class public because get_voronoi_edges requires these.
-  class SDG2: public CGAL::Segment_Delaunay_graph_2<GtD>
-  {
-    private:
-      typedef CGAL::Segment_Delaunay_graph_2<GtD> Base;
+	// Choosing the proper kernel is important http://doc.cgal.org/latest/Kernel_23/index.html
 
-    public:
-      typedef Base::Construct_sdg_bisector_segment_2 Construct_sdg_bisector_segment_2;
+  typedef CGAL::Simple_cartesian< double >					CKD;
+  typedef CGAL::Filtered_kernel<CKD>						KernelD;
+//  typedef CGAL::Segment_Delaunay_graph_traits_2<KernelD>	GtD;
 
-      inline Construct_sdg_bisector_segment_2
-      construct_sdg_bisector_segment_2_object() const {
-        return Base::construct_sdg_bisector_segment_2_object();
-      }
-  };
+  typedef CGAL::Lazy_exact_nt<CGAL::Gmpq >					NumberType;
+  typedef CGAL::Simple_cartesian< NumberType >				CK;
+  typedef CGAL::Filtered_kernel<CK>							Kernel;
+  typedef CGAL::Segment_Delaunay_graph_traits_2<Kernel>		Gt;
+//  typedef CGAL::Segment_Delaunay_graph_traits_2<CKD> GtD;
 
-  typedef CGAL::Segment_Delaunay_graph_site_2< CKD > SDGS2;
+
+ // typedef CGAL::Segment_Delaunay_graph_2<GtD> SDG2;
+  typedef CGAL::Segment_Delaunay_graph_2<Gt> SDG2;
+
+//   typedef GtD::Point_2		Point_2_GtD;
+//   typedef GtD::Line_2		Line_2_GtD;
+//   typedef GtD::Ray_2		Ray_2_GtD;
+//   typedef GtD::Segment_2	Segment_2_GtD;
+//   typedef CGAL::Parabola_segment_2<GtD> Parabola_segment_2_GtD;
+
+  typedef Gt::Point_2		Point_2_Gt;
+  typedef Gt::Line_2		Line_2_Gt;
+  typedef Gt::Ray_2		Ray_2_Gt;
+  typedef Gt::Segment_2	Segment_2_Gt;
+  typedef CGAL::Parabola_segment_2<Gt> Parabola_segment_2_Gt;
+
+ //typedef CGAL::Segment_Delaunay_graph_site_2< CKD > SDGS2;
+  typedef CGAL::Segment_Delaunay_graph_site_2< CK > SDGS2;
   typedef CGAL::Point_2<CK> Point;
   typedef CGAL::Polygon_2<CK> PolygonCK;
   typedef CGAL::Line_2<CK> Line;
@@ -52,6 +58,7 @@ namespace BWTA
   typedef CGAL::Point_set_2<Kernel>::Vertex_handle  Vertex_handle;
 
   typedef CGAL::Point_2<CKD> PointD;
+  typedef CGAL::Point_2<KernelD> PointKD;
   typedef CGAL::Polygon_2<CKD> PolygonD;
   typedef CGAL::Line_2<CKD> LineD;
   typedef CGAL::Ray_2<CKD> RayD;

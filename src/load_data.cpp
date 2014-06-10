@@ -122,16 +122,16 @@ namespace BWTA
 
   bool load_resources()
   {
-    MapData::rawMinerals=BWAPI::Broodwar->getStaticMinerals();
+    MapData::rawMinerals = BWAPI::Broodwar->getStaticMinerals();
     //filter out all mineral patches under 200
-    for(std::set<BWAPI::Unit*>::iterator m=MapData::rawMinerals.begin();m!=MapData::rawMinerals.end();m++)
+    for (BWAPI::Unitset::iterator m = MapData::rawMinerals.begin(); m != MapData::rawMinerals.end(); m++)
     {
-      if ((*m)->getInitialResources()>200)
+      if (m->getInitialResources()>200)
       {
-        MapData::minerals.insert(*m);
+        MapData::minerals.insert(m);
       }
     }
-    MapData::geysers=BWAPI::Broodwar->getStaticGeysers();
+    MapData::geysers = BWAPI::Broodwar->getStaticGeysers();
     return true;
   }
 
@@ -402,8 +402,8 @@ namespace BWTA
       file_out << (*p)->size() << "\n";
       for(unsigned int i=0;i<(*p)->size();i++)
       {
-        file_out << (**p)[i].x() << "\n";
-        file_out << (**p)[i].y() << "\n";
+        file_out << (**p)[i].x << "\n";
+        file_out << (**p)[i].y << "\n";
       }
       file_out << (*p)->getHoles().size() << "\n";
       for(std::vector<Polygon>::const_iterator h=(*p)->getHoles().begin();h!=(*p)->getHoles().end();h++)
@@ -411,18 +411,18 @@ namespace BWTA
         file_out << (*h).size() << "\n";
         for(unsigned int i=0;i<(*h).size();i++)
         {
-          file_out << (*h)[i].x() << "\n";
-          file_out << (*h)[i].y() << "\n";
+          file_out << (*h)[i].x << "\n";
+          file_out << (*h)[i].y << "\n";
         }
       }
     }
     for(std::set<BaseLocation*>::const_iterator b=BWTA_Result::baselocations.begin();b!=BWTA_Result::baselocations.end();b++)
     {
       file_out << bid[*b] << "\n";
-      file_out << (*b)->getPosition().x() << "\n";
-      file_out << (*b)->getPosition().y() << "\n";
-      file_out << (*b)->getTilePosition().x() << "\n";
-      file_out << (*b)->getTilePosition().y() << "\n";
+      file_out << (*b)->getPosition().x << "\n";
+      file_out << (*b)->getPosition().y << "\n";
+      file_out << (*b)->getTilePosition().x << "\n";
+      file_out << (*b)->getTilePosition().y << "\n";
       file_out << rid[(*b)->getRegion()] << "\n";
       for(std::set<BaseLocation*>::const_iterator b2=BWTA_Result::baselocations.begin();b2!=BWTA_Result::baselocations.end();b2++)
       {
@@ -437,12 +437,12 @@ namespace BWTA
       file_out << cid[*c] << "\n";
       file_out << rid[(*c)->getRegions().first] << "\n";
       file_out << rid[(*c)->getRegions().second] << "\n";
-      file_out << (*c)->getSides().first.x() << "\n";
-      file_out << (*c)->getSides().first.y() << "\n";
-      file_out << (*c)->getSides().second.x() << "\n";
-      file_out << (*c)->getSides().second.y() << "\n";
-      file_out << (*c)->getCenter().x() << "\n";
-      file_out << (*c)->getCenter().y() << "\n";
+      file_out << (*c)->getSides().first.x << "\n";
+      file_out << (*c)->getSides().first.y << "\n";
+      file_out << (*c)->getSides().second.x << "\n";
+      file_out << (*c)->getSides().second.y << "\n";
+      file_out << (*c)->getCenter().x << "\n";
+      file_out << (*c)->getCenter().y << "\n";
       file_out << (*c)->getWidth() << "\n";
     }
     for(std::set<Region*>::const_iterator r=BWTA_Result::regions.begin();r!=BWTA_Result::regions.end();r++)
@@ -452,11 +452,11 @@ namespace BWTA
       file_out << poly.size() << "\n";
       for(unsigned int i=0;i<poly.size();i++)
       {
-        file_out << poly[i].x() << "\n";
-        file_out << poly[i].y() << "\n";
+        file_out << poly[i].x << "\n";
+        file_out << poly[i].y << "\n";
       }
-      file_out << (*r)->getCenter().x() << "\n";
-      file_out << (*r)->getCenter().y() << "\n";
+      file_out << (*r)->getCenter().x << "\n";
+      file_out << (*r)->getCenter().y << "\n";
       file_out << (*r)->getChokepoints().size() << "\n";
       for(std::set<Chokepoint*>::const_iterator c=(*r)->getChokepoints().begin();c!=(*r)->getChokepoints().end();c++)
       {

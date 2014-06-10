@@ -49,26 +49,26 @@ namespace BWTA
     }
     //we will now join sets of minerals that are close together
     for(unsigned int index=0;index<resources.size();index++) {
-      BWAPI::Position pos=BWAPI::Position(resources[index]->getInitialTilePosition().x()*4+4,resources[index]->getInitialTilePosition().y()*4+2);
-      if (resources[index]->getInitialType()==BWAPI::UnitTypes::Resource_Vespene_Geyser) {
-        pos=BWAPI::Position(resources[index]->getInitialTilePosition().x()*4+8,resources[index]->getInitialTilePosition().y()*4+4);
+      BWAPI::Position pos=BWAPI::Position((*resources[index])->getInitialTilePosition().x*4+4,(*resources[index])->getInitialTilePosition().y*4+2);
+      if ((*resources[index])->getInitialType()==BWAPI::UnitTypes::Resource_Vespene_Geyser) {
+        pos=BWAPI::Position((*resources[index])->getInitialTilePosition().x*4+8,(*resources[index])->getInitialTilePosition().y*4+4);
       }
       //this will flood the nearby tiles with their distances to the current mineral
       calculate_walk_distances(simplified_map,pos,(mineral_cluster_distance+4*4)*10,distance_map);
       //lets look at some other minerals and see if they are close enough to
       //merge with this one
       for(unsigned int index2=index+1;index2<resources.size();index2++) {
-        BWAPI::Position pos2=BWAPI::Position(resources[index2]->getInitialTilePosition().x()*4+4,resources[index2]->getInitialTilePosition().y()*4+2);
-        if (resources[index2]->getInitialType()==BWAPI::UnitTypes::Resource_Vespene_Geyser) {
-          pos2=BWAPI::Position(resources[index2]->getInitialTilePosition().x()*4+8,resources[index2]->getInitialTilePosition().y()*4+4);
+        BWAPI::Position pos2=BWAPI::Position((*resources[index2])->getInitialTilePosition().x*4+4,(*resources[index2])->getInitialTilePosition().y*4+2);
+        if ((*resources[index2])->getInitialType()==BWAPI::UnitTypes::Resource_Vespene_Geyser) {
+          pos2=BWAPI::Position((*resources[index2])->getInitialTilePosition().x*4+8,(*resources[index2])->getInitialTilePosition().y*4+4);
         }
         //merge only if less than this distance
-        int x2=(int)pos2.x();
-        int y2=(int)pos2.y();
+        int x2=(int)pos2.x;
+        int y2=(int)pos2.y;
         int dist=distance_map[x2][y2];
         int augmented_cluster_distance=mineral_cluster_distance;
 
-        if (resources[index]->getInitialType()==BWAPI::UnitTypes::Resource_Vespene_Geyser || resources[index2]->getInitialType()==BWAPI::UnitTypes::Resource_Vespene_Geyser) {
+        if ((*resources[index])->getInitialType()==BWAPI::UnitTypes::Resource_Vespene_Geyser || (*resources[index2])->getInitialType()==BWAPI::UnitTypes::Resource_Vespene_Geyser) {
           //vespene geysers are often farther away from minerals than minerals 
           //are from each other. So we add some extra distance for vespene geyers
           augmented_cluster_distance+=3*4;
@@ -150,11 +150,11 @@ namespace BWTA
       for(int j=0;j<(int)resource_clusters[i].size();j++) {
         // Here we set build tiles too close to the unit resource_clusters[i][j] to false in base_build_map
         // Get the tile position of this unit
-        int x=(int)resource_clusters[i][j]->getInitialTilePosition().x();
-        int y=(int)resource_clusters[i][j]->getInitialTilePosition().y();
+        int x=(int)(*resource_clusters[i][j])->getInitialTilePosition().x;
+        int y=(int)(*resource_clusters[i][j])->getInitialTilePosition().y;
 
         // Minerals and geysers affect tiles differently
-        if (resource_clusters[i][j]->getInitialType()==BWAPI::UnitTypes::Resource_Mineral_Field) {
+        if ((*resource_clusters[i][j])->getInitialType()==BWAPI::UnitTypes::Resource_Mineral_Field) {
           int min_x=max(x-6,0);
           int max_x=min(x+4,(int)build_map.getWidth()-1);
           int min_y=max(y-5,0);
@@ -208,14 +208,14 @@ namespace BWTA
         }
       }
       for(unsigned int j=0;j<resource_clusters[i].size();j++) {
-        BWAPI::Position pos(resource_clusters[i][j]->getInitialTilePosition().x()*4+4,resource_clusters[i][j]->getInitialTilePosition().y()*4+2);
-        if (resource_clusters[i][j]->getInitialType()==BWAPI::UnitTypes::Resource_Vespene_Geyser) {
-          pos=BWAPI::Position(resource_clusters[i][j]->getInitialTilePosition().x()*4+8,resource_clusters[i][j]->getInitialTilePosition().y()*4+4);
+        BWAPI::Position pos((*resource_clusters[i][j])->getInitialTilePosition().x*4+4,(*resource_clusters[i][j])->getInitialTilePosition().y*4+2);
+        if ((*resource_clusters[i][j])->getInitialType()==BWAPI::UnitTypes::Resource_Vespene_Geyser) {
+          pos=BWAPI::Position((*resource_clusters[i][j])->getInitialTilePosition().x*4+8,(*resource_clusters[i][j])->getInitialTilePosition().y*4+4);
         }
         //this will flood the nearby tiles with their distances to the current mineral
         calculate_walk_distances(simplified_map,pos,max_influence_distance*4*10,distance_map);
-        int x=(int)pos.x()/4;
-        int y=(int)pos.y()/4;
+        int x=(int)pos.x/4;
+        int y=(int)pos.y/4;
         int min_x=max(x-max_influence_distance,0);
         int max_x=min(x+max_influence_distance,base_build_map.getWidth()-1);
         int min_y=max(y-max_influence_distance,0);
@@ -260,22 +260,22 @@ namespace BWTA
     //attach resources to base locations based on proximity (walk distance)
     RectangleArray<int> distance_map(MapData::mapWidth*4,MapData::mapHeight*4);
     for(std::set<BWTA::BaseLocation*>::iterator i=base_locations.begin();i!=base_locations.end();i++) {
-      BWAPI::Position p((*i)->getTilePosition().x()*4,(*i)->getTilePosition().y()*4);
+      BWAPI::Position p((*i)->getTilePosition().x*4,(*i)->getTilePosition().y*4);
       calculate_walk_distances_area(p,16,12,10*4*10,distance_map);
       BWTA::BaseLocationImpl* ii=(BWTA::BaseLocationImpl*)(*i);
-      for(std::set<BWAPI::Unit*>::const_iterator j=MapData::geysers.begin();j!=MapData::geysers.end();j++) {
-        int x=(int)(*j)->getInitialTilePosition().x()*4+8;
-        int y=(int)(*j)->getInitialTilePosition().y()*4+4;
+      for (BWAPI::Unitset::iterator j = MapData::geysers.begin(); j != MapData::geysers.end(); j++) {
+        int x=(int)j->getInitialTilePosition().x*4+8;
+        int y=(int)j->getInitialTilePosition().y*4+4;
         if (distance_map[x][y]>=0 && distance_map[x][y]<=4*10*10) {
-          ii->geysers.insert(*j);
+          ii->geysers.insert(j);
         }
       }
-      for(std::set<BWAPI::Unit*>::const_iterator j=MapData::rawMinerals.begin();j!=MapData::rawMinerals.end();j++) {
-        int x=(int)(*j)->getInitialTilePosition().x()*4+4;
-        int y=(int)(*j)->getInitialTilePosition().y()*4+2;
-        if (distance_map[x][y]>=0 && distance_map[x][y]<=4*10*10) {
-          ii->staticMinerals.insert(*j);
-        }
+      for (BWAPI::Unitset::iterator j = MapData::rawMinerals.begin(); j != MapData::rawMinerals.end(); j++) {
+//         int x=(int)(*j)->getInitialTilePosition().x*4+4;
+//         int y=(int)(*j)->getInitialTilePosition().y*4+2;
+//         if (distance_map[x][y]>=0 && distance_map[x][y]<=4*10*10) {
+//           ii->staticMinerals.insert(*j);
+//         }
       }
     }
   }
@@ -286,8 +286,8 @@ namespace BWTA
     attach_resources_to_base_locations(base_locations);
     RectangleArray<double> distance_map;
     for(std::set<BWTA::BaseLocation*>::iterator i=base_locations.begin();i!=base_locations.end();i++) {
-      BWAPI::Position p((*i)->getTilePosition().x()*32+64,(*i)->getTilePosition().y()*32+48);
-      BWAPI::TilePosition tp((*i)->getTilePosition().x()+1,(*i)->getTilePosition().y()+1);
+      BWAPI::Position p((*i)->getTilePosition().x*32+64,(*i)->getTilePosition().y*32+48);
+      BWAPI::TilePosition tp((*i)->getTilePosition().x+1,(*i)->getTilePosition().y+1);
       BWTA::getGroundDistanceMap(tp,distance_map);
       BWTA::BaseLocationImpl* ii=(BWTA::BaseLocationImpl*)(*i);
       //assume the base location is an island unless we can walk from this base location to another base location
@@ -300,19 +300,19 @@ namespace BWTA
         }
         else
         {
-          BWAPI::Position p2((*j)->getTilePosition().x()*32+64,(*j)->getTilePosition().y()*32+48);
-          BWAPI::TilePosition tp2((*j)->getTilePosition().x()+1,(*j)->getTilePosition().y()+1);
+          BWAPI::Position p2((*j)->getTilePosition().x*32+64,(*j)->getTilePosition().y*32+48);
+          BWAPI::TilePosition tp2((*j)->getTilePosition().x+1,(*j)->getTilePosition().y+1);
           if (BWTA::isConnected(tp,tp2)) {
             ii->island=false;
           }
-          ii->ground_distances[*j]=distance_map[tp2.x()][tp2.y()];
+          ii->ground_distances[*j]=distance_map[tp2.x][tp2.y];
           ii->air_distances[*j]=p.getDistance(p2);
         }
       }
       ii->start = false;
       for(std::set<BWAPI::TilePosition>::iterator j=MapData::startLocations.begin();j!=MapData::startLocations.end();j++)
       {
-        BWAPI::Position pos((*j).x()*32+64,(*j).y()*32+48);
+        BWAPI::Position pos((*j).x*32+64,(*j).y*32+48);
         double distance=pos.getDistance((*i)->getPosition());
         if (distance<32*10)
           ii->start = true;

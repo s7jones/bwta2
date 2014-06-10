@@ -7,8 +7,8 @@ namespace BWTA
     this->_regions=regions;
     this->_sides=sides;
     this->_center=sides.first+sides.second;
-    this->_center.x()/=2;
-    this->_center.y()/=2;
+    this->_center.x/=2;
+    this->_center.y/=2;
     this->_width=sides.first.getDistance(sides.second);
   }
   const std::pair<Region*,Region*>& ChokepointImpl::getRegions() const

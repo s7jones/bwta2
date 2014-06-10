@@ -92,7 +92,7 @@ namespace BWTA
     RectangleArray<double> distanceMap;
     for (std::set<BaseLocation*>::iterator i=BWTA::BWTA_Result::baselocations.begin();i!=BWTA::BWTA_Result::baselocations.end();i++)
     {
-      BWTA::getGroundWalkDistanceMap((*i)->getTilePosition().x()*4+8,(*i)->getTilePosition().y()*4+6,distanceMap);
+      BWTA::getGroundWalkDistanceMap((*i)->getTilePosition().x*4+8,(*i)->getTilePosition().y*4+6,distanceMap);
       for(int x=0;x<MapData::mapWidth*4;x++)
       {
         for(int y=0;y<MapData::mapHeight*4;y++)
@@ -133,7 +133,7 @@ namespace BWTA
     minDistanceMap.setTo(-1);
     for (std::set<Chokepoint*>::iterator i=BWTA::BWTA_Result::chokepoints.begin();i!=BWTA::BWTA_Result::chokepoints.end();i++)
     {
-      BWTA::getGroundWalkDistanceMap((*i)->getCenter().x()/8,(*i)->getCenter().y()/8,distanceMap);
+      BWTA::getGroundWalkDistanceMap((*i)->getCenter().x/8,(*i)->getCenter().y/8,distanceMap);
       for(int x=0;x<MapData::mapWidth*4;x++)
       {
         for(int y=0;y<MapData::mapHeight*4;y++)

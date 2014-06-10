@@ -1,0 +1,209 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Interface">
+      <UniqueIdentifier>{4311c728-e729-46cb-bdce-9e8496bd297e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{bf1f60af-4ae2-4fc0-a94d-e6851ea9b5c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Balance">
+      <UniqueIdentifier>{0790a554-4f49-4c0f-a5be-e4344f07c961}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pathfinding">
+      <UniqueIdentifier>{a342873c-5ba3-4b2f-924b-f0e66e0c3f90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Offline">
+      <UniqueIdentifier>{884c48ec-1bb2-4a5b-b8b3-66fa66c477fa}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="BaseLocationImpl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BWTA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BWTA_Result.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="calculate_connectivity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ChokepointImpl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ConnectedComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="extract_polygons.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="find_base_locations.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="get_voronoi_edges.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Graph.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="load_data.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MapData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Node.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Polygon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RegionImpl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="terrain_analysis.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="BalanceMetrics.cpp">
+      <Filter>Balance</Filter>
+    </ClCompile>
+    <ClCompile Include="DistanceTransform.cpp">
+      <Filter>Balance</Filter>
+    </ClCompile>
+    <ClCompile Include="pathfinding.cpp">
+      <Filter>Pathfinding</Filter>
+    </ClCompile>
+    <ClCompile Include="offline\MyUnitType.cpp">
+      <Filter>Offline</Filter>
+    </ClCompile>
+    <ClCompile Include="offline\sha1.cpp">
+      <Filter>Offline</Filter>
+    </ClCompile>
+    <ClCompile Include="offline\TileSet.cpp">
+      <Filter>Offline</Filter>
+    </ClCompile>
+    <ClCompile Include="offline\wallingAnalysis.cpp">
+      <Filter>Offline</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BaseLocationImpl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BWTA_Result.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ChokepointImpl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Color.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ConnectedComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="extract_polygons.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="find_base_locations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="functions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Globals.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Graph.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MapData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Node.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RegionImpl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="terrain_analysis.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\interface\BWTA\BaseLocation.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\interface\BWTA.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\interface\BWTA\Chokepoint.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\interface\BWTA\Polygon.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\interface\BWTA\RectangleArray.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\interface\BWTA\Region.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Heap.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="BalanceMetrics.h">
+      <Filter>Balance</Filter>
+    </ClInclude>
+    <ClInclude Include="DistanceTransform.h">
+      <Filter>Balance</Filter>
+    </ClInclude>
+    <ClInclude Include="offline\MiniTileFlags.h">
+      <Filter>Offline</Filter>
+    </ClInclude>
+    <ClInclude Include="offline\MyUnitType.h">
+      <Filter>Offline</Filter>
+    </ClInclude>
+    <ClInclude Include="offline\sha1.h">
+      <Filter>Offline</Filter>
+    </ClInclude>
+    <ClInclude Include="offline\TileSet.h">
+      <Filter>Offline</Filter>
+    </ClInclude>
+    <ClInclude Include="offline\TileType.h">
+      <Filter>Offline</Filter>
+    </ClInclude>
+    <ClInclude Include="offline\wallingAnalysis.h">
+      <Filter>Offline</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

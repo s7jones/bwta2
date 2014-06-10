@@ -26,7 +26,8 @@ const std::string tileSetName[9] = {
 
 
 // TODO we should instantiate a new Game
-namespace BWAPI { Game* Broodwar; }
+//namespace BWAPI { Game* Broodwar; }
+//namespace BWAPI { GameWrapper Broodwar; }
 
 
 void printError(const char * archive, const char * message, const char * file, int errnum) {
@@ -320,22 +321,22 @@ unsigned int getTileset(unsigned char *CHKdata, DWORD size) {
 	Finds a given chunk inside CHK data and returns a pointer to it, and its length (in 'desiredChunkLength')
 */
 unsigned char *getFileBuffer(const char *filename) {
-  unsigned char *buffer = NULL;
+	unsigned char *buffer = NULL;
 	std::ifstream file(filename, std::ios::in | std::ios::binary);
 	if (file.is_open()) {
-    file.seekg(0, std::ios::end);
-    std::streamsize size = file.tellg();
-    file.seekg(0, std::ios::beg);
+		file.seekg(0, std::ios::end);
+		std::streamsize size = file.tellg();
+		file.seekg(0, std::ios::beg);
 
-    buffer = new unsigned char[size];
-    if(!file.read((char *)buffer, size)) {
-      printError(filename, "Error reading file", filename, GetLastError());
-    }
+		buffer = new unsigned char[static_cast<unsigned int>(size)];
+		if(!file.read((char *)buffer, size)) {
+			printError(filename, "Error reading file", filename, GetLastError());
+		}
 		file.close();
-  } else {
-    printError(filename, "Cannot open file", filename, GetLastError());
-  }
-  return buffer;
+	} else {
+		printError(filename, "Cannot open file", filename, GetLastError());
+	}
+	return buffer;
 }
 
 //------------------------------------------------ GET TILE ------------------------------------------------
@@ -414,17 +415,17 @@ BWTA::RectangleArray<int> getChokeGrid(BWAPI::TilePosition center, int offset)
 //  std::cout << BWTA::MapData::walkability.getWidth() << "," << BWTA::MapData::buildability.getWidth() << std::endl;
   //TODO we don't check offset out of range!!
   for (unsigned int y = 0; y < gridSize; ++y) {
-    unsigned int ay = center.y()-offset+y;
+    unsigned int ay = center.y-offset+y;
     for (unsigned int x = 0; x < gridSize; ++x) {
-	  unsigned int ax = center.x()-offset+x;
+	  unsigned int ax = center.x-offset+x;
 	  if (ax >= 0 && ay >= 0 &&
 		  ax < BWTA::MapData::buildability.getWidth() && 
 		  ay < BWTA::MapData::buildability.getHeight()) {
-	      grid[x][y] = BWTA::MapData::walkability[(center.x()-offset+x)*BUILD_TO_WALK_TILE]
-												 [(center.y()-offset+y)*BUILD_TO_WALK_TILE]
+	      grid[x][y] = BWTA::MapData::walkability[(center.x-offset+x)*BUILD_TO_WALK_TILE]
+												 [(center.y-offset+y)*BUILD_TO_WALK_TILE]
 												 +
-					   BWTA::MapData::buildability[center.x()-offset+x]
-												  [center.y()-offset+y];
+					   BWTA::MapData::buildability[center.x-offset+x]
+												  [center.y-offset+y];
 	  } else {
 		  grid[x][y] = 4;
 	  }
@@ -561,7 +562,7 @@ int main (int argc, char * argv[])
   BWTA::analyze();
   std::cout << "DONE\n";
 
-  // Generatethe grids around all chokepoints:
+  // Generate the grids around all chokepoints:
   std::ofstream fileTxt("logs/output.txt"); 
   const std::set<BWTA::Chokepoint*> chokePoints = BWTA::getChokepoints();
   for(std::set<BWTA::Chokepoint*>::const_iterator c = chokePoints.begin();
@@ -574,17 +575,17 @@ int main (int argc, char * argv[])
 	  BWAPI::TilePosition region1 = BWAPI::TilePosition(cp->getRegions().first->getCenter());
 	  BWAPI::TilePosition region2 = BWAPI::TilePosition(cp->getRegions().second->getCenter());
 	  fileTxt << "Chokepoint:\n";
-	  fileTxt << "Region 1: " << radius+region1.x()-center.x() << "," << 
-								  radius+region1.y()-center.y() << std::endl;
-	  fileTxt << "Region 2: " << radius+region2.x()-center.x() << "," << 
-								  radius+region2.y()-center.y() << std::endl;
+	  fileTxt << "Region 1: " << radius+region1.x-center.x << "," << 
+								  radius+region1.y-center.y << std::endl;
+	  fileTxt << "Region 2: " << radius+region2.x-center.x << "," << 
+								  radius+region2.y-center.y << std::endl;
 	  BWAPI::TilePosition side1 = BWAPI::TilePosition(cp->getSides().first);
 	  BWAPI::TilePosition side2 = BWAPI::TilePosition(cp->getSides().second);
-	  int s1x = radius+side1.x()-center.x();
-	  int s1y = radius+side1.y()-center.y();
+	  int s1x = radius+side1.x-center.x;
+	  int s1y = radius+side1.y-center.y;
 //	  fileTxt << "Side 1: " << s1x << "," << s1y << " is " << chokeGrid[s1x][s1y] << std::endl;
-	  int s2x = radius+side2.x()-center.x();
-	  int s2y = radius+side2.y()-center.y();
+	  int s2x = radius+side2.x-center.x;
+	  int s2y = radius+side2.y-center.y;
 //	  fileTxt << "Side 2: " << s2x << "," << s2y << " is " << chokeGrid[s2x][s2y] << std::endl;
 	  generateWallStartingPoints(chokeGrid, s1x, s1y, s2x, s2y, &fileTxt);
 	  for (unsigned int y = 0; y < chokeGrid.getHeight(); ++y) {

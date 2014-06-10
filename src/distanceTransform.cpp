@@ -170,7 +170,7 @@ namespace BWTA
 		QVector<QPointF> qp;
 		for(int i=0;i<(int)p.size();i++) {
 			int j=(i+1)%p.size();
-			qp.push_back(QPointF(p[i].x(),p[i].y()));
+			qp.push_back(QPointF(p[i].x,p[i].y));
 		}
 		scene->addPolygon(QPolygonF(qp),QPen(QColor(0,0,0)),QBrush(qc));  
     }

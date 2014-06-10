@@ -4,9 +4,9 @@ namespace BWTA
 {
 	namespace MapData
 	{
-		std::set<BWAPI::Unit*> minerals;
-		std::set<BWAPI::Unit*> rawMinerals;
-		std::set<BWAPI::Unit*> geysers;
+		BWAPI::Unitset minerals;
+		BWAPI::Unitset rawMinerals;
+		BWAPI::Unitset geysers;
 		RectangleArray<bool> walkability;
 		RectangleArray<bool> rawWalkability;
 		RectangleArray<bool> lowResWalkability;

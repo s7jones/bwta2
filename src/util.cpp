@@ -83,14 +83,14 @@ namespace BWTA
     double distance=min(width/2,height/2);
     for(size_t i=0;i<polygon.size();i++)
     {
-      if (polygon[i].x()<distance)
-        distance=polygon[i].x();
-      if (polygon[i].y()<distance)
-        distance=polygon[i].y();
-      if (width-polygon[i].x()<distance)
-        distance=width-polygon[i].x();
-      if (height-polygon[i].y()<distance)
-        distance=height-polygon[i].y();
+      if (polygon[i].x<distance)
+        distance=polygon[i].x;
+      if (polygon[i].y<distance)
+        distance=polygon[i].y;
+      if (width-polygon[i].x<distance)
+        distance=width-polygon[i].x;
+      if (height-polygon[i].y<distance)
+        distance=height-polygon[i].y;
     }
     if (distance<0) distance=0;
     return distance;
@@ -133,15 +133,15 @@ namespace BWTA
       }
     }
     heap.push(std::make_pair(start,0));
-    int sx=(int)start.x();
-    int sy=(int)start.y();
+    int sx=(int)start.x;
+    int sy=(int)start.y;
     distance_map[sx][sy]=0;
     while (!heap.empty()) {
       BWAPI::Position pos=heap.top().first;
       int distance=heap.top().second;
       heap.pop();
-      int x=(int)pos.x();
-      int y=(int)pos.y();
+      int x=(int)pos.x;
+      int y=(int)pos.y;
       if (distance>max_distance && max_distance>0) break;
       int min_x=max(x-1,0);
       int max_x=min(x+1,read_map.getWidth()-1);
@@ -178,8 +178,8 @@ namespace BWTA
         distance_map[x][y]=-1;
       }
     }
-    int sx=(int)start.x();
-    int sy=(int)start.y();
+    int sx=(int)start.x;
+    int sy=(int)start.y;
     for(int x=sx;x<sx+width;x++) {
       for(int y=sy;y<sy+height;y++) {
         heap.push(std::make_pair(BWAPI::Position(x,y),0));
@@ -190,8 +190,8 @@ namespace BWTA
       BWAPI::Position pos=heap.top().first;
       int distance=heap.top().second;
       heap.pop();
-      int x=(int)pos.x();
-      int y=(int)pos.y();
+      int x=(int)pos.x;
+      int y=(int)pos.y;
       if (distance>max_distance && max_distance>0) break;
       int min_x=max(x-1,0);
       int max_x=min(x+1,MapData::mapWidth*4-1);

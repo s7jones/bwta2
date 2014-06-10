@@ -25,20 +25,20 @@ namespace BWTA
       int gvalue=gmap[p];
       openTiles.pop();
       closedTiles.insert(p);
-      int minx=max(p.x()-1,0);
-      int maxx=min(p.x()+1,MapData::mapWidth-1);
-      int miny=max(p.y()-1,0);
-      int maxy=min(p.y()+1,MapData::mapHeight-1);
+      int minx=max(p.x-1,0);
+      int maxx=min(p.x+1,MapData::mapWidth-1);
+      int miny=max(p.y-1,0);
+      int maxy=min(p.y+1,MapData::mapHeight-1);
       for(int x=minx;x<=maxx;x++)
         for(int y=miny;y<=maxy;y++)
         {
           if (!MapData::lowResWalkability[x][y]) continue;
-          if (p.x() != x && p.y() != y && !MapData::lowResWalkability[p.x()][y] && !MapData::lowResWalkability[x][p.y()]) continue;
+          if (p.x != x && p.y != y && !MapData::lowResWalkability[p.x][y] && !MapData::lowResWalkability[x][p.y]) continue;
           BWAPI::TilePosition t(x,y);
           if (closedTiles.find(t)!=closedTiles.end()) continue;
 
-          int g=gvalue+10; if (x!=p.x() && y!=p.y()) g+=4;
-          int dx=abs(x-end.x()); int dy=abs(y-end.y());
+          int g=gvalue+10; if (x!=p.x && y!=p.y) g+=4;
+          int dx=abs(x-end.x); int dy=abs(y-end.y);
           int h=abs(dx-dy)*10+min(dx,dy)*14;
           int f=g+h;
           if (gmap.find(t)==gmap.end() || gmap[t]>g)
@@ -66,23 +66,23 @@ namespace BWTA
       int gvalue=gmap[p];
       openTiles.pop();
       closedTiles.insert(p);
-      int minx=max(p.x()-1,0);
-      int maxx=min(p.x()+1,MapData::mapWidth-1);
-      int miny=max(p.y()-1,0);
-      int maxy=min(p.y()+1,MapData::mapHeight-1);
+      int minx=max(p.x-1,0);
+      int maxx=min(p.x+1,MapData::mapWidth-1);
+      int miny=max(p.y-1,0);
+      int maxy=min(p.y+1,MapData::mapHeight-1);
       for(int x=minx;x<=maxx;x++)
         for(int y=miny;y<=maxy;y++)
         {
           if (!MapData::lowResWalkability[x][y]) continue;
-          if (p.x() != x && p.y() != y && !MapData::lowResWalkability[p.x()][y] && !MapData::lowResWalkability[x][p.y()]) continue;
+          if (p.x != x && p.y != y && !MapData::lowResWalkability[p.x][y] && !MapData::lowResWalkability[x][p.y]) continue;
           BWAPI::TilePosition t(x,y);
           if (closedTiles.find(t)!=closedTiles.end()) continue;
 
-          int g=gvalue+10; if (x!=p.x() && y!=p.y()) g+=4;
+          int g=gvalue+10; if (x!=p.x && y!=p.y) g+=4;
           int h=-1;
           for(std::set<BWAPI::TilePosition>::iterator i=end.begin();i!=end.end();i++)
           {
-            int dx=abs(x-i->x()); int dy=abs(y-i->y());
+            int dx=abs(x-i->x); int dy=abs(y-i->y);
             int ch=abs(dx-dy)*10+min(dx,dy)*14;
             if (h==-1 || ch<h)
               h=ch;
@@ -119,23 +119,23 @@ namespace BWTA
       int gvalue=gmap[p];
       openTiles.pop();
       closedTiles.insert(p);
-      int minx=max(p.x()-1,0);
-      int maxx=min(p.x()+1,MapData::mapWidth-1);
-      int miny=max(p.y()-1,0);
-      int maxy=min(p.y()+1,MapData::mapHeight-1);
+      int minx=max(p.x-1,0);
+      int maxx=min(p.x+1,MapData::mapWidth-1);
+      int miny=max(p.y-1,0);
+      int maxy=min(p.y+1,MapData::mapHeight-1);
       for(int x=minx;x<=maxx;x++)
         for(int y=miny;y<=maxy;y++)
         {
           if (!MapData::lowResWalkability[x][y]) continue;
-          if (p.x() != x && p.y() != y && !MapData::lowResWalkability[p.x()][y] && !MapData::lowResWalkability[x][p.y()]) continue;
+          if (p.x != x && p.y != y && !MapData::lowResWalkability[p.x][y] && !MapData::lowResWalkability[x][p.y]) continue;
           BWAPI::TilePosition t(x,y);
           if (closedTiles.find(t)!=closedTiles.end()) continue;
 
-          int g=gvalue+10; if (x!=p.x() && y!=p.y()) g+=4;
+          int g=gvalue+10; if (x!=p.x && y!=p.y) g+=4;
           int h=-1;
           for(std::set<BWAPI::TilePosition>::iterator i=end.begin();i!=end.end();i++)
           {
-            int dx=abs(x-i->x()); int dy=abs(y-i->y());
+            int dx=abs(x-i->x); int dy=abs(y-i->y);
             int ch=abs(dx-dy)*10+min(dx,dy)*14;
             if (h==-1 || ch<h)
               h=ch;
@@ -181,22 +181,22 @@ namespace BWTA
       int gvalue=gmap[p];
       openTiles.pop();
       closedTiles.insert(p);
-      int minx=max(p.x()-1,0);
-      int maxx=min(p.x()+1,MapData::mapWidth-1);
-      int miny=max(p.y()-1,0);
-      int maxy=min(p.y()+1,MapData::mapHeight-1);
+      int minx=max(p.x-1,0);
+      int maxx=min(p.x+1,MapData::mapWidth-1);
+      int miny=max(p.y-1,0);
+      int maxy=min(p.y+1,MapData::mapHeight-1);
       for(int x=minx;x<=maxx;x++)
         for(int y=miny;y<=maxy;y++)
         {
           if (!MapData::lowResWalkability[x][y]) continue;
-          if (p.x() != x && p.y() != y && !MapData::lowResWalkability[p.x()][y] && !MapData::lowResWalkability[x][p.y()]) continue;
+          if (p.x != x && p.y != y && !MapData::lowResWalkability[p.x][y] && !MapData::lowResWalkability[x][p.y]) continue;
           BWAPI::TilePosition t(x,y);
           if (closedTiles.find(t)!=closedTiles.end()) continue;
 
           int g=gvalue+10;
-          if (x!=p.x() && y!=p.y()) g+=4;
-          int dx=abs(x-end.x());
-          int dy=abs(y-end.y());
+          if (x!=p.x && y!=p.y) g+=4;
+          int dx=abs(x-end.x);
+          int dy=abs(y-end.y);
           int h=abs(dx-dy)*10+min(dx,dy)*14;
           int f=g+h;
           if (gmap.find(t)==gmap.end() || g<gmap.find(t)->second)
@@ -240,23 +240,23 @@ namespace BWTA
       int gvalue=gmap[p];
       openTiles.pop();
       closedTiles.insert(p);
-      int minx=max(p.x()-1,0);
-      int maxx=min(p.x()+1,MapData::mapWidth-1);
-      int miny=max(p.y()-1,0);
-      int maxy=min(p.y()+1,MapData::mapHeight-1);
+      int minx=max(p.x-1,0);
+      int maxx=min(p.x+1,MapData::mapWidth-1);
+      int miny=max(p.y-1,0);
+      int maxy=min(p.y+1,MapData::mapHeight-1);
       for(int x=minx;x<=maxx;x++)
         for(int y=miny;y<=maxy;y++)
         {
           if (!MapData::lowResWalkability[x][y]) continue;
-          if (p.x() != x && p.y() != y && !MapData::lowResWalkability[p.x()][y] && !MapData::lowResWalkability[x][p.y()]) continue;
+          if (p.x != x && p.y != y && !MapData::lowResWalkability[p.x][y] && !MapData::lowResWalkability[x][p.y]) continue;
           BWAPI::TilePosition t(x,y);
           if (closedTiles.find(t)!=closedTiles.end()) continue;
 
-          int g=gvalue+10; if (x!=p.x() && y!=p.y()) g+=4;
+          int g=gvalue+10; if (x!=p.x && y!=p.y) g+=4;
           int h=-1;
           for(std::set<BWAPI::TilePosition>::iterator i=end.begin();i!=end.end();i++)
           {
-            int dx=abs(x-i->x()); int dy=abs(y-i->y());
+            int dx=abs(x-i->x); int dy=abs(y-i->y);
             int ch=abs(dx-dy)*10+min(dx,dy)*14;
             if (h==-1 || ch<h)
               h=ch;
@@ -363,8 +363,8 @@ namespace BWTA
 
 				int g = gvalue + child->second;
 				BWAPI::TilePosition tileCenter = BWAPI::TilePosition(t->getCenter());
-				int dx = abs(tileCenter.x() - target.x());
-				int dy = abs(tileCenter.y() - target.y());
+				int dx = abs(tileCenter.x - target.x);
+				int dy = abs(tileCenter.y - target.y);
 				int h = abs(dx - dy) * 10 + min(dx, dy) * 14;
 				int f = g + h;
 				if (gmap.find(t) == gmap.end() || g < gmap.find(t)->second) {
@@ -454,8 +454,8 @@ namespace BWTA
 
 				int g = gvalue + child->second;
 				BWAPI::TilePosition tileCenter = BWAPI::TilePosition(t->getCenter());
-				int dx = abs(tileCenter.x() - target.x());
-				int dy = abs(tileCenter.y() - target.y());
+				int dx = abs(tileCenter.x - target.x);
+				int dy = abs(tileCenter.y - target.y);
 				int h = abs(dx - dy) * 10 + min(dx, dy) * 14;
 				int f = g + h;
 				if (gmap.find(t) == gmap.end() || g < gmap.find(t)->second) {

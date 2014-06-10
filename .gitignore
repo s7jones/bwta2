@@ -1,18 +1,25 @@
-# Temporal project files
-bwta2.ncb
-bwta2.suo
-src/bwta.vcproj.*
+# User-specific files
+*.suo
+*.user
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+x64/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+Release-Log/
+Exe-Release/
 src/logs/*
 
-# Binary folders
-Debug
-Release
-Release-Log
-Exe-Release
-
-# Temporal binary folders
-src/Debug
-src/Release
-src/Release-Log
-src/Exe-Release
-/tmp.chk
+# Visual C++ cache files
+ipch/
+*.aps
+*.ncb
+*.opensdf
+*.sdf
+*.cachefile

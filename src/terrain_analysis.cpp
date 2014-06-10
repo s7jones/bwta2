@@ -178,17 +178,17 @@ namespace BWTA
     render(1);
   #endif
 
-  // All line segments we create we will store in the sites vector and also insert into the 2d segmented delaunay graph object sdg
+  // All line segments we create we will store in the sites vector and also insert into the 2d segmented Delaunay graph object sdg
 
-  // Create the sites vector and 2d segmented delaunary graph
+  // Create the sites vector and 2d segmented Delaunay graph
   vector<SDGS2> sites;
   SDG2 sdg;
 
   // Add line segments of the 4 edges of the map to the sites vector
-  sites.push_back(SDGS2::construct_site_2(PointD(0,0),PointD(0,MapData::walkability.getHeight()-1)));
-  sites.push_back(SDGS2::construct_site_2(PointD(0,MapData::walkability.getHeight()-1),PointD(MapData::walkability.getWidth()-1,MapData::walkability.getHeight()-1)));
-  sites.push_back(SDGS2::construct_site_2(PointD(MapData::walkability.getWidth()-1,MapData::walkability.getHeight()-1),PointD(MapData::walkability.getWidth()-1,0)));
-  sites.push_back(SDGS2::construct_site_2(PointD(MapData::walkability.getWidth()-1,0),PointD(0,0)));
+  sites.push_back(SDGS2::construct_site_2(Point(0,0),Point(0,MapData::walkability.getHeight()-1)));
+  sites.push_back(SDGS2::construct_site_2(Point(0,MapData::walkability.getHeight()-1),Point(MapData::walkability.getWidth()-1,MapData::walkability.getHeight()-1)));
+  sites.push_back(SDGS2::construct_site_2(Point(MapData::walkability.getWidth()-1,MapData::walkability.getHeight()-1),Point(MapData::walkability.getWidth()-1,0)));
+  sites.push_back(SDGS2::construct_site_2(Point(MapData::walkability.getWidth()-1,0),Point(0,0)));
 
   // Add these same line segments to the sdg
   for(unsigned int i=0;i<sites.size();i++) {
@@ -202,8 +202,8 @@ namespace BWTA
     for(size_t i=0;i<polygons[p].size();i++)
     {
       int j=(i+1)%polygons[p].size();
-      PointD a(polygons[p][i].x(),polygons[p][i].y());
-      PointD b(polygons[p][j].x(),polygons[p][j].y());
+	  Point a(polygons[p][i].x,polygons[p][i].y);
+	  Point b(polygons[p][j].x,polygons[p][j].y);
       sites.push_back(SDGS2::construct_site_2(b,a));
       if (i==0)
       {
@@ -224,8 +224,8 @@ namespace BWTA
       for(size_t i=0;i<hole->size();i++)
       {
         int j=(i+1)%hole->size();
-        PointD a((*hole)[i].x(),(*hole)[i].y());
-        PointD b((*hole)[j].x(),(*hole)[j].y());
+		Point a((*hole)[i].x,(*hole)[i].y);
+		Point b((*hole)[j].x,(*hole)[j].y);
         sites.push_back(SDGS2::construct_site_2(b,a));
         h=sdg.insert(sites[sites.size()-1],h);
       }
@@ -234,7 +234,7 @@ namespace BWTA
   log("  Created voronoi diagram.");
   // The sites vector and sdg object not contain all of the edges of each polygon as well as
   // the four edges that form the border of the map
-  // Check to see if the 2d segmented delaunay graph is still valid
+  // Check to see if the 2d segmented Delaunay graph is still valid
   assert( sdg.is_valid(true, 1) );
   //cout << endl << endl;
   log("  Verified voronoi diagram.");
@@ -268,11 +268,11 @@ namespace BWTA
   //color all initial segments and vertices from the polygons BLACK
   for (Arrangement_2::Edge_iterator eit = arr.edges_begin(); eit != arr.edges_end(); ++eit)
   {
-    eit->data()=BLACK;
+    eit->data() = BLACK;
   }
   for (Arrangement_2::Vertex_iterator vit = arr.vertices_begin(); vit != arr.vertices_end(); ++vit)
   {
-    vit->data().c=BLACK;
+    vit->data().c = BLACK;
   }
 
   // Insert into arrangement all segments from voronoi diagram which are not bounded by any polygon
@@ -320,7 +320,7 @@ namespace BWTA
       eit->twin()->data()=BLUE;
     }
   }
-  // Color all the new verties BlUE
+  // Color all the new vertices BLUE
   for (Arrangement_2::Vertex_iterator vit = arr.vertices_begin(); vit != arr.vertices_end(); ++vit)
   {
     if (vit->data().c!=BLACK)
@@ -527,7 +527,7 @@ namespace BWTA
   {
     Polygon poly;
     PolygonD pd=(*r)->get_polygon();
-    for(int i=0;i<pd.size();i++)
+    for(unsigned int i=0;i<pd.size();i++)
     {
       poly.push_back(BWAPI::Position((int)(pd[i].x()*8),(int)(pd[i].y()*8)));
     }
@@ -578,7 +578,7 @@ namespace BWTA
         double y0=cast_to_double((*r)->point.y());
         PolygonD boundary=(*r)->get_polygon();
         QVector<QPointF> qp;
-        for(int i=0;i<boundary.size();i++)
+        for(unsigned int i=0;i<boundary.size();i++)
         {
           qp.push_back(QPointF(boundary.vertex(i).x(),boundary.vertex(i).y()));
         }
@@ -747,7 +747,7 @@ namespace BWTA
       {
         int j=(i+1)%p.size();
         //scene_ptr->addLine(QLineF(p[i].x(),p[i].y(),p[j].x(),p[j].y()),qc);
-        qp.push_back(QPointF(p[i].x(),p[i].y()));
+        qp.push_back(QPointF(p[i].x,p[i].y));
       }
       scene_ptr->addPolygon(QPolygonF(qp),QPen(QColor(0,0,0)),QBrush(qc));  
     }
@@ -1099,12 +1099,11 @@ namespace BWTA
       finished=true;
       Node* chokepoint_to_merge=NULL;
       Heap<Node*, double> h(false);
-      for(std::set<Node*>::iterator c=g_ptr->chokepoints_begin();c!=g_ptr->chokepoints_end();c++)
-      {
-        double cost=(*c)->radius;
-        if (calculate_merge_value(*c)>0)
-          h.set(*c,cost);
-      }
+	for(std::set<Node*>::iterator c=g_ptr->chokepoints_begin();c!=g_ptr->chokepoints_end();c++) {
+		BWTA::Node* node = *c;
+		double cost = node->radius;
+		if (calculate_merge_value(node)>0)  h.set(node,cost);
+	}
       finished = (h.size() == 0);
       while (h.size()>0)
       {
@@ -1143,16 +1142,11 @@ namespace BWTA
             affectedChokepoints.insert(*c2);
           }
         }
-        for(std::set<Node*>::iterator c=affectedChokepoints.begin();c!=affectedChokepoints.end();c++)
-        {
-          double cost=(*c)->radius;
-          if (calculate_merge_value(*c)>0)
-            h.set(*c,cost);
-          else
-          {
-            if (h.contains(*c))
-              h.erase(*c);
-          }
+        for(std::set<Node*>::iterator c=affectedChokepoints.begin();c!=affectedChokepoints.end();c++) {
+			BWTA::Node* node = *c;
+			double cost = node->radius;
+			if (calculate_merge_value(node)>0)  h.set(node,cost);
+			else if (h.contains(node)) h.erase(node);
         }
         smaller->radius=smaller_radius;
         g_ptr->merge_chokepoint(chokepoint_to_merge);

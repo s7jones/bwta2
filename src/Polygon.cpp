@@ -19,9 +19,9 @@ namespace BWTA
     double a=0;
     for(unsigned int i=0;i+1<size();i++)
     {
-      a+=(double)(*this)[i].x()*(*this)[i+1].y()-(double)(*this)[i+1].x()*(*this)[i].y();
+      a+=(double)(*this)[i].x*(*this)[i+1].y-(double)(*this)[i+1].x*(*this)[i].y;
     }
-    a+=back().x()*front().y()-front().x()*back().y();
+    a+=back().x*front().y-front().x*back().y;
     a/=2;
     a=fabs(a);
     return a;
@@ -47,9 +47,9 @@ namespace BWTA
     {
       if (j==size())
         j=0;
-      temp=(double)(*this)[i].x()*(*this)[j].y()-(double)(*this)[j].x()*(*this)[i].y();
-      cx+=((*this)[i].x()+(*this)[j].x())*temp;
-      cy+=((*this)[i].y()+(*this)[j].y())*temp;
+      temp=(double)(*this)[i].x*(*this)[j].y-(double)(*this)[j].x*(*this)[i].y;
+      cx+=((*this)[i].x+(*this)[j].x)*temp;
+      cy+=((*this)[i].y+(*this)[j].y)*temp;
     }
     cx=cx/(6.0*a);
     cy=cy/(6.0*a);
@@ -62,10 +62,10 @@ namespace BWTA
       polygonDs[this]=PolygonD();
       for(unsigned int i=0;i<size();i++)
       {
-        polygonDs[this].push_back(PointD((*this)[i].x(),(*this)[i].y()));
+        polygonDs[this].push_back(PointD((*this)[i].x,(*this)[i].y));
       }
     }
-    PointD query_pt(p.x(),p.y());
+    PointD query_pt(p.x,p.y);
     if (polygonDs[this].bounded_side(query_pt)==CGAL::ON_UNBOUNDED_SIDE)
       return false;
     for(std::vector<Polygon>::const_iterator i=holes.begin();i!=holes.end();i++)
@@ -77,18 +77,18 @@ namespace BWTA
   }
   BWAPI::Position Polygon::getNearestPoint(BWAPI::Position p) const
   {
-    double x3=p.x();
-    double y3=p.y();
+    double x3=p.x;
+    double y3=p.y;
     BWAPI::Position minp=BWAPI::Positions::Unknown;
     int j=1;
     double mind2=-1;
     for(int i=0;i<(int)size();i++)
     {
       j= (i+1) % size();
-      double x1=(*this)[i].x();
-      double y1=(*this)[i].y();
-      double x2=(*this)[j].x();
-      double y2=(*this)[j].y();
+      double x1=(*this)[i].x;
+      double y1=(*this)[i].y;
+      double x2=(*this)[j].x;
+      double y2=(*this)[j].y;
       double u=((x3-x1)*(x2-x1)+(y3-y1)*(y2-y1))/((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
       if (u<0) u=0;
       if (u>1) u=1;

@@ -11,9 +11,9 @@ namespace BWTA
 
 	namespace MapData
 	{
-		extern std::set<BWAPI::Unit*> minerals;
-		extern std::set<BWAPI::Unit*> rawMinerals;
-		extern std::set<BWAPI::Unit*> geysers;
+		extern BWAPI::Unitset minerals;
+		extern BWAPI::Unitset rawMinerals;
+		extern BWAPI::Unitset geysers;
 		extern RectangleArray<bool> walkability;
 		extern RectangleArray<bool> rawWalkability;
 		extern RectangleArray<bool> lowResWalkability;

@@ -28,31 +28,31 @@ namespace BWTA
   }
   BWAPI::Position getNearestUnwalkablePosition(BWAPI::Position position)
   {
-    Polygon* p = BWTA::getNearestUnwalkablePolygon(position.x()/32,position.y()/32);
+    Polygon* p = BWTA::getNearestUnwalkablePolygon(position.x/32,position.y/32);
     BWAPI::Position nearest = BWAPI::Positions::None;
     if (p == NULL)
     {
       //use an edge of the map if we don't find a polygon
-      nearest = BWAPI::Position(0,position.y());
+      nearest = BWAPI::Position(0,position.y);
     }
     else
     {
       nearest = p->getNearestPoint(position);
     }
-    if (position.x()<position.getDistance(nearest))
-      nearest=BWAPI::Position(0,position.y());
-    if (position.y()<position.getDistance(nearest))
-      nearest=BWAPI::Position(position.x(),0);
-    if (MapData::mapWidth*32-position.x()<position.getDistance(nearest))
-      nearest=BWAPI::Position(MapData::mapWidth*32,position.y());
-    if (MapData::mapHeight*32-position.y()<position.getDistance(nearest))
-      nearest=BWAPI::Position(position.x(),MapData::mapHeight*32);
+    if (position.x < position.getDistance(nearest))
+      nearest=BWAPI::Position(0,position.y);
+    if (position.y < position.getDistance(nearest))
+      nearest=BWAPI::Position(position.x,0);
+    if (MapData::mapWidth*32-position.x < position.getDistance(nearest))
+      nearest=BWAPI::Position(MapData::mapWidth*32,position.y);
+    if (MapData::mapHeight*32-position.y < position.getDistance(nearest))
+      nearest=BWAPI::Position(position.x,MapData::mapHeight*32);
     return nearest;
   }
   BaseLocation* getStartLocation(BWAPI::Player* player)
   {
     if (player==NULL) return NULL;
-    return getNearestBaseLocation(player->getStartLocation());
+    return getNearestBaseLocation((*player)->getStartLocation());
   }
   Region* getRegion(int x, int y)
   {
@@ -60,15 +60,15 @@ namespace BWTA
   }
   Region* getRegion(BWAPI::TilePosition tileposition)
   {
-    return BWTA::BWTA_Result::getRegion.getItemSafe(tileposition.x(),tileposition.y());
+    return BWTA::BWTA_Result::getRegion.getItemSafe(tileposition.x,tileposition.y);
   }
   std::set<Region*> fourRegions;
   Region* getRegion(BWAPI::Position position)
   {
-    Region* r00 = BWTA::BWTA_Result::getRegion.getItemSafe((position.x()-16)/32 + 0,(position.y()-16)/32 + 0);
-    Region* r01 = BWTA::BWTA_Result::getRegion.getItemSafe((position.x()-16)/32 + 0,(position.y()-16)/32 + 1);
-    Region* r10 = BWTA::BWTA_Result::getRegion.getItemSafe((position.x()-16)/32 + 1,(position.y()-16)/32 + 0);
-    Region* r11 = BWTA::BWTA_Result::getRegion.getItemSafe((position.x()-16)/32 + 1,(position.y()-16)/32 + 1);
+    Region* r00 = BWTA::BWTA_Result::getRegion.getItemSafe((position.x-16)/32 + 0,(position.y-16)/32 + 0);
+    Region* r01 = BWTA::BWTA_Result::getRegion.getItemSafe((position.x-16)/32 + 0,(position.y-16)/32 + 1);
+    Region* r10 = BWTA::BWTA_Result::getRegion.getItemSafe((position.x-16)/32 + 1,(position.y-16)/32 + 0);
+    Region* r11 = BWTA::BWTA_Result::getRegion.getItemSafe((position.x-16)/32 + 1,(position.y-16)/32 + 1);
     Region* aNotNullRegion = r00;
     if (aNotNullRegion == NULL)
       aNotNullRegion = r01;
@@ -125,11 +125,11 @@ namespace BWTA
   }
   Chokepoint* getNearestChokepoint(BWAPI::TilePosition position)
   {
-    return BWTA::BWTA_Result::getChokepoint.getItemSafe(position.x(),position.y());
+    return BWTA::BWTA_Result::getChokepoint.getItemSafe(position.x,position.y);
   }
   Chokepoint* getNearestChokepoint(BWAPI::Position position)
   {
-    return BWTA::BWTA_Result::getChokepointW.getItemSafe(position.x()/8,position.y()/8);
+    return BWTA::BWTA_Result::getChokepointW.getItemSafe(position.x/8,position.y/8);
   }
   BaseLocation* getNearestBaseLocation(int x, int y)
   {
@@ -137,11 +137,11 @@ namespace BWTA
   }
   BaseLocation* getNearestBaseLocation(BWAPI::TilePosition tileposition)
   {
-    return BWTA::BWTA_Result::getBaseLocation.getItemSafe(tileposition.x(),tileposition.y());
+    return BWTA::BWTA_Result::getBaseLocation.getItemSafe(tileposition.x,tileposition.y);
   }
   BaseLocation* getNearestBaseLocation(BWAPI::Position position)
   {
-    return BWTA::BWTA_Result::getBaseLocationW.getItemSafe(position.x()/8,position.y()/8);
+    return BWTA::BWTA_Result::getBaseLocationW.getItemSafe(position.x/8,position.y/8);
   }
   Polygon* getNearestUnwalkablePolygon(int x, int y)
   {
@@ -149,7 +149,7 @@ namespace BWTA
   }
   Polygon* getNearestUnwalkablePolygon(BWAPI::TilePosition tileposition)
   {
-    return BWTA::BWTA_Result::getUnwalkablePolygon.getItemSafe(tileposition.x(),tileposition.y());
+    return BWTA::BWTA_Result::getUnwalkablePolygon.getItemSafe(tileposition.x,tileposition.y);
   }
 
   bool isConnected(int x1, int y1, int x2, int y2)
@@ -162,7 +162,7 @@ namespace BWTA
   {
     if (getRegion(a)==NULL) return false;
     if (getRegion(b)==NULL) return false;
-    return getRegion(a.x(),a.y())->isReachable(getRegion(b.x(),b.y()));
+    return getRegion(a.x,a.y)->isReachable(getRegion(b.x,b.y));
   }
   std::pair<BWAPI::TilePosition, double> getNearestTilePosition(BWAPI::TilePosition start, const std::set<BWAPI::TilePosition>& targets)
   {
@@ -207,15 +207,15 @@ namespace BWTA
       }
     }
     heap.push(std::make_pair(start,0));
-    int sx=(int)start.x();
-    int sy=(int)start.y();
+    int sx=(int)start.x;
+    int sy=(int)start.y;
     distanceMap[sx][sy]=0;
     while (!heap.empty()) {
       BWAPI::TilePosition pos=heap.top().first;
       int distance=heap.top().second;
       heap.pop();
-      int x=(int)pos.x();
-      int y=(int)pos.y();
+      int x=(int)pos.x;
+      int y=(int)pos.y;
       int min_x=max(x-1,0);
       int max_x=min(x+1,distanceMap.getWidth()-1);
       int min_y=max(y-1,0);
@@ -251,15 +251,15 @@ namespace BWTA
     }
     BWAPI::TilePosition start(walkx,walky);
     heap.push(std::make_pair(start,0));
-    int sx=(int)start.x();
-    int sy=(int)start.y();
+    int sx=(int)start.x;
+    int sy=(int)start.y;
     distanceMap[sx][sy]=0;
     while (!heap.empty()) {
       BWAPI::TilePosition pos=heap.top().first;
       int distance=heap.top().second;
       heap.pop();
-      int x=(int)pos.x();
-      int y=(int)pos.y();
+      int x=(int)pos.x;
+      int y=(int)pos.y;
       int min_x=max(x-1,0);
       int max_x=min(x+1,distanceMap.getWidth()-1);
       int min_y=max(y-1,0);

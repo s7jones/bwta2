@@ -16,9 +16,9 @@ namespace BWTA
     virtual int minerals() const;
     virtual int gas() const;
 
-    virtual const std::set<BWAPI::Unit*> &getMinerals();
-    virtual const std::set<BWAPI::Unit*> &getStaticMinerals() const;
-    virtual const std::set<BWAPI::Unit*> &getGeysers() const;
+    virtual const BWAPI::Unitset &getMinerals();
+    virtual const BWAPI::Unitset &getStaticMinerals() const;
+    virtual const BWAPI::Unitset &getGeysers() const;
 
     virtual double getGroundDistance(BaseLocation* other) const;
     virtual double getAirDistance(BaseLocation* other) const;
@@ -32,9 +32,9 @@ namespace BWTA
     Region* region;
     bool island;
     bool start;
-    std::set<BWAPI::Unit*> geysers;
-    std::set<BWAPI::Unit*> staticMinerals;
-    std::set<BWAPI::Unit*> currentMinerals;
+    BWAPI::Unitset geysers;
+    BWAPI::Unitset staticMinerals;
+    BWAPI::Unitset currentMinerals;
     std::map<BaseLocation*, double > ground_distances;
     std::map<BaseLocation*, double > air_distances;
     BWAPI::TilePosition tilePosition;

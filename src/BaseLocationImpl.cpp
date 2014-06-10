@@ -5,7 +5,7 @@ namespace BWTA
   BaseLocationImpl::BaseLocationImpl(const BWAPI::TilePosition &tp)
   {
     tilePosition=tp;
-    position=BWAPI::Position(tp.x()*32+64,tp.y()*32+48);
+    position=BWAPI::Position(tp.x*32+64,tp.y*32+48);
     island=false;
     region=NULL;
   }
@@ -25,41 +25,41 @@ namespace BWTA
   int BaseLocationImpl::minerals() const
   {
     int count=0;
-    for each (BWAPI::Unit* m in this->staticMinerals)
-      count+=m->getResources();
+    for each (BWAPI::Unit m in this->staticMinerals)
+      count += m->getResources();
     return count;
   }
   int BaseLocationImpl::gas() const
   {
     int count=0;
-    for each (BWAPI::Unit* g in this->geysers)
-      count+=g->getResources();
+    for each (BWAPI::Unit g in this->geysers)
+      count += g->getResources();
     return count;
   }
-  const std::set<BWAPI::Unit*>& BaseLocationImpl::getMinerals()
+  const BWAPI::Unitset& BaseLocationImpl::getMinerals()
   {
-    std::set<BWAPI::Unit*>::iterator i_next;
-    for(std::set<BWAPI::Unit*>::iterator i=this->currentMinerals.begin();i!=this->currentMinerals.end();i=i_next)
+    BWAPI::Unitset::iterator i_next;
+    for(BWAPI::Unitset::iterator i=this->currentMinerals.begin();i!=this->currentMinerals.end();i=i_next)
     {
       i_next=i;
       i_next++;
-      if (!(*i)->exists())
+      if (!i->exists())
         this->currentMinerals.erase(i);
     }
-    for(std::set<BWAPI::Unit*>::iterator i=this->staticMinerals.begin();i!=this->staticMinerals.end();i=i_next)
+    for(BWAPI::Unitset::iterator i=this->staticMinerals.begin();i!=this->staticMinerals.end();i=i_next)
     {
       i_next=i;
       i_next++;
-      if ((*i)->exists())
-        this->currentMinerals.insert(*i);
+      if (i->exists())
+        this->currentMinerals.insert(i);
     }
     return this->currentMinerals;
   }
-  const std::set<BWAPI::Unit*>& BaseLocationImpl::getStaticMinerals() const
+  const BWAPI::Unitset& BaseLocationImpl::getStaticMinerals() const
   {
     return this->staticMinerals;
   }
-  const std::set<BWAPI::Unit*>& BaseLocationImpl::getGeysers() const
+  const BWAPI::Unitset& BaseLocationImpl::getGeysers() const
   {
     return this->geysers;
   }

@@ -29,7 +29,7 @@ namespace BWTA
       Polygon newpoly;
       newpoly.push_back(BWAPI::Position(cx,cy));
       bool first=true;
-      while(cx!=newpoly[0].x() || cy!=newpoly[0].y() || first)
+      while(cx!=newpoly[0].x || cy!=newpoly[0].y || first)
       {
         first=false;
         for(int i=0;i<3;i++) {
@@ -189,12 +189,12 @@ namespace BWTA
           break;
         for(size_t k=i+1;k<j;k++)
         {
-          double dx=polygon[i].x()-polygon[j].x();
-          double dy=polygon[i].y()-polygon[j].y();
+          double dx=polygon[i].x-polygon[j].x;
+          double dy=polygon[i].y-polygon[j].y;
           double d=sqrt(dx*dx+dy*dy);
           double nx=dy/d;
           double ny=-dx/d;
-          double distance=abs((polygon[k].x()-polygon[i].x())*nx+(polygon[k].y()-polygon[i].y())*ny);
+          double distance=abs((polygon[k].x-polygon[i].x)*nx+(polygon[k].y-polygon[i].y)*ny);
           if (distance>=error_tol)
           {
             within_tol=false;

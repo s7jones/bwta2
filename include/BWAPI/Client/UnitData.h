@@ -56,8 +56,8 @@ namespace BWAPI
     int targetPositionY;
     int order;
     int orderTarget;
-	int orderTargetPositionX;
-	int orderTargetPositionY;
+    int orderTargetPositionX;
+    int orderTargetPositionY;
     int secondaryOrder;
     int rallyPositionX;
     int rallyPositionY;
@@ -100,7 +100,7 @@ namespace BWAPI
     bool isUnderStorm;
     bool isUnderDarkSwarm;
     bool isUnderDWeb;
-    bool isUnpowered;
+    bool isPowered;
     bool isVisible[9];
     int  buttonset;
 
