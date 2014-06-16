@@ -121,7 +121,7 @@ namespace BWTA
 	start = clock();
 #ifndef OFFLINE
   // Give find_mineral_clusters the walkability data, minerals, and geysers, so it can compute the resource clutters
-	std::vector< std::vector< BWAPI::Unit* > > clusters;
+	std::vector< std::vector< BWAPI::Unit > > clusters;
   find_mineral_clusters(MapData::walkability,MapData::minerals,MapData::geysers,clusters);
   log("  Found " << clusters.size() << " mineral clusters.");
 

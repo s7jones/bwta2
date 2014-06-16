@@ -38,6 +38,7 @@ namespace BWTA
   }
   const BWAPI::Unitset& BaseLocationImpl::getMinerals()
   {
+	  // TODO this can be simplified
     BWAPI::Unitset::iterator i_next;
     for(BWAPI::Unitset::iterator i=this->currentMinerals.begin();i!=this->currentMinerals.end();i=i_next)
     {

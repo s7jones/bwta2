@@ -1,4 +1,6 @@
 #pragma once
+#include <BWAPI.h>
+#include <set>
 #include <BWTA/Polygon.h>
 namespace BWTA
 {

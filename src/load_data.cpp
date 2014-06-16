@@ -73,16 +73,16 @@ namespace BWTA
   //log("***Block static neutral units***");
 	int x1,y1,x2,y2;
 	BWAPI::UnitType unitType;
-	std::set<BWAPI::Unit*>::iterator unit;
-	std::set<BWAPI::Unit*> neutralUnits = BWAPI::Broodwar->getStaticNeutralUnits();
+	BWAPI::Unitset::iterator unit;
+	BWAPI::Unitset neutralUnits = BWAPI::Broodwar->getStaticNeutralUnits();
 	for(unit = neutralUnits.begin(); unit != neutralUnits.end(); ++unit) {
 		// check if it is a resource container
-		unitType = (*unit)->getType();
+		unitType = unit->getType();
 		if (unitType == BWAPI::UnitTypes::Resource_Vespene_Geyser || unitType.isMineralField()) continue;
 		// get build area
     //log("  (" << unitType << ") " << unitType.getName() << " at " << (*unit)->getTilePosition().x() << "," << (*unit)->getTilePosition().y());
-		x1 = (*unit)->getTilePosition().x()*4;
-		y1 = (*unit)->getTilePosition().y()*4;
+		x1 = unit->getTilePosition().x*4;
+		y1 = unit->getTilePosition().y*4;
 		x2 = x1 + unitType.tileWidth()*4;
 		y2 = y1 + unitType.tileHeight()*4;
 		// sanitize
@@ -124,13 +124,12 @@ namespace BWTA
   {
     MapData::rawMinerals = BWAPI::Broodwar->getStaticMinerals();
     //filter out all mineral patches under 200
-    for (BWAPI::Unitset::iterator m = MapData::rawMinerals.begin(); m != MapData::rawMinerals.end(); m++)
-    {
-      if (m->getInitialResources()>200)
-      {
+    for (BWAPI::Unitset::iterator m = MapData::rawMinerals.begin(); m != MapData::rawMinerals.end(); m++) {
+      if  (m->getInitialResources() > 200) {
         MapData::minerals.insert(m);
       }
     }
+	log("Found " << MapData::minerals.size() << " minerals");
     MapData::geysers = BWAPI::Broodwar->getStaticGeysers();
     return true;
   }

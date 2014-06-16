@@ -1,4 +1,5 @@
 #pragma once
+#include <BWAPI.h>
 #include <BWTA/Chokepoint.h>
 #include <BWTA/Polygon.h>
 #include <BWTA/Region.h>
