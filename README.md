@@ -5,6 +5,8 @@ The original BWTA is only aimed to analyze "normal" maps, i.e. ICCup maps or oth
 
 BWTA2 offers more functionalities (to be documented) and compatibility with [BWAPI 4.0.1](https://github.com/bwapi/bwapi).
 
+CGAL library is used to create the [Segment Delaunay Graph](http://doc.cgal.org/latest/Segment_Delaunay_graph_2/index.html). [How to install](http://www.cgal.org/windows_installation.html) (only if you need to compile the project).
+
 There are two different branches:
 
 * **master**: It has the project in VS2010 and it is under maintenance.

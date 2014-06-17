@@ -1,15 +1,11 @@
 #pragma once
 
-// #define DEBUG_DRAW 1
-// #define DRAW_COLOR 1
-
 #include "VertexData.h"
 #include <BWTA/RectangleArray.h>
 #include <BWTA/BaseLocation.h>
 #include <BWTA/Polygon.h>
 #ifdef DEBUG_DRAW
-  // Qt version 4.6.3 // 5.3.0
-  #include <QtGui>
+  #include <QtGui/QtGui>
   #include <QtWidgets/QApplication>
   #include <QtWidgets/QGraphicsScene>
 #endif
@@ -22,23 +18,13 @@ namespace BWTA
 
   typedef CGAL::Simple_cartesian< double >					CKD;
   typedef CGAL::Filtered_kernel<CKD>						KernelD;
-//  typedef CGAL::Segment_Delaunay_graph_traits_2<KernelD>	GtD;
 
   typedef CGAL::Lazy_exact_nt<CGAL::Gmpq >					NumberType;
   typedef CGAL::Simple_cartesian< NumberType >				CK;
   typedef CGAL::Filtered_kernel<CK>							Kernel;
   typedef CGAL::Segment_Delaunay_graph_traits_2<Kernel>		Gt;
-//  typedef CGAL::Segment_Delaunay_graph_traits_2<CKD> GtD;
 
-
- // typedef CGAL::Segment_Delaunay_graph_2<GtD> SDG2;
   typedef CGAL::Segment_Delaunay_graph_2<Gt> SDG2;
-
-//   typedef GtD::Point_2		Point_2_GtD;
-//   typedef GtD::Line_2		Line_2_GtD;
-//   typedef GtD::Ray_2		Ray_2_GtD;
-//   typedef GtD::Segment_2	Segment_2_GtD;
-//   typedef CGAL::Parabola_segment_2<GtD> Parabola_segment_2_GtD;
 
   typedef Gt::Point_2		Point_2_Gt;
   typedef Gt::Line_2		Line_2_Gt;
@@ -46,7 +32,6 @@ namespace BWTA
   typedef Gt::Segment_2	Segment_2_Gt;
   typedef CGAL::Parabola_segment_2<Gt> Parabola_segment_2_Gt;
 
- //typedef CGAL::Segment_Delaunay_graph_site_2< CKD > SDGS2;
   typedef CGAL::Segment_Delaunay_graph_site_2< CK > SDGS2;
   typedef CGAL::Point_2<CK> Point;
   typedef CGAL::Polygon_2<CK> PolygonCK;

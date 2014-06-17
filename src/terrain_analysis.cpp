@@ -366,15 +366,10 @@ namespace BWTA
     log("Drawing results of step 4");
     draw_polygons(&polygons);
     draw_arrangement(&arr);
-    for(std::set<Node*>::iterator r=g.regions_begin();r!=g.regions_end();r++)
-    {
-      double x0=cast_to_double((*r)->point.x());
-      double y0=cast_to_double((*r)->point.y());
-      #ifdef DRAW_COLOR
-        scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(0,0,255)),QBrush(QColor(0,0,255)));
-      #else
-        scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(0,0,0)),QBrush(QColor(0,0,0)));
-      #endif
+    for(std::set<Node*>::iterator r=g.regions_begin();r!=g.regions_end();r++) {
+		double x0=cast_to_double((*r)->point.x());
+		double y0=cast_to_double((*r)->point.y());
+		scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(0,0,255)),QBrush(QColor(0,0,255)));
     }
     render(4);
   #endif
@@ -394,25 +389,13 @@ namespace BWTA
     {
       double x0=cast_to_double((*r)->point.x());
       double y0=cast_to_double((*r)->point.y());
-      #ifdef DRAW_COLOR
-        scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(0,0,255)),QBrush(QColor(0,0,255)));
-      #else
-        scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(0,0,0)),QBrush(QColor(0,0,0)));
-      #endif
+      scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(0,0,255)),QBrush(QColor(0,0,255)));
     }
     for(std::set<Node*>::iterator c=g.chokepoints_begin();c!=g.chokepoints_end();c++)
     {
       double x0=cast_to_double((*c)->point.x());
       double y0=cast_to_double((*c)->point.y());
-      #ifdef DRAW_COLOR
-        scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(255,0,0)),QBrush(QColor(255,0,0)));
-      #else
-        QVector<QPointF> qp;
-        qp.push_back(QPointF(x0,y0-6));
-        qp.push_back(QPointF(x0-7,y0+6));
-        qp.push_back(QPointF(x0+7,y0+6));
-        scene_ptr->addPolygon(QPolygonF(qp),QPen(QColor(0,0,0)),QBrush(QColor(0,0,0)));  
-      #endif
+      scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(255,0,0)),QBrush(QColor(255,0,0)));
     }
     render(5);
   #endif
@@ -444,28 +427,13 @@ namespace BWTA
         qp.setWidth(2);
         scene.addLine(QLineF(x0,y0,x1,y1),qp);
       }
-      #ifdef DRAW_COLOR
-        scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(0,0,255)),QBrush(QColor(0,0,255)));
-      #else
-        scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(0,0,0)),QBrush(QColor(0,0,0)));
-      #endif
-      //scene.addEllipse(QRectF(x0-(*r)->radius,y0-(*r)->radius,2*(*r)->radius,2*(*r)->radius),QPen(QColor(0,0,255)));
+      scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(0,0,255)),QBrush(QColor(0,0,255)));
     }
     for(std::set<Node*>::iterator c=g.chokepoints_begin();c!=g.chokepoints_end();c++)
     {
       double x0=cast_to_double((*c)->point.x());
       double y0=cast_to_double((*c)->point.y());
-//       scene.addEllipse(QRectF(x0-3,y0-3,6,6),QPen(QColor(255,0,0)),QBrush(QColor(255,0,0)));
-//       scene.addRect(QRectF(x0-5,y0-5,10,10),QPen(QColor(0,0,0)),QBrush(QColor(0,0,0)));
-      #ifdef DRAW_COLOR
-        scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(255,0,0)),QBrush(QColor(255,0,0)));
-      #else
-        QVector<QPointF> qp;
-        qp.push_back(QPointF(x0,y0-6));
-        qp.push_back(QPointF(x0-7,y0+6));
-        qp.push_back(QPointF(x0+7,y0+6));
-        scene_ptr->addPolygon(QPolygonF(qp),QPen(QColor(0,0,0)),QBrush(QColor(0,0,0)));  
-      #endif
+      scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(255,0,0)),QBrush(QColor(255,0,0)));
       if (calculate_merge_value(*c)>0)
         scene.addEllipse(QRectF(x0-(*c)->radius,y0-(*c)->radius,2*(*c)->radius,2*(*c)->radius));
     }
@@ -495,27 +463,13 @@ namespace BWTA
         qp.setWidth(2);
         scene.addLine(QLineF(x0,y0,x1,y1),qp);
       }
-      #ifdef DRAW_COLOR
-        scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(0,0,255)),QBrush(QColor(0,0,255)));
-      #else
-        scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(0,0,0)),QBrush(QColor(0,0,0)));
-      #endif
+      scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(0,0,255)),QBrush(QColor(0,0,255)));
     }
     for(std::set<Node*>::iterator c=g.chokepoints_begin();c!=g.chokepoints_end();c++)
     {
       double x0=cast_to_double((*c)->point.x());
       double y0=cast_to_double((*c)->point.y());
-//      scene.addEllipse(QRectF(x0-3,y0-3,6,6),QPen(QColor(255,0,0)),QBrush(QColor(255,0,0)));
-//      scene.addRect(QRectF(x0-5,y0-5,10,10),QPen(QColor(0,0,0)),QBrush(QColor(0,0,0)));
-      #ifdef DRAW_COLOR
-        scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(255,0,0)),QBrush(QColor(255,0,0)));
-      #else
-        QVector<QPointF> qp;
-        qp.push_back(QPointF(x0,y0-6));
-        qp.push_back(QPointF(x0-7,y0+6));
-        qp.push_back(QPointF(x0+7,y0+6));
-        scene_ptr->addPolygon(QPolygonF(qp),QPen(QColor(0,0,0)),QBrush(QColor(0,0,0)));  
-      #endif
+      scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(255,0,0)),QBrush(QColor(255,0,0)));
 
     }
     render(7);
@@ -544,7 +498,6 @@ namespace BWTA
   #ifdef DEBUG_DRAW
     log("Drawing results of step 8");
     draw_polygons(&polygons);
-    #ifdef DRAW_COLOR
     
       for(std::set<Node*>::iterator r=g.regions_begin();r!=g.regions_end();r++)
       {
@@ -583,10 +536,8 @@ namespace BWTA
           qp.push_back(QPointF(boundary.vertex(i).x(),boundary.vertex(i).y()));
         }
         scene.addPolygon(QPolygonF(qp),QPen(QColor(0,0,0)),QBrush(hsl2rgb((*r)->hue,1.0,0.75)));    
-//        scene.addPolygon(QPolygonF(qp),QPen(QColor(0,0,0)),QBrush(QColor(255,255,255)));    
       }
     
-    #endif
   draw_arrangement(&arr);
   render(8);
   #endif
@@ -706,26 +657,15 @@ namespace BWTA
         double x1=cast_to_double(eit->curve().target().x());
         double y1=cast_to_double(eit->curve().target().y());
         QColor color(0,0,0);
-        if (eit->data()==BLUE)
-        {
+        if (eit->data() == BLUE) {
           color=QColor(0,0,255);
-        }
-        else if (eit->data()==BLACK)
-        {
+        } else if (eit->data() == BLACK)  {
           color=QColor(0,0,0);
-        }
-        else if (eit->data()==RED)
-        {
+        } else if (eit->data()==RED) {
           color=QColor(255,0,0);
-        }
-        else
-        {
+        } else {
           color=QColor(0,180,0);
         }
-        #ifndef DRAW_COLOR
-          //all black
-          color=QColor(0,0,0);
-        #endif
         QPen qp(color);
         qp.setWidth(2);
         scene_ptr->addLine(QLineF(x0,y0,x1,y1),qp);

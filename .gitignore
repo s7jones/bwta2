@@ -13,7 +13,7 @@ bld/
 [Bb]in/
 [Oo]bj/
 Release-Log/
-Exe-Release/
+Release-Exe/
 src/logs/*
 
 # Visual C++ cache files
