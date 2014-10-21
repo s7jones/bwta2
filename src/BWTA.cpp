@@ -49,10 +49,10 @@ namespace BWTA
       nearest=BWAPI::Position(position.x,MapData::mapHeight*32);
     return nearest;
   }
-  BaseLocation* getStartLocation(BWAPI::Player* player)
+  BaseLocation* getStartLocation(BWAPI::Player player)
   {
-    if (player==NULL) return NULL;
-    return getNearestBaseLocation((*player)->getStartLocation());
+    if (player == nullptr) return nullptr;
+    return getNearestBaseLocation(player->getStartLocation());
   }
   Region* getRegion(int x, int y)
   {

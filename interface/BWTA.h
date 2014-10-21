@@ -21,7 +21,7 @@ namespace BWTA
   const std::set<BaseLocation*>& getStartLocations();
   const std::set<Polygon*>& getUnwalkablePolygons();
 
-  BaseLocation* getStartLocation(BWAPI::Player* player);
+  BaseLocation* getStartLocation(BWAPI::Player player);
 
   Region* getRegion(int x, int y);
   Region* getRegion(BWAPI::TilePosition tileposition);
