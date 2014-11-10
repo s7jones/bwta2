@@ -26,35 +26,26 @@ namespace BWTA
   {
     int count=0;
     for each (BWAPI::Unit m in this->staticMinerals)
-      count += m->getResources();
+		count += m->getResources();
     return count;
   }
   int BaseLocationImpl::gas() const
   {
     int count=0;
     for each (BWAPI::Unit g in this->geysers)
-      count += g->getResources();
+		count += g->getResources();
     return count;
   }
   const BWAPI::Unitset& BaseLocationImpl::getMinerals()
   {
-	  // TODO this can be simplified
-    BWAPI::Unitset::iterator i_next;
-    for(BWAPI::Unitset::iterator i=this->currentMinerals.begin();i!=this->currentMinerals.end();i=i_next)
-    {
-      i_next=i;
-      i_next++;
-      if (!i->exists())
-        this->currentMinerals.erase(i);
-    }
-    for(BWAPI::Unitset::iterator i=this->staticMinerals.begin();i!=this->staticMinerals.end();i=i_next)
-    {
-      i_next=i;
-      i_next++;
-      if (i->exists())
-        this->currentMinerals.insert(i);
-    }
-    return this->currentMinerals;
+	  //  check if a mineral have been deleted (or we don't have access to them)
+	  currentMinerals.clear();
+	  for (auto mineral : staticMinerals) {
+		  if (mineral->exists()) {
+			  currentMinerals.push_back(mineral);
+		  }
+	  }
+	  return currentMinerals;
   }
   const BWAPI::Unitset& BaseLocationImpl::getStaticMinerals() const
   {

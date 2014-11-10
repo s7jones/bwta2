@@ -33,8 +33,8 @@ namespace BWTA
     bool island;
     bool start;
     BWAPI::Unitset geysers;
-    BWAPI::Unitset staticMinerals;
-    BWAPI::Unitset currentMinerals;
+	BWAPI::Unitset staticMinerals;
+	BWAPI::Unitset currentMinerals;
     std::map<BaseLocation*, double > ground_distances;
     std::map<BaseLocation*, double > air_distances;
     BWAPI::TilePosition tilePosition;
