@@ -107,6 +107,9 @@
     <ClCompile Include="offline\wallingAnalysis.cpp">
       <Filter>Offline</Filter>
     </ClCompile>
+    <ClCompile Include="offline\MapFileParser.cpp">
+      <Filter>Offline</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseLocationImpl.h">
@@ -203,6 +206,9 @@
       <Filter>Offline</Filter>
     </ClInclude>
     <ClInclude Include="offline\wallingAnalysis.h">
+      <Filter>Offline</Filter>
+    </ClInclude>
+    <ClInclude Include="offline\MapFileParser.h">
       <Filter>Offline</Filter>
     </ClInclude>
   </ItemGroup>
