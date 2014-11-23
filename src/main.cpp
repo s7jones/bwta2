@@ -499,6 +499,7 @@ int main (int argc, char * argv[])
 	std::string cv5FileName = "tileset/"+tileSetName[tileset]+".cv5";
 	BWTA::MapData::TileSet = (TileType*)getFileBuffer(cv5FileName.c_str());
 
+
 	// Load MiniTileFlags file (tileSetName[tileset].vf4) into BWTA::MapData::MiniTileFlags
 	std::string vf4FileName = "tileset/"+tileSetName[tileset]+".vf4";
 	BWTA::MapData::MiniTileFlags = (BWTA::MapData::MiniTileMaps_type*)getFileBuffer(vf4FileName.c_str());
@@ -508,40 +509,21 @@ int main (int argc, char * argv[])
 	DWORD chunkSize = 0;
 	BWTA::MapData::TileArray = (TileID*)getChunkPointer((unsigned char *)"MTXM", CHKdata, dataSize, &chunkSize);
 
+
 	// Set walkability
 	BWTA::MapData::isWalkable.resize(BWTA::MapData::mapWidth * 4, BWTA::MapData::mapHeight * 4);
 	setWalkability(BWTA::MapData::isWalkable);
 	// Test walkability data
-	{
-		std::ofstream fileTxt("logs/walkable.txt");
-		u16 h = BWTA::MapData::mapHeight * 4;
-		u16 w = BWTA::MapData::mapWidth * 4;
-		for (unsigned int y = 0; y < h; ++y) {
-			for (unsigned int x = 0; x < w; ++x) {
-				fileTxt << BWTA::MapData::isWalkable[x][y];
-			}
-			fileTxt << std::endl;
-		}
-		fileTxt.close();
-	}
+	BWTA::MapData::isWalkable.saveToFile("logs/walkable.txt");
+
 
 	// Set buildability
 	BWTA::MapData::buildability.resize(BWTA::MapData::mapWidth, BWTA::MapData::mapHeight);
 	setBuildability(BWTA::MapData::buildability);
 	// Test buildability data
-	{
-		std::ofstream fileTxt("logs/buildable2.txt");
-		u16 h = BWTA::MapData::mapHeight;
-		u16 w = BWTA::MapData::mapWidth;
-		for (unsigned int y = 0; y < h; ++y) {
-			for (unsigned int x = 0; x < w; ++x) {
-				fileTxt << BWTA::MapData::buildability[x][y];
-			}
-			fileTxt << std::endl;
-		}
-		fileTxt.close();
-	}
-	//BWTA::MapData::buildability.saveToFile("logs/buildable2.txt");
+	BWTA::MapData::buildability.saveToFile("logs/buildable.txt");
+
+
 	delete CHKdata;
 
 	// Normal procedure to analyze map
