@@ -8,9 +8,7 @@
 #include "offline/MiniTileFlags.h"
 #include "offline/MyUnitType.h"
 #include "offline/sha1.h"
-
 #include "offline/wallingAnalysis.h"
-
 
 const std::string tileSetName[9] = {
   "badlands",
@@ -25,13 +23,7 @@ const std::string tileSetName[9] = {
 };
 
 
-// TODO we should instantiate a new Game
-//namespace BWAPI { Game* Broodwar; }
-//namespace BWAPI { GameWrapper Broodwar; }
-
-
 void printError(const char * archive, const char * message, const char * file, int errnum) {
-
 	char * error = NULL;
 	char cCurrentPath[FILENAME_MAX];
 	_getcwd(cCurrentPath, sizeof(cCurrentPath));
@@ -62,17 +54,17 @@ void printError(const char * archive, const char * message, const char * file, i
 */
 bool hasEnding (const char *fullString, const char *ending)
 {
-  int l1 = strlen(fullString);
-  int l2 = strlen(ending);
-  if (l1 >= l2) {
-    int start = l1-l2;
-    for(int idx = 0;idx<l2;idx++) {
-      if (fullString[start+idx] != ending[idx]) return false;
-    }
-    return true;
-  } else {
-    return false;
-  }
+	int l1 = strlen(fullString);
+	int l2 = strlen(ending);
+	if (l1 >= l2) {
+		int start = l1-l2;
+		for(int idx = 0;idx<l2;idx++) {
+			if (fullString[start+idx] != ending[idx]) return false;
+		}
+		return true;
+	} else {
+		return false;
+	}
 }
 
 
@@ -114,13 +106,13 @@ unsigned char *extractCHKfile(const char *archive, DWORD *dataSize)
 		if ( hFileFind != (HANDLE)0xFFFFFFFF ) 
 			SFileFindClose(hFileFind);
 
-		// Open (extract) chk file
+		// Open (extract) CHK file
 		if(!SFileOpenFileEx(hMpq, SFileFindData.cFileName, 0, &hFileFind)) {
-			printError(archive, "Cannot extract chk file", archive, GetLastError());
+			printError(archive, "Cannot extract CHK file", archive, GetLastError());
 			return NULL;
 		}
 
-		// Read chk
+		// Read CHK
 		CHKdata = new unsigned char[SFileFindData.dwFileSize];
 		DWORD dwBytes = 0;
 		SFileReadFile(hFileFind, CHKdata, SFileFindData.dwFileSize, &dwBytes, NULL);
@@ -260,7 +252,7 @@ void getUnits(unsigned char *CHKdata, DWORD size) {
 			position+=2;	
 			int player = (playerIsValid==1 ? UNITdata[position] : neutralPlayer);
 			//std::cout << "Unit(" << unitClass << ") ID=" << ID << " at " << x << "," << y << " player " << player << "\n";
-      std::cout << "Unit(" << unitClass << ") type=" << BWTA::UnitType::getName(ID) << " at " << x << "," << y << " player " << player << "\n";
+			std::cout << "Unit(" << unitClass << ") type=" << BWTA::UnitType::getName(ID) << " at " << x << "," << y << " player " << player << "\n";
 
 			// TODO: how do we translate from the unitClass to a unit type? I have not been able to find information online...
 			// ...
@@ -305,16 +297,16 @@ unsigned int getTileset(unsigned char *CHKdata, DWORD size) {
 	unsigned char *ERAdata = getChunkPointer((unsigned char *)"ERA ", CHKdata, size, &chunkSize);
 
 	if (ERAdata!=NULL) {
-    // StarCraft masks the tileset indicator's bit value, 
-    // so bits after the third place (anything after the value "7") are removed. 
-    // Thus, 9 (1001 in binary) is interpreted as 1 (0001), 10 (1010) as 2 (0010), etc. 
-    unsigned char tileset = ERAdata[0];
-    //std::cout << "ERAdata = " << (std::bitset<8>) tileset << std::endl;
-    tileset &= 7;
-    //std::cout << "ERAdata = " << (std::bitset<8>) tileset << std::endl;
+		// StarCraft masks the tileset indicator's bit value, 
+		// so bits after the third place (anything after the value "7") are removed. 
+		// Thus, 9 (1001 in binary) is interpreted as 1 (0001), 10 (1010) as 2 (0010), etc. 
+		unsigned char tileset = ERAdata[0];
+		//std::cout << "ERAdata = " << (std::bitset<8>) tileset << std::endl;
+		tileset &= 7;
+		//std::cout << "ERAdata = " << (std::bitset<8>) tileset << std::endl;
 		return (unsigned int) tileset;
 	}
-  return 8;
+	return 8;
 }
 
 /*
@@ -455,20 +447,20 @@ BWTA::RectangleArray<int> getChokeGrid(BWTA::Chokepoint* chokepoint)
 int main (int argc, char * argv[])
 {
 	// Check the number of parameters
-  if (argc < 2) {
-    // Tell the user how to run the program
-    std::cerr << "Usage: " << argv[0] << " [mapFile]" << std::endl;
-    return 1;
-  }
+	if (argc < 2) {
+		// Tell the user how to run the program
+		std::cerr << "Usage: " << argv[0] << " [mapFile]" << std::endl;
+		return 1;
+	}
 
-  // Save map name
-  std::string strName = argv[1];
-  unsigned found = strName.find_last_of("/\\");
-  BWTA::MapData::mapFileName = strName.substr(found+1);
+	// Save map name
+	std::string strName = argv[1];
+	unsigned found = strName.find_last_of("/\\");
+	BWTA::MapData::mapFileName = strName.substr(found+1);
 
-  std::cout << "=======================\n";
-  std::cout << "Testing standalone BWTA\n";
-  std::cout << "=======================\n";
+	std::cout << "=======================\n";
+	std::cout << "Testing standalone BWTA\n";
+	std::cout << "=======================\n";
 	DWORD dataSize = 0;
 
 	unsigned char *CHKdata = extractCHKfile(argv[1], &dataSize);
@@ -477,12 +469,12 @@ int main (int argc, char * argv[])
 	std::cout << "Successfully extracted the CHK file, of size " << dataSize << "\n";
 	//printCHKchunks(CHKdata, dataSize);
 
-  // Calculate hash
-  unsigned char hash[20];
-  char hexstring[42];
-  sha1::calc(CHKdata, dataSize, hash);
-  sha1::toHexString(hash, hexstring);
-  BWTA::MapData::hash = std::string(hexstring);
+	// Calculate hash
+	unsigned char hash[20];
+	char hexstring[42];
+	sha1::calc(CHKdata, dataSize, hash);
+	sha1::toHexString(hash, hexstring);
+	BWTA::MapData::hash = std::string(hexstring);
 
 	// Load map dimensions
 	unsigned int width = 0, height = 0;
@@ -491,111 +483,106 @@ int main (int argc, char * argv[])
 	BWTA::MapData::mapWidth = width;
 	BWTA::MapData::mapHeight = height;
 
-  // TODO: Load neutral units (minerals, gas, and starting locations)
+	// TODO: Load neutral units (minerals, gas, and starting locations)
 	//getUnits(CHKdata, dataSize);
-  getDoodads(CHKdata, dataSize);
+	getDoodads(CHKdata, dataSize);
 
-  // Get map tileset ID
-  unsigned int tileset = getTileset(CHKdata, dataSize);
-  if (tileset > 7) {
-    std::cout << "Tileset Unknown (" << tileset << ")\n";
-    return 0;
-  }
-  std::cout << "Map's tilset: " << tileSetName[tileset] << "\n";
+	// Get map tileset ID
+	unsigned int tileset = getTileset(CHKdata, dataSize);
+	if (tileset > 7) {
+		std::cout << "Tileset Unknown (" << tileset << ")\n";
+		return 0;
+	}
+	std::cout << "Map's tilset: " << tileSetName[tileset] << "\n";
   
-  // Load TileSet file (tileSetName[tileset].cv5) into BWTA::MapData::TileSet
-  std::string cv5FileName = "tileset/"+tileSetName[tileset]+".cv5";
-  BWTA::MapData::TileSet = (TileType*)getFileBuffer(cv5FileName.c_str());
+	// Load TileSet file (tileSetName[tileset].cv5) into BWTA::MapData::TileSet
+	std::string cv5FileName = "tileset/"+tileSetName[tileset]+".cv5";
+	BWTA::MapData::TileSet = (TileType*)getFileBuffer(cv5FileName.c_str());
 
-  // Load MiniTileFlags file (tileSetName[tileset].vf4) into BWTA::MapData::MiniTileFlags
-  std::string vf4FileName = "tileset/"+tileSetName[tileset]+".vf4";
-  BWTA::MapData::MiniTileFlags = (BWTA::MapData::MiniTileMaps_type*)getFileBuffer(vf4FileName.c_str());
+	// Load MiniTileFlags file (tileSetName[tileset].vf4) into BWTA::MapData::MiniTileFlags
+	std::string vf4FileName = "tileset/"+tileSetName[tileset]+".vf4";
+	BWTA::MapData::MiniTileFlags = (BWTA::MapData::MiniTileMaps_type*)getFileBuffer(vf4FileName.c_str());
 
 
-  // Load Map Tiles
-  DWORD chunkSize = 0;
-  BWTA::MapData::TileArray = (TileID*)getChunkPointer((unsigned char *)"MTXM", CHKdata, dataSize, &chunkSize);
+	// Load Map Tiles
+	DWORD chunkSize = 0;
+	BWTA::MapData::TileArray = (TileID*)getChunkPointer((unsigned char *)"MTXM", CHKdata, dataSize, &chunkSize);
 
 	// Set walkability
-	BWTA::RectangleArray<bool> walkability;
-	walkability.resize(BWTA::MapData::mapWidth*4, BWTA::MapData::mapHeight*4);
-  setWalkability(walkability);
-  BWTA::MapData::isWalkable = walkability;
-  // Test walkability data
-  {
-    std::ofstream fileTxt("logs/walkable.txt");
-    u16 h = BWTA::MapData::mapHeight * 4;
-    u16 w = BWTA::MapData::mapWidth * 4;
-    for (unsigned int y = 0; y < h; ++y) {
-      for (unsigned int x = 0; x < w; ++x) {
-        fileTxt << walkability[x][y];
-      }
- 	  fileTxt << std::endl;
-    }
-    fileTxt.close();
-  }
-
-  // Set buildability
-  BWTA::RectangleArray<bool> buildability;
-  buildability.resize(BWTA::MapData::mapWidth, BWTA::MapData::mapHeight);
-  setBuildability(buildability);
-  BWTA::MapData::buildability = buildability;
-  // Test buildability data
-  {
-    std::ofstream fileTxt("logs/buildable.txt");
-    u16 h = BWTA::MapData::mapHeight;
-    u16 w = BWTA::MapData::mapWidth;
-    for (unsigned int y = 0; y < h; ++y) {
-      for (unsigned int x = 0; x < w; ++x) {
-        fileTxt << buildability[x][y];
-  	  }
- 	  fileTxt << std::endl;
-    }
-    fileTxt.close();
-  }
-  delete CHKdata;
-
-  // Normal procedure to analyze map
-  std::cout << "Reading map info (low resolution walkable map, ...)\n";
-  BWTA::readMap();
-  std::cout << "Analyzing map...";
-  BWTA::analyze();
-  std::cout << "DONE\n";
-
-  // Generate the grids around all chokepoints:
-  std::ofstream fileTxt("logs/output.txt"); 
-  const std::set<BWTA::Chokepoint*> chokePoints = BWTA::getChokepoints();
-  for(std::set<BWTA::Chokepoint*>::const_iterator c = chokePoints.begin();
-	  c!=chokePoints.end();++c) {
-	  BWTA::Chokepoint *cp = (*c);
-	  BWTA::RectangleArray<int> chokeGrid = getChokeGrid(cp);
-	   // Print grid
-	  BWAPI::TilePosition center = BWAPI::TilePosition(cp->getCenter());
-	  int radius = int(cp->getWidth()/TILE_SIZE);
-	  BWAPI::TilePosition region1 = BWAPI::TilePosition(cp->getRegions().first->getCenter());
-	  BWAPI::TilePosition region2 = BWAPI::TilePosition(cp->getRegions().second->getCenter());
-	  fileTxt << "Chokepoint:\n";
-	  fileTxt << "Region 1: " << radius+region1.x-center.x << "," << 
-								  radius+region1.y-center.y << std::endl;
-	  fileTxt << "Region 2: " << radius+region2.x-center.x << "," << 
-								  radius+region2.y-center.y << std::endl;
-	  BWAPI::TilePosition side1 = BWAPI::TilePosition(cp->getSides().first);
-	  BWAPI::TilePosition side2 = BWAPI::TilePosition(cp->getSides().second);
-	  int s1x = radius+side1.x-center.x;
-	  int s1y = radius+side1.y-center.y;
-//	  fileTxt << "Side 1: " << s1x << "," << s1y << " is " << chokeGrid[s1x][s1y] << std::endl;
-	  int s2x = radius+side2.x-center.x;
-	  int s2y = radius+side2.y-center.y;
-//	  fileTxt << "Side 2: " << s2x << "," << s2y << " is " << chokeGrid[s2x][s2y] << std::endl;
-	  generateWallStartingPoints(chokeGrid, s1x, s1y, s2x, s2y, &fileTxt);
-	  for (unsigned int y = 0; y < chokeGrid.getHeight(); ++y) {
-		for (unsigned int x = 0; x < chokeGrid.getWidth(); ++x) {
-		  fileTxt << chokeGrid[x][y];
+	BWTA::MapData::isWalkable.resize(BWTA::MapData::mapWidth * 4, BWTA::MapData::mapHeight * 4);
+	setWalkability(BWTA::MapData::isWalkable);
+	// Test walkability data
+	{
+		std::ofstream fileTxt("logs/walkable.txt");
+		u16 h = BWTA::MapData::mapHeight * 4;
+		u16 w = BWTA::MapData::mapWidth * 4;
+		for (unsigned int y = 0; y < h; ++y) {
+			for (unsigned int x = 0; x < w; ++x) {
+				fileTxt << BWTA::MapData::isWalkable[x][y];
+			}
+			fileTxt << std::endl;
 		}
-		fileTxt << "\n";
-	  }
-  }
-  fileTxt.close();
-  std::cout << "Finished\n";
-  return 0;
+		fileTxt.close();
+	}
+
+	// Set buildability
+	BWTA::MapData::buildability.resize(BWTA::MapData::mapWidth, BWTA::MapData::mapHeight);
+	setBuildability(BWTA::MapData::buildability);
+	// Test buildability data
+	{
+		std::ofstream fileTxt("logs/buildable2.txt");
+		u16 h = BWTA::MapData::mapHeight;
+		u16 w = BWTA::MapData::mapWidth;
+		for (unsigned int y = 0; y < h; ++y) {
+			for (unsigned int x = 0; x < w; ++x) {
+				fileTxt << BWTA::MapData::buildability[x][y];
+			}
+			fileTxt << std::endl;
+		}
+		fileTxt.close();
+	}
+	//BWTA::MapData::buildability.saveToFile("logs/buildable2.txt");
+	delete CHKdata;
+
+	// Normal procedure to analyze map
+	std::cout << "Reading map info (low resolution walkable map, ...)\n";
+	BWTA::readMap();
+	std::cout << "Analyzing map...";
+	BWTA::analyze();
+	std::cout << "DONE\n";
+
+	// Generate the grids around all chokepoints:
+	std::ofstream fileTxt("logs/output.txt"); 
+	const std::set<BWTA::Chokepoint*> chokePoints = BWTA::getChokepoints();
+	for(std::set<BWTA::Chokepoint*>::const_iterator c = chokePoints.begin(); c!=chokePoints.end();++c) {
+		BWTA::Chokepoint *cp = (*c);
+		BWTA::RectangleArray<int> chokeGrid = getChokeGrid(cp);
+		// Print grid
+		BWAPI::TilePosition center = BWAPI::TilePosition(cp->getCenter());
+		int radius = int(cp->getWidth()/TILE_SIZE);
+		BWAPI::TilePosition region1 = BWAPI::TilePosition(cp->getRegions().first->getCenter());
+		BWAPI::TilePosition region2 = BWAPI::TilePosition(cp->getRegions().second->getCenter());
+		fileTxt << "Chokepoint:\n";
+		fileTxt << "Region 1: " << radius+region1.x-center.x << "," << radius+region1.y-center.y << std::endl;
+		fileTxt << "Region 2: " << radius+region2.x-center.x << "," << radius+region2.y-center.y << std::endl;
+		BWAPI::TilePosition side1 = BWAPI::TilePosition(cp->getSides().first);
+		BWAPI::TilePosition side2 = BWAPI::TilePosition(cp->getSides().second);
+		int s1x = radius + side1.x - center.x;
+		int s1y = radius + side1.y - center.y;
+// 		fileTxt << "Side 1: " << s1x << "," << s1y << " is " << chokeGrid[s1x][s1y] << std::endl;
+		int s2x = radius+side2.x-center.x;
+		int s2y = radius+side2.y-center.y;
+// 		fileTxt << "Side 2: " << s2x << "," << s2y << " is " << chokeGrid[s2x][s2y] << std::endl;
+		generateWallStartingPoints(chokeGrid, s1x, s1y, s2x, s2y, &fileTxt);
+		for (unsigned int y = 0; y < chokeGrid.getHeight(); ++y) {
+			for (unsigned int x = 0; x < chokeGrid.getWidth(); ++x) {
+				fileTxt << chokeGrid[x][y];
+			}
+			fileTxt << "\n";
+		}
+	}
+	fileTxt.close();
+
+	std::cout << "Finished\n";
+	return 0;
 }

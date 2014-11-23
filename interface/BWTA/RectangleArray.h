@@ -17,7 +17,9 @@ namespace BWTA
        RectangleArray(unsigned int width = 1, unsigned int height = 1, Type* data = NULL);
        /** Copy constructor */
        RectangleArray(const RectangleArray<Type>& rectangleArray);
-       /** Destorys the array and deletes all content of array. */
+	   /** Assignment operator */
+	   const RectangleArray& operator=(const RectangleArray<Type>& rectangleArray);
+       /** Destroys the array and deletes all content of array. */
        ~RectangleArray(void);
        /**
         * Gets the width of the array.
@@ -109,7 +111,7 @@ namespace BWTA
     for (unsigned int position = 0;i < width; i ++,position += height)
       columns[i] = &this->data[position];
   }
-  //---------------------------------------------- CONSTRUCTOR -----------------------------------------------
+  //-------------------------------------------- COPY CONSTRUCTOR --------------------------------------------
   template <class Type>
   RectangleArray<Type>::RectangleArray(const RectangleArray<Type>& rectangleArray)
   :owner(true)
@@ -123,6 +125,22 @@ namespace BWTA
     for (unsigned int position = 0;i < width; i ++,position += height)
       columns[i] = &data[position];
     memcpy(this->data, rectangleArray.data, sizeof(Type)*this->getWidth()*this->getHeight());
+  }
+  //------------------------------------------ ASSIGNMENT OPERATOR -------------------------------------------
+  template <class Type>
+  const RectangleArray<Type>& RectangleArray<Type>::operator=(const RectangleArray<Type>& rectangleArray)
+  {
+	  this->setWidth(rectangleArray.getWidth());
+	  this->setHeight(rectangleArray.getHeight());
+	  this->owner = true;
+	  this->data = new Type[this->getWidth()*this->getHeight()];
+	  columns = new Type*[this->getWidth()];
+
+	  unsigned int i = 0;
+	  for (unsigned int position = 0; i < width; i++, position += height)
+		  columns[i] = &data[position];
+	  memcpy(this->data, rectangleArray.data, sizeof(Type)*this->getWidth()*this->getHeight());
+	  return *this;
   }
   //----------------------------------------------- DESTRUCTOR -----------------------------------------------
   template <class Type>

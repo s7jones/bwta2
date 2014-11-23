@@ -1,19 +1,12 @@
-#include <StormLib.h>
-#include <direct.h>
-#include <bitset>
+#include <stack>
 
 #include "../MapData.h"
-#include "TileSet.h"
-#include "TileType.h"
-#include "MiniTileFlags.h"
-#include "MyUnitType.h"
-#include "sha1.h"
 
 
 /*
 	This function does the following:
 	- finds the center point of s1x,s1y and s2x,s2y
-	- then it computes a line starting at the center pioint, and that crosses both points
+	- then it computes a line starting at the center point, and that crosses both points
 	- it extends this line until the tile type is different from that at the center
 	- it returns the two extremes
 	- if previous == true, it returns the edges right before changing tile type
