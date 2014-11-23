@@ -25,6 +25,7 @@ namespace BWTA
 		RectangleArray<bool> isWalkable;
 		TileID   *TileArray = NULL;
 		TileType *TileSet   = NULL;
+		std::vector<UnitTypePosition> staticNeutralUnits;
 		MiniTileMaps_type *MiniTileFlags = NULL;
 	}
 }

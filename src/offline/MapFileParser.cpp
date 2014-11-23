@@ -231,8 +231,9 @@ namespace BWTA
 				int playerIsValid = mapEditorFlags & 0x0001;	// If this is 0, it is a neutral unit/critter/start location/etc.
 				position += 2;
 				int player = (playerIsValid == 1 ? UNITdata[position] : neutralPlayer);
-				//std::cout << "Unit(" << unitClass << ") ID=" << ID << " at " << x << "," << y << " player " << player << "\n";
-				std::cout << "Unit(" << unitClass << ") type=" << BWTA::UnitType::getName(ID) << " at " << x << "," << y << " player " << player << "\n";
+				
+				BWAPI::UnitType unitType(ID);
+				std::cout << "Unit(" << unitClass << ") type=" << unitType.c_str() << " at " << x << "," << y << " player " << player << "\n";
 
 				// TODO: how do we translate from the unitClass to a unit type? I have not been able to find information online...
 				// ...
@@ -263,7 +264,16 @@ namespace BWTA
 				unsigned int ID = decode2ByteUnsigned(UNITdata + position);
 				position += 2;
 				int player = UNITdata[position];
-				std::cout << "Doodad (" << unitNumber << ":" << BWTA::UnitType::getName(unitNumber) << ") \tat " << x << "," << y << " player " << player << "\n";
+				
+				BWAPI::UnitType unitType(unitNumber);
+				//std::cout << "Doodad (" << unitNumber << ":" << unitType.c_str() << ") at " << x << "," << y << " player " << player << "\n";
+				
+				if (unitType.isBuilding()) {
+					std::cout << "Doodad " << unitType.c_str() << " at " << x << "," << y << std::endl;
+					BWAPI::Position unitPosition(x, y);
+					BWTA::UnitTypePosition unitTypePosition = std::make_pair(unitType, unitPosition);
+					BWTA::MapData::staticNeutralUnits.push_back(unitTypePosition);
+				}
 			}
 
 		}

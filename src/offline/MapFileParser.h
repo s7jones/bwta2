@@ -8,7 +8,6 @@
 #include <fstream>
 
 #include "../MapData.h"
-#include "MyUnitType.h"
 #include "TileSet.h"
 #include "TileType.h"
 #include "MiniTileFlags.h"

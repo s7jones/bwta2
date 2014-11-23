@@ -240,7 +240,6 @@
     <ClCompile Include="BalanceMetrics.cpp" />
     <ClCompile Include="DistanceTransform.cpp" />
     <ClCompile Include="pathfinding.cpp" />
-    <ClCompile Include="offline\MyUnitType.cpp" />
     <ClCompile Include="offline\sha1.cpp" />
     <ClCompile Include="offline\TileSet.cpp" />
     <ClCompile Include="offline\wallingAnalysis.cpp" />
@@ -274,7 +273,6 @@
     <ClInclude Include="BalanceMetrics.h" />
     <ClInclude Include="DistanceTransform.h" />
     <ClInclude Include="offline\MiniTileFlags.h" />
-    <ClInclude Include="offline\MyUnitType.h" />
     <ClInclude Include="offline\sha1.h" />
     <ClInclude Include="offline\TileSet.h" />
     <ClInclude Include="offline\TileType.h" />

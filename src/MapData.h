@@ -9,6 +9,8 @@ namespace BWTA
 	typedef std::set< std::pair<Chokepoint*, int> > ChokeCost;
 	typedef std::map<Chokepoint*, ChokeCost> ChokepointGraph;
 
+	typedef std::pair<BWAPI::UnitType, BWAPI::Position> UnitTypePosition;
+
 	namespace MapData
 	{
 		extern BWAPI::Unitset minerals;
@@ -32,6 +34,7 @@ namespace BWTA
 		extern RectangleArray<bool> isWalkable;
 		extern TileID   *TileArray;
 		extern TileType *TileSet;
+		extern std::vector<UnitTypePosition> staticNeutralUnits;
 		/** Direct mapping of minitile flags array */
 		struct MiniTileMaps_type {
 			struct MiniTileFlagArray {

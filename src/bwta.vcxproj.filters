@@ -95,9 +95,6 @@
     <ClCompile Include="pathfinding.cpp">
       <Filter>Pathfinding</Filter>
     </ClCompile>
-    <ClCompile Include="offline\MyUnitType.cpp">
-      <Filter>Offline</Filter>
-    </ClCompile>
     <ClCompile Include="offline\sha1.cpp">
       <Filter>Offline</Filter>
     </ClCompile>
@@ -191,9 +188,6 @@
       <Filter>Balance</Filter>
     </ClInclude>
     <ClInclude Include="offline\MiniTileFlags.h">
-      <Filter>Offline</Filter>
-    </ClInclude>
-    <ClInclude Include="offline\MyUnitType.h">
       <Filter>Offline</Filter>
     </ClInclude>
     <ClInclude Include="offline\sha1.h">

@@ -94,7 +94,7 @@ int main (int argc, char * argv[])
 	std::cout << "END PARSING FILE" << std::endl;
 
 	// Normal procedure to analyze map
-	std::cout << "All info loaded, analyze map as regular...";
+	std::cout << "All info loaded, analyzing map as regular..." << std::endl;
 	BWTA::readMap();
 	BWTA::analyze();
 	std::cout << "DONE" << std::endl;
