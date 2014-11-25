@@ -10,12 +10,11 @@ namespace BWTA
 	typedef std::map<Chokepoint*, ChokeCost> ChokepointGraph;
 
 	typedef std::pair<BWAPI::UnitType, BWAPI::Position> UnitTypePosition;
+	typedef std::pair<BWAPI::UnitType, BWAPI::WalkPosition> UnitTypeWalkPosition;
+	typedef std::pair<BWAPI::UnitType, BWAPI::TilePosition> UnitTypeTilePosition;
 
 	namespace MapData
 	{
-		extern BWAPI::Unitset minerals;
-		extern BWAPI::Unitset rawMinerals;
-		extern BWAPI::Unitset geysers;
 		extern RectangleArray<bool> walkability;
 		extern RectangleArray<bool> rawWalkability;
 		extern RectangleArray<bool> lowResWalkability;
@@ -30,12 +29,11 @@ namespace BWTA
 		// data for HPA*
 		extern ChokepointGraph chokeNodes;
 		
-		// offline map load
+		// offline map data
 		extern RectangleArray<bool> isWalkable;
 		extern TileID   *TileArray;
 		extern TileType *TileSet;
-		extern std::vector<UnitTypePosition> staticNeutralUnits;
-		/** Direct mapping of minitile flags array */
+		/** Direct mapping of mini tile flags array */
 		struct MiniTileMaps_type {
 			struct MiniTileFlagArray {
 				u16 miniTile[16];
@@ -43,6 +41,8 @@ namespace BWTA
 			MiniTileFlagArray tile[0x10000];
 		};
 		extern MiniTileMaps_type *MiniTileFlags;
+		extern std::vector<UnitTypePosition> staticNeutralBuildings;
+		extern std::vector<UnitTypeWalkPosition> resourcesWalkPositions;
 	}
 }
 

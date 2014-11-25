@@ -71,7 +71,7 @@ namespace BWTA
 	int x1,y1,x2,y2;
 	BWAPI::UnitType unitType;
 #ifdef OFFLINE
-	for (auto unit : BWTA::MapData::staticNeutralUnits) {
+	for (auto unit : BWTA::MapData::staticNeutralBuildings) {
 		unitType = unit.first;
 		// get build area (the position is in the middle of the unit)
 		x1 = (unit.second.x / 8) - (unitType.tileWidth() * 2);
@@ -123,16 +123,20 @@ namespace BWTA
 
   bool load_resources()
   {
-    MapData::rawMinerals = BWAPI::Broodwar->getStaticMinerals();
-    //filter out all mineral patches under 200
-    for (BWAPI::Unitset::iterator m = MapData::rawMinerals.begin(); m != MapData::rawMinerals.end(); m++) {
-      if  (m->getInitialResources() > 200) {
-        MapData::minerals.insert(m);
-      }
-    }
-	log("Found " << MapData::minerals.size() << " minerals");
-    MapData::geysers = BWAPI::Broodwar->getStaticGeysers();
-    return true;
+	  //filter out all mineral patches under 200
+	  for (auto mineral : BWAPI::Broodwar->getStaticMinerals()) {
+		  if (mineral->getInitialResources() > 200) {
+			  BWAPI::WalkPosition unitWalkPosition(mineral->getPosition());
+			  MapData::resourcesWalkPositions.push_back(std::make_pair(mineral->getType(), unitWalkPosition));
+		  }
+	  }
+
+	  for (auto geyser : BWAPI::Broodwar->getStaticGeysers()) {
+		  BWAPI::WalkPosition unitWalkPosition(geyser->getPosition());
+		  MapData::resourcesWalkPositions.push_back(std::make_pair(geyser->getType(), unitWalkPosition));
+	  }
+	  
+	  return true;
   }
 
   void load_data(std::string filename)
@@ -356,7 +360,9 @@ namespace BWTA
       }
     }
     file_in.close();
-    attach_resources_to_base_locations(BWTA_Result::baselocations);
+#ifndef OFFLINE
+    attachResourcePointersToBaseLocations(BWTA_Result::baselocations);
+#endif
   }
 
   void save_data(std::string filename)

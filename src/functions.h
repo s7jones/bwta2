@@ -103,9 +103,7 @@ namespace BWTA
   //void writeFile(const char* filename, const char* text, ...);
 #ifdef OFFLINE
   #define BWTA_PATH "logs/"
-  #define log(message) { \
-	  std::ofstream logFile( "logs/BWTA.log", std::ios_base::out | std::ios_base::app ); \
-	  logFile << message << std::endl; }
+  #define log(message) { std::cout << message << std::endl; }
 #else
   #define BWTA_PATH "bwapi-data/BWTA2/"
   #define log(message) { \
@@ -120,10 +118,10 @@ namespace BWTA
   }
   double distance_to_border(Polygon& polygon,int width, int height);
 
-  void calculate_walk_distances(const RectangleArray<bool> &read_map
-                               ,const BWAPI::Position &start
-                               ,int max_distance
-                               ,RectangleArray<int> &distance_map);
+  void calculateWalkDistances(const RectangleArray<bool> &read_map,
+	  const BWAPI::WalkPosition &start,
+	  int max_distance,
+	  RectangleArray<int> &distance_map);
 
   void calculate_walk_distances_area(const BWAPI::Position &start
                                     ,int width

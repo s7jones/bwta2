@@ -4,9 +4,6 @@ namespace BWTA
 {
 	namespace MapData
 	{
-		BWAPI::Unitset minerals;
-		BWAPI::Unitset rawMinerals;
-		BWAPI::Unitset geysers;
 		RectangleArray<bool> walkability;
 		RectangleArray<bool> rawWalkability;
 		RectangleArray<bool> lowResWalkability;
@@ -21,11 +18,12 @@ namespace BWTA
 		// data for HPA*
 		ChokepointGraph chokeNodes;
 		
-		// offline map load
+		// offline map data
 		RectangleArray<bool> isWalkable;
 		TileID   *TileArray = NULL;
 		TileType *TileSet   = NULL;
-		std::vector<UnitTypePosition> staticNeutralUnits;
 		MiniTileMaps_type *MiniTileFlags = NULL;
+		std::vector<UnitTypePosition> staticNeutralBuildings;
+		std::vector<UnitTypeWalkPosition> resourcesWalkPositions;
 	}
 }

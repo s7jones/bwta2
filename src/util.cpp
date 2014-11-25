@@ -96,24 +96,6 @@ namespace BWTA
     return distance;
   }
 
-//   char buffer[1024];
-//   void writeFile(const char* filename, const char* text, ...)
-//   {
-//     FILE * pFile;
-//     pFile = fopen (filename,"a");
-//     
-//     va_list ap;
-//     va_start(ap, text);
-//     vsprintf(buffer,text,ap );
-//     va_end(ap);
-//     if (pFile!=NULL)
-//     {
-//       fputs (buffer,pFile);
-//       fclose (pFile);
-//     }
-//   }
-
-
   int get_set(std::vector<int> &a,int i)
   {
     if (i==a[i]) return i;
@@ -121,49 +103,49 @@ namespace BWTA
     return a[i];
   }
 
-  void calculate_walk_distances(const RectangleArray<bool> &read_map
-                               ,const BWAPI::Position &start
-                               ,int max_distance
-                               ,RectangleArray<int> &distance_map)
+  void calculateWalkDistances(const RectangleArray<bool> &read_map,
+	  const BWAPI::WalkPosition &start,
+	  int max_distance,
+	  RectangleArray<int> &distance_map)
   {
-    Heap< BWAPI::Position , int > heap(true);
-    for(unsigned int x=0;x<distance_map.getWidth();x++) {
-      for(unsigned int y=0;y<distance_map.getHeight();y++) {
-        distance_map[x][y]=-1;
-      }
-    }
-    heap.push(std::make_pair(start,0));
-    int sx=(int)start.x;
-    int sy=(int)start.y;
-    distance_map[sx][sy]=0;
-    while (!heap.empty()) {
-      BWAPI::Position pos=heap.top().first;
-      int distance=heap.top().second;
-      heap.pop();
-      int x=(int)pos.x;
-      int y=(int)pos.y;
-      if (distance>max_distance && max_distance>0) break;
-      int min_x=max(x-1,0);
-      int max_x=min(x+1,read_map.getWidth()-1);
-      int min_y=max(y-1,0);
-      int max_y=min(y+1,read_map.getHeight()-1);
-      for(int ix=min_x;ix<=max_x;ix++) {
-        for(int iy=min_y;iy<=max_y;iy++) {
-          int f=abs(ix-x)*10+abs(iy-y)*10;
-          if (f>10) {f=14;}
-          int v=distance+f;
-          if (distance_map[ix][iy]>v) {
-            heap.set(BWAPI::Position(x,y),v);
-            distance_map[ix][iy]=v;
-          } else {
-            if (distance_map[ix][iy]==-1 && read_map[ix][iy]==true) {
-              distance_map[ix][iy]=v;
-              heap.push(std::make_pair(BWAPI::Position(ix,iy),v));
-            }
-          }
-        }
-      }
-    }
+	  Heap< BWAPI::WalkPosition, int > heap(true);
+	  for (unsigned int x = 0; x < distance_map.getWidth(); x++) {
+		  for (unsigned int y = 0; y<distance_map.getHeight(); y++) {
+			  distance_map[x][y] = -1;
+		  }
+	  }
+	  heap.push(std::make_pair(start, 0));
+	  int sx = (int)start.x;
+	  int sy = (int)start.y;
+	  distance_map[sx][sy] = 0;
+	  while (!heap.empty()) {
+		  BWAPI::WalkPosition pos = heap.top().first;
+		  int distance = heap.top().second;
+		  heap.pop();
+		  int x = (int)pos.x;
+		  int y = (int)pos.y;
+		  if (distance>max_distance && max_distance>0) break;
+		  int min_x = max(x - 1, 0);
+		  int max_x = min(x + 1, read_map.getWidth() - 1);
+		  int min_y = max(y - 1, 0);
+		  int max_y = min(y + 1, read_map.getHeight() - 1);
+		  for (int ix = min_x; ix <= max_x; ix++) {
+			  for (int iy = min_y; iy <= max_y; iy++) {
+				  int f = abs(ix - x) * 10 + abs(iy - y) * 10;
+				  if (f > 10) { f = 14; }
+				  int v = distance + f;
+				  if (distance_map[ix][iy] > v) {
+					  heap.set(BWAPI::WalkPosition(x, y), v);
+					  distance_map[ix][iy] = v;
+				  } else {
+					  if (distance_map[ix][iy] == -1 && read_map[ix][iy] == true) {
+						  distance_map[ix][iy] = v;
+						  heap.push(std::make_pair(BWAPI::WalkPosition(ix, iy), v));
+					  }
+				  }
+			  }
+		  }
+	  }
   }
 
   void calculate_walk_distances_area(const BWAPI::Position &start

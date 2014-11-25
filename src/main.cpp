@@ -47,10 +47,10 @@ int main (int argc, char * argv[])
 	BWTA::MapData::mapWidth = width;
 	BWTA::MapData::mapHeight = height;
 
-	// TODO: Load neutral units (minerals, gas, and starting locations)
-	//BWTA::getUnits(CHKdata, dataSize);
+	// Load neutral units (minerals, gas, and starting locations)
+	BWTA::getUnits(CHKdata, dataSize);
 
-	// TODO: some doodads are not walkable
+	// Some doodads (buildings) are not walkable
 	BWTA::getDoodads(CHKdata, dataSize);
 
 	// Get map tileset ID
@@ -131,6 +131,5 @@ int main (int argc, char * argv[])
 	}
 	fileTxt.close();
 
-	std::cout << "Finished\n";
 	return 0;
 }

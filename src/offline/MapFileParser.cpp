@@ -200,8 +200,6 @@ namespace BWTA
 
 
 	/*
-	*** This function is not finished ***
-
 	This function will decode the unit information from a CHK map, and return a list of all the units with their
 	types, players and coordinates.
 	*/
@@ -233,16 +231,28 @@ namespace BWTA
 				int player = (playerIsValid == 1 ? UNITdata[position] : neutralPlayer);
 				
 				BWAPI::UnitType unitType(ID);
-				std::cout << "Unit(" << unitClass << ") type=" << unitType.c_str() << " at " << x << "," << y << " player " << player << "\n";
+				BWAPI::Position unitPosition(x, y);
+				BWAPI::WalkPosition unitWalkPosition(unitPosition);
+				BWAPI::TilePosition unitTilePosition((x - unitType.dimensionLeft()) / TILE_SIZE, (y - unitType.dimensionUp()) / TILE_SIZE);
+// 				std::cout << "Unit(" << unitClass << ") type=" << unitType.c_str() << " at " << x << "," << y << " player " << player << "\n";
+// 				std::cout << unitType.c_str() << " Tile " << unitTilePosition.x << "," << unitTilePosition.y << std::endl;
 
-				// TODO: how do we translate from the unitClass to a unit type? I have not been able to find information online...
-				// ...
+				if (unitType.isMineralField() || unitType == BWAPI::UnitTypes::Resource_Vespene_Geyser) {
+					MapData::resourcesWalkPositions.push_back(std::make_pair(unitType, unitWalkPosition));
+				}
+				if (unitType == BWAPI::UnitTypes::Special_Start_Location) {
+// 					std::cout << unitType.c_str() << " Tile " << unitTilePosition.x << "," << unitTilePosition.y << std::endl;
+					MapData::startLocations.push_back(unitTilePosition);
+				}
 			}
 
 		}
 	}
 
-	// TODO this function is not finished
+	/*
+	This function decode the doodads information from a CHK map, 
+	and store the neutral buildings positions in BWTA::MapData::staticNeutralBuildings
+	*/
 	void getDoodads(unsigned char *CHKdata, DWORD size) {
 		DWORD chunkSize = 0;
 		unsigned char *UNITdata = getChunkPointer((unsigned char *)"THG2", CHKdata, size, &chunkSize);
@@ -269,10 +279,10 @@ namespace BWTA
 				//std::cout << "Doodad (" << unitNumber << ":" << unitType.c_str() << ") at " << x << "," << y << " player " << player << "\n";
 				
 				if (unitType.isBuilding()) {
-					std::cout << "Doodad " << unitType.c_str() << " at " << x << "," << y << std::endl;
+					//std::cout << "Doodad " << unitType.c_str() << " at " << x << "," << y << std::endl;
 					BWAPI::Position unitPosition(x, y);
 					BWTA::UnitTypePosition unitTypePosition = std::make_pair(unitType, unitPosition);
-					BWTA::MapData::staticNeutralUnits.push_back(unitTypePosition);
+					BWTA::MapData::staticNeutralBuildings.push_back(unitTypePosition);
 				}
 			}
 

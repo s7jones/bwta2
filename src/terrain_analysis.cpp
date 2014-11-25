@@ -50,10 +50,6 @@ namespace BWTA
   void readMap()
   {
 #ifdef OFFLINE
-    // Clean previous logfile
-    std::ofstream logFile( "logs/BWTA.log");
-    logFile << "Map name: " << MapData::mapFileName << std::endl;
-
     load_map();
 #else
     MapData::mapWidth = BWAPI::Broodwar->mapWidth();
@@ -102,7 +98,7 @@ namespace BWTA
       scene_ptr=&scene;
     #endif
 
-    // Delete and clear any old regions, chokepoints, and unwalkable polygons
+    // Delete and clear any old regions, chokepoints, and not walkable polygons
     for(std::set<BWTA::Region*>::iterator i=BWTA_Result::regions.begin();i!=BWTA_Result::regions.end();i++)
       delete *i;
     BWTA_Result::regions.clear();
@@ -119,20 +115,18 @@ namespace BWTA
 	double seconds;
 
 	start = clock();
-#ifndef OFFLINE
-  // Give find_mineral_clusters the walkability data, minerals, and geysers, so it can compute the resource clutters
-	std::vector< std::vector< BWAPI::Unit > > clusters;
-  find_mineral_clusters(MapData::walkability,MapData::minerals,MapData::geysers,clusters);
-  log("  Found " << clusters.size() << " mineral clusters.");
 
-  // For each build tile, base_build_map[x][y] is true if we can build a base
-  // (resource depot) at that position (top left corner being on the given tile)
-  RectangleArray<bool> base_build_map;
+	std::vector< std::vector< UnitTypeWalkPosition > > clusters;
+	findMineralClusters(MapData::walkability, MapData::resourcesWalkPositions, clusters);
+	log("  Found " << clusters.size() << " mineral clusters.");
 
-  // Give calculate_base_build_map the buildability data and clusters so it can compute the base_build_map
-  calculate_base_build_map(MapData::buildability,clusters,base_build_map);
-  log("  Calculated base build map.");
-#endif
+	end = clock();
+	seconds = double(end - start) / CLOCKS_PER_SEC;
+	log(" [Clustering done in " << seconds << " seconds]");
+	start = end;
+
+	RectangleArray<bool> base_build_map;
+	calculateBaseBuildMap(MapData::buildability, clusters, base_build_map);
 
   // Give find_connected_components the walkability data so it can compute the list of connected components,
   // and determine which component each tile belongs to
@@ -141,11 +135,14 @@ namespace BWTA
   find_connected_components(MapData::walkability,get_component,components);
   log("  Calculated connected components.");
 
-#ifndef OFFLINE
   // Give calculate_base_locations the walkability data, base_build_map, and clusters so it can compute the base locations
-  calculate_base_locations(MapData::walkability,base_build_map,clusters,BWTA_Result::baselocations);
+//   calculate_base_locations(MapData::walkability, base_build_map, clusters, BWTA_Result::baselocations);
+  calculateBaseLocations(MapData::walkability, base_build_map, clusters, BWTA_Result::baselocations);
+  for (auto i : BWTA_Result::baselocations) {
+	  log("BaseLocation at Position " << i->getPosition().x << "," << i->getPosition().y << " Tile " << i->getTilePosition().x << ", " << i->getTilePosition().y);
+  }
+
   log("  Calculated base locations.");
-#endif
 
   // Give extract_polygons the walkability data and connected components so it can compute the polygonal obstacles
   vector<Polygon> polygons;
@@ -579,46 +576,8 @@ namespace BWTA
 	end = clock();
 	seconds = double(end-start)/CLOCKS_PER_SEC;
 	log(" [Calculated base location properties in " << seconds << " seconds]");
-	//start = end;
-    
-	// This looks like a file output to plot the distance transform of the map using Mathematica
-    /*#ifdef DEBUG_DRAW
-      writeFile("bwapi-data/logs/heightMap.txt","h={");
-      string comma1="";
-      string comma2="";
-      for(int x=0;x<MapData::mapWidth;x++)
-      {
-        writeFile("bwapi-data/logs/heightMap.txt","%s{",comma1.c_str());
-        comma1=",";
-        comma2="";
-        for(int y=0;y<MapData::mapHeight;y++)
-        {
-          BWAPI::Position p(x*32+16,y*32+16);
-          double dist=p.getDistance(BWTA::getNearestUnwalkablePosition(p));
-          if (BWTA::getRegion(x,y)==NULL)
-            dist=0;
-          writeFile("bwapi-data/logs/heightMap.txt","%s%d",comma2.c_str(),(int)dist);
-          comma2=",";
-        }
-        writeFile("bwapi-data/logs/heightMap.txt","}");
-      }
-      writeFile("bwapi-data/logs/heightMap.txt","}\n");
-      writeFile("bwapi-data/logs/heightMap.txt","p1=ListPlot3D[h, Mesh -> None, BoxRatios -> {100, 100, 10}]\n");
-      writeFile("bwapi-data/logs/heightMap.txt","c={\n");
-      comma1="";
-      for(std::set<Chokepoint*>::const_iterator i=BWTA::getChokepoints().begin();i!=getChokepoints().end();i++)
-      {
-        BWAPI::Position p((*i)->getCenter().x(),(*i)->getCenter().y());
-        double dist=p.getDistance(BWTA::getNearestUnwalkablePosition(p));
-        writeFile("bwapi-data/logs/heightMap.txt","%s{%d,%d,%d}\n",comma1.c_str(),(*i)->getCenter().y()/32,(*i)->getCenter().x()/32,(int)dist);
-        comma1=",";
-      }
-      writeFile("bwapi-data/logs/heightMap.txt","}\n");
-      writeFile("bwapi-data/logs/heightMap.txt","p2=ListPointPlot3D[c,PlotStyle -> PointSize[Large]]\n");
-      writeFile("bwapi-data/logs/heightMap.txt","Show[p1,p2]\n");
-    #endif*/
-    //log("Created result sets.");
   }
+
   #ifdef DEBUG_DRAW
     int render(int step)
     {
