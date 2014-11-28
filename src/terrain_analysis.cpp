@@ -11,6 +11,17 @@ namespace BWTA
     QApplication app(argc,&argv);
   #endif
 
+    bool createDir(std::string& path)
+    {
+        boost::filesystem::path dir(path);
+        if (boost::filesystem::create_directory(dir)) {
+            return true;
+        }
+
+        return false;
+    }
+
+
   class My_observer : public CGAL::Arr_observer<Arrangement_2>
   {
     public:
@@ -74,7 +85,15 @@ namespace BWTA
   {
     clock_t start;
     clock_t end;
-    std::string filename = BWTA_PATH + MapData::hash + ".bwta";
+
+    // Verify if "bwta2" directory exists, and create it if it doesn't.
+    auto bwtaPath = std::string(BWTA_PATH);
+    if (! boost::filesystem::exists(bwtaPath)) {
+        createDir(bwtaPath);    
+    }
+
+    std::string filename = bwtaPath + MapData::hash + ".bwta";
+
 //#ifndef DEBUG_DRAW
     if (fileExists(filename) && fileVersion(filename)==BWTA_FILE_VERSION) {
       log("Recognized map, loading map data...");

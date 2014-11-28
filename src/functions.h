@@ -1,5 +1,7 @@
 #pragma once
 
+#include <boost/filesystem.hpp>
+
 #include "VertexData.h"
 #include <BWTA/RectangleArray.h>
 #include <BWTA/BaseLocation.h>
@@ -22,7 +24,7 @@ namespace BWTA
   typedef CGAL::Lazy_exact_nt<CGAL::Gmpq >					NumberType;
   typedef CGAL::Simple_cartesian< NumberType >				CK;
   typedef CGAL::Filtered_kernel<CK>							Kernel;
-  typedef CGAL::Segment_Delaunay_graph_traits_2<Kernel>		Gt;
+  typedef CGAL::Segment_Delaunay_graph_traits_2<Kernel>		Gt; 
 
   typedef CGAL::Segment_Delaunay_graph_2<Gt> SDG2;
 
@@ -82,6 +84,7 @@ namespace BWTA
 
   void get_voronoi_edges(SDG2 &sdg, std::vector<Segment> &voronoi_diagram_edges, std::map<Point, std::set< Point >, ptcmp> &nearest, std::map<Point,double, ptcmp> &distance, const std::vector<Polygon> &polygons);
 
+  bool createDir(std::string& path);
   double get_distance(Point a, Point b);
   double get_distance(PointD a, PointD b);
   double cast_to_double( double q);
