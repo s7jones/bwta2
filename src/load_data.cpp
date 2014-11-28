@@ -68,23 +68,25 @@ namespace BWTA
       }
     }
 
-#ifndef OFFLINE
-	//Block static neutral units
-  //log("***Block static neutral units***");
 	int x1,y1,x2,y2;
 	BWAPI::UnitType unitType;
-	BWAPI::Unitset::iterator unit;
-	BWAPI::Unitset neutralUnits = BWAPI::Broodwar->getStaticNeutralUnits();
-	for(unit = neutralUnits.begin(); unit != neutralUnits.end(); ++unit) {
+#ifdef OFFLINE
+	for (auto unit : BWTA::MapData::staticNeutralBuildings) {
+		unitType = unit.first;
+		// get build area (the position is in the middle of the unit)
+		x1 = (unit.second.x / 8) - (unitType.tileWidth() * 2);
+		y1 = (unit.second.y / 8) - (unitType.tileHeight() * 2);
+#else
+	for (auto unit : BWAPI::Broodwar->getStaticNeutralUnits()) {
 		// check if it is a resource container
 		unitType = unit->getType();
 		if (unitType == BWAPI::UnitTypes::Resource_Vespene_Geyser || unitType.isMineralField()) continue;
 		// get build area
-    //log("  (" << unitType << ") " << unitType.getName() << " at " << (*unit)->getTilePosition().x() << "," << (*unit)->getTilePosition().y());
-		x1 = unit->getTilePosition().x*4;
-		y1 = unit->getTilePosition().y*4;
-		x2 = x1 + unitType.tileWidth()*4;
-		y2 = y1 + unitType.tileHeight()*4;
+		x1 = unit->getTilePosition().x * 4;
+		y1 = unit->getTilePosition().y * 4;
+#endif
+		x2 = x1 + unitType.tileWidth() * 4;
+		y2 = y1 + unitType.tileHeight() * 4;
 		// sanitize
 		if (x1 < 0) x1 = 0;
 		if (y1 < 0) y1 = 0;
@@ -103,7 +105,6 @@ namespace BWTA
 			}
 		}
 	}
-#endif
 
     BWTA_Result::getRegion.resize(b_width,b_height);
     BWTA_Result::getChokepoint.resize(b_width,b_height);
@@ -122,16 +123,20 @@ namespace BWTA
 
   bool load_resources()
   {
-    MapData::rawMinerals = BWAPI::Broodwar->getStaticMinerals();
-    //filter out all mineral patches under 200
-    for (BWAPI::Unitset::iterator m = MapData::rawMinerals.begin(); m != MapData::rawMinerals.end(); m++) {
-      if  (m->getInitialResources() > 200) {
-        MapData::minerals.insert(m);
-      }
-    }
-	log("Found " << MapData::minerals.size() << " minerals");
-    MapData::geysers = BWAPI::Broodwar->getStaticGeysers();
-    return true;
+	  //filter out all mineral patches under 200
+	  for (auto mineral : BWAPI::Broodwar->getStaticMinerals()) {
+		  if (mineral->getInitialResources() > 200) {
+			  BWAPI::WalkPosition unitWalkPosition(mineral->getPosition());
+			  MapData::resourcesWalkPositions.push_back(std::make_pair(mineral->getType(), unitWalkPosition));
+		  }
+	  }
+
+	  for (auto geyser : BWAPI::Broodwar->getStaticGeysers()) {
+		  BWAPI::WalkPosition unitWalkPosition(geyser->getPosition());
+		  MapData::resourcesWalkPositions.push_back(std::make_pair(geyser->getType(), unitWalkPosition));
+	  }
+	  
+	  return true;
   }
 
   void load_data(std::string filename)
@@ -355,7 +360,9 @@ namespace BWTA
       }
     }
     file_in.close();
-    attach_resources_to_base_locations(BWTA_Result::baselocations);
+#ifndef OFFLINE
+    attachResourcePointersToBaseLocations(BWTA_Result::baselocations);
+#endif
   }
 
   void save_data(std::string filename)
