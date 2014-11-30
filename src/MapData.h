@@ -30,7 +30,6 @@ namespace BWTA
 		extern ChokepointGraph chokeNodes;
 		
 		// offline map data
-		extern RectangleArray<bool> isWalkable;
 		extern TileID   *TileArray;
 		extern TileType *TileSet;
 		/** Direct mapping of mini tile flags array */

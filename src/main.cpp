@@ -1,7 +1,7 @@
 #include <windows.h>
 
 #include "MapData.h"
-#include "offline/sha1.h"
+#include "util/sha1.h"
 #include "offline/MapFileParser.h"
 #include "offline/wallingAnalysis.h"
 
@@ -77,10 +77,10 @@ int main (int argc, char * argv[])
 
 
 	// Set walkability
-	BWTA::MapData::isWalkable.resize(BWTA::MapData::mapWidth * 4, BWTA::MapData::mapHeight * 4);
-	BWTA::setOfflineWalkability(BWTA::MapData::isWalkable);
+	BWTA::MapData::rawWalkability.resize(BWTA::MapData::mapWidth * 4, BWTA::MapData::mapHeight * 4);
+	BWTA::setOfflineWalkability(BWTA::MapData::rawWalkability);
 	// Test walkability data
-	BWTA::MapData::isWalkable.saveToFile("logs/walkable.txt");
+	BWTA::MapData::rawWalkability.saveToFile("logs/walkable.txt");
 
 
 	// Set buildability
@@ -95,7 +95,6 @@ int main (int argc, char * argv[])
 
 	// Normal procedure to analyze map
 	std::cout << "All info loaded, analyzing map as regular..." << std::endl;
-	BWTA::readMap();
 	BWTA::analyze();
 	std::cout << "DONE" << std::endl;
 

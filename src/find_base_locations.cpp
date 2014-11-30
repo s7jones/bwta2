@@ -264,9 +264,6 @@ namespace BWTA
 		, const std::list<ConnectedComponent> &components
 		, std::set< BWTA::BaseLocation* > &base_locations)
 	{
-#ifndef OFFLINE
-		attachResourcePointersToBaseLocations(base_locations);
-#endif
 		RectangleArray<double> distance_map;
 		for (std::set<BWTA::BaseLocation*>::iterator i = base_locations.begin(); i != base_locations.end(); i++) {
 			BWAPI::Position p((*i)->getTilePosition().x * 32 + 64, (*i)->getTilePosition().y * 32 + 48);
@@ -290,15 +287,19 @@ namespace BWTA
 					ii->air_distances[*j] = p.getDistance(p2);
 				}
 			}
+
+			// look if this base location is a start location
 			ii->start = false;
-			for (BWAPI::TilePosition::set::iterator j = MapData::startLocations.begin(); j != MapData::startLocations.end(); j++) {
-				BWAPI::Position pos((*j).x * 32 + 64, (*j).y * 32 + 48);
-				double distance = pos.getDistance((*i)->getPosition());
-				if (distance < 32 * 10)
+			double distance;
+			double maxDistance = TILE_SIZE * 10;
+			for (auto startLocation : MapData::startLocations) {
+				BWAPI::Position pos(startLocation.x * TILE_SIZE + 64, startLocation.y * TILE_SIZE + 48);
+				distance = pos.getApproxDistance((*i)->getPosition());
+				if (distance < maxDistance) {
 					ii->start = true;
-			}
-			if (ii->start) {
-				BWTA::BWTA_Result::startlocations.insert(*i);
+					BWTA::BWTA_Result::startlocations.insert(*i);
+					break;
+				}
 			}
 
 			//find what region this base location is in and tell that region about the base location

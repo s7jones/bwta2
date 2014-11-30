@@ -11,133 +11,148 @@ using namespace std;
 using namespace BWAPI;
 namespace BWTA
 {
-  bool load_map()
-  {
-    int b_width=MapData::mapWidth;
-    int b_height=MapData::mapHeight;
-    int width=MapData::mapWidth*4;
-    int height=MapData::mapHeight*4;
-    MapData::buildability.resize(b_width,b_height);
-    MapData::lowResWalkability.resize(b_width,b_height);
-    MapData::walkability.resize(width,height);
-    MapData::rawWalkability.resize(width,height);
-    MapData::distanceTransform.resize(width, height);
+	void loadMapFromBWAPI()
+	{
+		// load map name
+		MapData::hash = BWAPI::Broodwar->mapHash(); // TODO Warning on-line and off-line data are different!!!!
+		MapData::mapFileName = BWAPI::Broodwar->mapFileName();
+		// Clean previous log file
+		std::ofstream logFile(LOG_FILE_PATH);
+		logFile << "Map name: " << MapData::mapFileName << std::endl;
 
-    // copy buildability data into buildability array
-#ifdef OFFLINE
-    MapData::lowResWalkability = MapData::buildability;
-#else
-    for(int x=0;x<b_width;x++) {
-      for(int y=0;y<b_height;y++) {
-        MapData::buildability[x][y]=BWAPI::Broodwar->isBuildable(x,y);
-        MapData::lowResWalkability[x][y]=true;
-      }
-    }
-#endif
-    // copy and simplify walkability data as it is copies into walkability array
-	  // init distance transform map
-    for(int x=0;x<width;x++) {
-      for(int y=0;y<height;y++) {
-#ifdef OFFLINE
-        MapData::rawWalkability[x][y] = MapData::isWalkable[x][y];
-#else
-        MapData::rawWalkability[x][y] = BWAPI::Broodwar->isWalkable(x,y);
-#endif
-        MapData::walkability[x][y] = true;
-		
-		    if (MapData::rawWalkability[x][y]) {
-          if (x==0 || x==width-1 || y==0 || y==height-1){
-            MapData::distanceTransform[x][y] = 1;
-          } else {
-            MapData::distanceTransform[x][y] = -1;
-          }
-        } else {
-          MapData::distanceTransform[x][y] = 0;
-        }
-      }
-    }
-
-    for(int x=0;x<width;x++) {
-      for(int y=0;y<height;y++) {
-        for(int x2=max(x-1,0);x2<=min(width-1,x+1);x2++) {
-          for(int y2=max(y-1,0);y2<=min(height-1,y+1);y2++) {
-            MapData::walkability[x2][y2]&=MapData::rawWalkability[x][y];
-          }
-        }
-        MapData::lowResWalkability[x/4][y/4]&=MapData::rawWalkability[x][y];
-      }
-    }
-
-	int x1,y1,x2,y2;
-	BWAPI::UnitType unitType;
-#ifdef OFFLINE
-	for (auto unit : BWTA::MapData::staticNeutralBuildings) {
-		unitType = unit.first;
-		// get build area (the position is in the middle of the unit)
-		x1 = (unit.second.x / 8) - (unitType.tileWidth() * 2);
-		y1 = (unit.second.y / 8) - (unitType.tileHeight() * 2);
-#else
-	for (auto unit : BWAPI::Broodwar->getStaticNeutralUnits()) {
-		// check if it is a resource container
-		unitType = unit->getType();
-		if (unitType == BWAPI::UnitTypes::Resource_Vespene_Geyser || unitType.isMineralField()) continue;
-		// get build area
-		x1 = unit->getTilePosition().x * 4;
-		y1 = unit->getTilePosition().y * 4;
-#endif
-		x2 = x1 + unitType.tileWidth() * 4;
-		y2 = y1 + unitType.tileHeight() * 4;
-		// sanitize
-		if (x1 < 0) x1 = 0;
-		if (y1 < 0) y1 = 0;
-		if (x2 >= width) x2 = width-1;
-		if (y2 >= height) y2 = height-1;
-		// map area
-		for (int x = x1; x <= x2; x++) {
-			for (int y = y1; y <= y2; y++) {
-				for(int x3=max(x-1,0);x3<=min(width-1,x+1);x3++) {
-					for(int y3=max(y-1,0);y3<=min(height-1,y+1);y3++) {
-						MapData::walkability[x3][y3] = false;
-					}
-				}
-				MapData::distanceTransform[x][y] = 0;
-				MapData::lowResWalkability[x/4][y/4] = false;
+		// load map info
+		MapData::mapWidth = BWAPI::Broodwar->mapWidth();
+		MapData::mapHeight = BWAPI::Broodwar->mapHeight();
+		MapData::buildability.resize(MapData::mapWidth, MapData::mapHeight);
+		for (int x = 0; x < MapData::mapWidth; x++) {
+			for (int y = 0; y < MapData::mapHeight; y++) {
+				MapData::buildability[x][y] = BWAPI::Broodwar->isBuildable(x, y);
 			}
 		}
+
+		int walkTileWidth = MapData::mapWidth * 4;
+		int walkTileHeight = MapData::mapHeight * 4;
+		MapData::rawWalkability.resize(walkTileWidth, walkTileHeight);
+		for (int x = 0; x < walkTileWidth; x++) {
+			for (int y = 0; y < walkTileHeight; y++) {
+				MapData::rawWalkability[x][y] = BWAPI::Broodwar->isWalkable(x, y);
+			}
+		}
+
+		// load static buildings
+		BWAPI::UnitType unitType;
+		for (auto unit : BWAPI::Broodwar->getStaticNeutralUnits()) {
+			// check if it is a resource container
+			unitType = unit->getType();
+			if (unitType == BWAPI::UnitTypes::Resource_Vespene_Geyser || unitType.isMineralField()) continue;
+			BWTA::UnitTypePosition unitTypePosition = std::make_pair(unitType, unit->getPosition());
+			BWTA::MapData::staticNeutralBuildings.push_back(unitTypePosition);
+		}
+
+		// load resources (minerals, gas) and start locations
+		for (auto mineral : BWAPI::Broodwar->getStaticMinerals()) {
+			if (mineral->getInitialResources() > 200) { //filter out all mineral patches under 200
+				BWAPI::WalkPosition unitWalkPosition(mineral->getPosition());
+				MapData::resourcesWalkPositions.push_back(std::make_pair(mineral->getType(), unitWalkPosition));
+			}
+		}
+
+		for (auto geyser : BWAPI::Broodwar->getStaticGeysers()) {
+			BWAPI::WalkPosition unitWalkPosition(geyser->getPosition());
+			MapData::resourcesWalkPositions.push_back(std::make_pair(geyser->getType(), unitWalkPosition));
+		}
+
+		MapData::startLocations = BWAPI::Broodwar->getStartLocations();
 	}
 
-    BWTA_Result::getRegion.resize(b_width,b_height);
-    BWTA_Result::getChokepoint.resize(b_width,b_height);
-    BWTA_Result::getBaseLocation.resize(b_width,b_height);
-    BWTA_Result::getChokepointW.resize(b_width*4,b_height*4);
-    BWTA_Result::getBaseLocationW.resize(b_width*4,b_height*4);
-    BWTA_Result::getUnwalkablePolygon.resize(b_width,b_height);
-    BWTA_Result::getRegion.setTo(NULL);
-    BWTA_Result::getChokepoint.setTo(NULL);
-    BWTA_Result::getBaseLocation.setTo(NULL);
-    BWTA_Result::getChokepointW.setTo(NULL);
-    BWTA_Result::getBaseLocationW.setTo(NULL);
-    BWTA_Result::getUnwalkablePolygon.setTo(NULL);
-    return true;
-  }
+	void loadMap()
+	{
+		int b_width = MapData::mapWidth;
+		int b_height = MapData::mapHeight;
+		int width = MapData::mapWidth * 4;
+		int height = MapData::mapHeight * 4;
 
-  bool load_resources()
-  {
-	  //filter out all mineral patches under 200
-	  for (auto mineral : BWAPI::Broodwar->getStaticMinerals()) {
-		  if (mineral->getInitialResources() > 200) {
-			  BWAPI::WalkPosition unitWalkPosition(mineral->getPosition());
-			  MapData::resourcesWalkPositions.push_back(std::make_pair(mineral->getType(), unitWalkPosition));
-		  }
-	  }
+		// init distance transform map
+		MapData::distanceTransform.resize(width, height);
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+				if (MapData::rawWalkability[x][y]) {
+					if (x == 0 || x == width - 1 || y == 0 || y == height - 1){
+						MapData::distanceTransform[x][y] = 1;
+					} else {
+						MapData::distanceTransform[x][y] = -1;
+					}
+				} else {
+					MapData::distanceTransform[x][y] = 0;
+				}
+			}
+		}
 
-	  for (auto geyser : BWAPI::Broodwar->getStaticGeysers()) {
-		  BWAPI::WalkPosition unitWalkPosition(geyser->getPosition());
-		  MapData::resourcesWalkPositions.push_back(std::make_pair(geyser->getType(), unitWalkPosition));
-	  }
-	  
-	  return true;
-  }
+		// init walkability map and lowResWalkability map
+		MapData::lowResWalkability.resize(b_width, b_height);
+		MapData::lowResWalkability.setTo(true);
+
+		MapData::walkability.resize(width, height);
+		MapData::walkability.setTo(true);
+
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+				for (int x2 = max(x - 1, 0); x2 <= min(width - 1, x + 1); x2++) {
+					for (int y2 = max(y - 1, 0); y2 <= min(height - 1, y + 1); y2++) {
+						MapData::walkability[x2][y2] &= MapData::rawWalkability[x][y];
+					}
+				}
+				MapData::lowResWalkability[x / 4][y / 4] &= MapData::rawWalkability[x][y];
+			}
+		}
+
+		// set walkability to false on static buildings
+		int x1, y1, x2, y2;
+		BWAPI::UnitType unitType;
+		for (auto unit : MapData::staticNeutralBuildings) {
+			unitType = unit.first;
+			// get build area (the position is in the middle of the unit)
+			x1 = (unit.second.x / 8) - (unitType.tileWidth() * 2);
+			y1 = (unit.second.y / 8) - (unitType.tileHeight() * 2);
+			x2 = x1 + unitType.tileWidth() * 4;
+			y2 = y1 + unitType.tileHeight() * 4;
+			// sanitize
+			if (x1 < 0) x1 = 0;
+			if (y1 < 0) y1 = 0;
+			if (x2 >= width) x2 = width - 1;
+			if (y2 >= height) y2 = height - 1;
+			// map area
+			for (int x = x1; x <= x2; x++) {
+				for (int y = y1; y <= y2; y++) {
+					for (int x3 = max(x - 1, 0); x3 <= min(width - 1, x + 1); x3++) {
+						for (int y3 = max(y - 1, 0); y3 <= min(height - 1, y + 1); y3++) {
+							MapData::walkability[x3][y3] = false;
+						}
+					}
+					MapData::distanceTransform[x][y] = 0;
+					MapData::lowResWalkability[x / 4][y / 4] = false;
+				}
+			}
+		}
+
+#ifdef OFFLINE
+		BWTA::MapData::lowResWalkability.saveToFile("logs/lowResWalkability.txt");
+#endif
+
+		BWTA_Result::getRegion.resize(b_width, b_height);
+		BWTA_Result::getChokepoint.resize(b_width, b_height);
+		BWTA_Result::getBaseLocation.resize(b_width, b_height);
+		BWTA_Result::getChokepointW.resize(width, height);
+		BWTA_Result::getBaseLocationW.resize(width, height);
+		BWTA_Result::getUnwalkablePolygon.resize(b_width, b_height);
+		BWTA_Result::getRegion.setTo(NULL);
+		BWTA_Result::getChokepoint.setTo(NULL);
+		BWTA_Result::getBaseLocation.setTo(NULL);
+		BWTA_Result::getChokepointW.setTo(NULL);
+		BWTA_Result::getBaseLocationW.setTo(NULL);
+		BWTA_Result::getUnwalkablePolygon.setTo(NULL);
+	}
+
 
   void load_data(std::string filename)
   {
@@ -360,9 +375,6 @@ namespace BWTA
       }
     }
     file_in.close();
-#ifndef OFFLINE
-    attachResourcePointersToBaseLocations(BWTA_Result::baselocations);
-#endif
   }
 
   void save_data(std::string filename)

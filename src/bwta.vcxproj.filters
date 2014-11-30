@@ -95,9 +95,6 @@
     <ClCompile Include="pathfinding.cpp">
       <Filter>Pathfinding</Filter>
     </ClCompile>
-    <ClCompile Include="offline\sha1.cpp">
-      <Filter>Offline</Filter>
-    </ClCompile>
     <ClCompile Include="offline\TileSet.cpp">
       <Filter>Offline</Filter>
     </ClCompile>
@@ -106,6 +103,9 @@
     </ClCompile>
     <ClCompile Include="offline\MapFileParser.cpp">
       <Filter>Offline</Filter>
+    </ClCompile>
+    <ClCompile Include="util\sha1.cpp">
+      <Filter>Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -148,9 +148,6 @@
     <ClInclude Include="RegionImpl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="terrain_analysis.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -190,9 +187,6 @@
     <ClInclude Include="offline\MiniTileFlags.h">
       <Filter>Offline</Filter>
     </ClInclude>
-    <ClInclude Include="offline\sha1.h">
-      <Filter>Offline</Filter>
-    </ClInclude>
     <ClInclude Include="offline\TileSet.h">
       <Filter>Offline</Filter>
     </ClInclude>
@@ -204,6 +198,9 @@
     </ClInclude>
     <ClInclude Include="offline\MapFileParser.h">
       <Filter>Offline</Filter>
+    </ClInclude>
+    <ClInclude Include="util\sha1.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

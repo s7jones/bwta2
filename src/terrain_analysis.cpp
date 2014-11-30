@@ -58,56 +58,63 @@ namespace BWTA
     }
   };
 
-  void readMap()
-  {
-#ifdef OFFLINE
-    load_map();
-#else
-    MapData::mapWidth = BWAPI::Broodwar->mapWidth();
-    MapData::mapHeight = BWAPI::Broodwar->mapHeight();
-    MapData::hash = BWAPI::Broodwar->mapHash();
-    MapData::mapFileName = BWAPI::Broodwar->mapFileName();
+	void readMap(){} // for backwards interface compatibility
 
-    // Clean previous logfile
-    std::ofstream logFile( "bwapi-data/logs/BWTA.log");
-    logFile << "Map name: " << MapData::mapFileName << std::endl;
+	void analyze()
+	{
+		// timer variables
+		clock_t start;
+		double seconds;
 
-    load_map();
-    load_resources();
-    MapData::startLocations = BWAPI::Broodwar->getStartLocations();
+#ifndef OFFLINE
+		loadMapFromBWAPI();
 #endif
-  }
-  void analyze()
-  {
-    clock_t start;
-    clock_t end;
+		
+		// compute extra map info
+		loadMap();
 
-    // Verify if "bwta2" directory exists, and create it if it doesn't.
-    auto bwtaPath = std::string(BWTA_PATH);
-    if (! boost::filesystem::exists(bwtaPath)) {
-        createDir(bwtaPath);    
-    }
+		// Verify if "bwta2" directory exists, and create it if it doesn't.
+		auto bwtaPath = std::string(BWTA_PATH);
+		if (! boost::filesystem::exists(bwtaPath)) {
+			createDir(bwtaPath);    
+		}
 
-    std::string filename = bwtaPath + MapData::hash + ".bwta";
+		std::string filename = bwtaPath + MapData::hash + ".bwta";
 
-//#ifndef DEBUG_DRAW
-    if (fileExists(filename) && fileVersion(filename)==BWTA_FILE_VERSION) {
-      log("Recognized map, loading map data...");
-      load_data(filename);
-      log("Loaded map data.");
-    } else
-//#endif
-    {
-      log("Analyzing new map...");
-      start = clock();
-      analyze_map();
-      end = clock();
-      double seconds = double(end-start)/CLOCKS_PER_SEC;
-      log("Map analyzed in " << seconds << " seconds");
-      save_data(filename);
-      log("Saved map data.");
-    }
-  }
+		if (fileExists(filename) && fileVersion(filename)==BWTA_FILE_VERSION) {
+			log("Recognized map, loading map data...");
+			start = clock();
+
+			load_data(filename);
+
+			seconds = double(clock() - start) / CLOCKS_PER_SEC;
+			log("Loaded map data in " << seconds << " seconds");
+		} else {
+			log("Analyzing new map...");
+			start = clock();
+
+			analyze_map();
+
+			seconds = double(clock() - start) / CLOCKS_PER_SEC;
+			log("Map analyzed in " << seconds << " seconds");
+			
+			save_data(filename);
+			log("Saved map data.");
+		}
+
+#ifndef OFFLINE
+		attachResourcePointersToBaseLocations(BWTA_Result::baselocations);
+#endif
+		// debug base locations distances
+// 		log("Base distances");
+// 		for (auto baseLocation1 : BWTA_Result::baselocations) {
+// 			std::string distances;
+// 			for (auto baseLocation2 : BWTA_Result::baselocations) {
+// 				distances += " " + std::to_string((int)baseLocation1->getGroundDistance(baseLocation2));
+// 			}
+// 			log("(" << baseLocation1->getPosition().x << "," << baseLocation1->getPosition().y << ")" << distances);
+// 		}
+	}
 
   void analyze_map()
   {
@@ -589,8 +596,8 @@ namespace BWTA
 	log(" [Linked choke points wiht regions in " << seconds << " seconds]");
 	start = end;
 
-  calculate_connectivity();
-  calculate_base_location_properties(get_component,components,BWTA_Result::baselocations);
+	calculate_connectivity();
+	calculate_base_location_properties(get_component,components,BWTA_Result::baselocations);
 
 	end = clock();
 	seconds = double(end-start)/CLOCKS_PER_SEC;
@@ -614,18 +621,10 @@ namespace BWTA
 		filename = filename + "-" + numstr + ".png";
         image->save(filename.c_str(), "PNG");
 
-		// show a GUI with the image
-		/*QGraphicsView* view = new QGraphicsView(scene_ptr);
-		CGAL::Qt::GraphicsViewNavigation navigation;
-		view->installEventFilter(&navigation);
-		view->viewport()->installEventFilter(&navigation);
-		view->setRenderHint(QPainter::Antialiasing);
-		view->show();
-		app_ptr->exec();*/
-
 		scene_ptr->clear();
 		return 0;
     }
+
     void draw_arrangement(Arrangement_2* arr_ptr)
     {
       for (Arrangement_2::Edge_iterator eit = arr_ptr->edges_begin(); eit != arr_ptr->edges_end(); ++eit)
