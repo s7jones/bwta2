@@ -97,8 +97,8 @@ namespace BWTA
   bool is_real( CGAL::Quotient<CGAL::MP_Float> q);
   bool is_real( CGAL::Gmpq q);
   bool is_real( CGAL::Lazy_exact_nt<CGAL::Gmpq > q);
-  bool load_map();
-  bool load_resources();
+  void loadMapFromBWAPI();
+  void loadMap();
   int str2int(std::string str);
   std::string int2str(int number);
   int max(int a, int b);
@@ -106,11 +106,13 @@ namespace BWTA
   //void writeFile(const char* filename, const char* text, ...);
 #ifdef OFFLINE
   #define BWTA_PATH "logs/"
+  const std::string LOG_FILE_PATH = "logs/BWTA.log";
   #define log(message) { std::cout << message << std::endl; }
 #else
   #define BWTA_PATH "bwapi-data/BWTA2/"
+  const std::string LOG_FILE_PATH = "bwapi-data/logs/BWTA.log";
   #define log(message) { \
-	  std::ofstream logFile( "bwapi-data/logs/BWTA.log", std::ios_base::out | std::ios_base::app ); \
+	  std::ofstream logFile(LOG_FILE_PATH , std::ios_base::out | std::ios_base::app ); \
 	  logFile << message << std::endl; }
 #endif
 
@@ -133,14 +135,7 @@ namespace BWTA
                                     ,RectangleArray<int> &distance_map);
 
   int get_set(std::vector<int> &a,int i);
-  template <class _Tp1>
-  _Tp1 get_set2(std::map<_Tp1,_Tp1> &a,_Tp1 i)
-  {
-    if (a.find(i)==a.end()) a[i]=i;
-    if (i==a[i]) return i;
-    a[i]=get_set2(a,a[i]);
-    return a[i];
-  }
+
   void calculate_connectivity();
 
   float max(float a, float b);
