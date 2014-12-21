@@ -3,8 +3,7 @@
 #include <algorithm>
 #include <iosfwd>
 #include <tuple>
-
-#include <BWAPI/Vectorset.h>
+#include <deque>
 
 #ifndef _MAKE_POSITION_TEMPLATE
 
@@ -59,7 +58,7 @@ namespace BWAPI
   class Point
   {
   public:
-    typedef Vectorset< Point<_T,__Scale> > set;
+    typedef std::deque< Point<_T,__Scale> > list;
 
     // Constructors
     Point(_T _x = 0, _T _y = 0) : x(_x), y(_y) {};
@@ -104,18 +103,32 @@ namespace BWAPI
     _OPERATOR_OP_VAL_CHK(/)
     _OPERATOR_OP_VAL_CHK(%)
     
+    /// Ouput stream operator overload. Outputs the Point in the format "(x,y)" without
+    /// quotations.
+    ///
+    /// @param out
+    ///   Output stream.
+    /// @param pt
+    ///   Point to output.
+    /// @returns Output stream \p out.
     friend std::ostream &operator << (std::ostream &out, const Point<_T,__Scale> &pt)
     {
       return out << '(' << pt.x << ',' << pt.y << ')';
     };
 
+    /// Input stream operator overload. Reads the input in the form "x y" without quotations.
+    /// The x and y values are read as type T(typically int or float) and stored into pt.
+    ///
+    /// @param in
+    ///   The input stream.
+    /// @param pt
+    ///   The receiving variable.
+    /// @returns Input stream \p in.
     friend std::istream &operator >> (std::istream &in, Point<_T,__Scale> &pt)
     {
       return in >> pt.x >> pt.y;
     };
 
-    // Functions
-    
     /// Checks if this point is within the game's map bounds.
     ///
     /// @note If the Broodwar pointer is not initialized, this function will check validity
@@ -235,7 +248,7 @@ namespace BWAPI
     /// @overload
     Point &setMin(const Point<_T,__Scale> &min)
     {
-      this->setMin(max.x, max.y);
+      this->setMin(min.x, min.y);
       return *this;
     };
 

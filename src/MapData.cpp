@@ -9,7 +9,7 @@ namespace BWTA
 		RectangleArray<bool> lowResWalkability;
 		RectangleArray<bool> buildability;
 		RectangleArray<int> distanceTransform;
-		BWAPI::TilePosition::set startLocations;
+		BWAPI::TilePosition::list startLocations;
 		std::string hash;
 		std::string mapFileName;
 		int mapWidth;

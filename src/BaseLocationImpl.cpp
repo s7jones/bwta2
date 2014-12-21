@@ -42,7 +42,7 @@ namespace BWTA
 	  currentMinerals.clear();
 	  for (auto mineral : staticMinerals) {
 		  if (mineral->exists()) {
-			  currentMinerals.push_back(mineral);
+			  currentMinerals.insert(mineral);
 		  }
 	  }
 	  return currentMinerals;

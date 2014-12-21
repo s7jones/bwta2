@@ -291,7 +291,7 @@ namespace BWTA
 				}
 			}
 			ii->start = false;
-			for (BWAPI::TilePosition::set::iterator j = MapData::startLocations.begin(); j != MapData::startLocations.end(); j++) {
+			for (auto j = MapData::startLocations.begin(); j != MapData::startLocations.end(); j++) {
 				BWAPI::Position pos((*j).x * 32 + 64, (*j).y * 32 + 48);
 				double distance = pos.getDistance((*i)->getPosition());
 				if (distance < 32 * 10)
