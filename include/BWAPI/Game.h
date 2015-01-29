@@ -1,6 +1,7 @@
 #pragma once
 #include <list>
 #include <string>
+#include <cstdarg>
 
 #include <BWAPI/Interface.h>
 #include <BWAPI/UnitType.h>
@@ -605,6 +606,10 @@ namespace BWAPI
     /// checks for creep, power, and resource distance requirements in addition to the tiles'
     /// buildability and possible units obstructing the build location.
     ///
+    /// @note If the type is an addon and a builer is provided, then the location of the addon will
+    /// be placed 4 tiles to the right and 1 tile down from the given \p position. If the builder
+    /// is not given, then the check for the addon will be conducted at position.
+    ///
     /// @param position
     ///   Indicates the tile position that the top left corner of the structure is intended to go.
     /// @param type
@@ -1206,8 +1211,7 @@ namespace BWAPI
     virtual void setGUI(bool enabled) = 0;
 
     /// Retrieves the Starcraft instance number recorded by BWAPI to identify which Starcraft
-    /// instance an AI module belongs to. This only applies to users running multiple instances
-    /// of Starcraft.
+    /// instance an AI module belongs to. The very first instance should return 1.
     ///
     /// @returns
     ///   An integer value representing the instance number.
@@ -1259,7 +1263,7 @@ namespace BWAPI
     ///
     /// @retval true if there is a path between the two positions
     /// @retval false if there is no path
-    virtual bool hasPath(Position source, Position destination) const = 0;
+    bool hasPath(Position source, Position destination) const;
 
     /// Sets the alliance state of the current player with the target player.
     ///
