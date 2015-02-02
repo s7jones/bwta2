@@ -1,9 +1,10 @@
 #pragma once
 #include <cmath>
 #include <algorithm>
-#include <iosfwd>
 #include <tuple>
 #include <deque>
+#include <iostream>
+
 
 #ifdef SWIG
 #define BWAPI_MAKE_POSITION_TEMPLATE(_n,T,_s) typedef BWAPI::Point<T,_s> _n;
