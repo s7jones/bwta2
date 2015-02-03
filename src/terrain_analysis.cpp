@@ -62,6 +62,13 @@ namespace BWTA
 
 	void analyze()
 	{
+		// clear everything (TODO possibly memory leaks here)
+		BWTA_Result::regions.clear();
+		BWTA_Result::chokepoints.clear();
+		BWTA_Result::unwalkablePolygons.clear();
+		BWTA_Result::baselocations.clear();
+		BWTA_Result::startlocations.clear();
+
 		// timer variables
 		clock_t start;
 		double seconds;
@@ -123,17 +130,6 @@ namespace BWTA
       QGraphicsScene scene;
       scene_ptr=&scene;
     #endif
-
-    // Delete and clear any old regions, chokepoints, and not walkable polygons
-    for(std::set<BWTA::Region*>::iterator i=BWTA_Result::regions.begin();i!=BWTA_Result::regions.end();i++)
-      delete *i;
-    BWTA_Result::regions.clear();
-    for(std::set<BWTA::Chokepoint*>::iterator i=BWTA_Result::chokepoints.begin();i!=BWTA_Result::chokepoints.end();i++)
-      delete *i;
-    BWTA_Result::chokepoints.clear();
-    for(std::set<BWTA::Polygon*>::iterator i=BWTA_Result::unwalkablePolygons.begin();i!=BWTA_Result::unwalkablePolygons.end();i++)
-      delete *i;
-    BWTA_Result::unwalkablePolygons.clear();
 
 	// time performance
 	clock_t start;
