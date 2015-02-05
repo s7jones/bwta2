@@ -14,7 +14,7 @@ namespace BWTA
     bool createDir(std::string& path)
     {
         boost::filesystem::path dir(path);
-        if (boost::filesystem::create_directory(dir)) {
+        if (boost::filesystem::create_directories(dir)) {
             return true;
         }
 
