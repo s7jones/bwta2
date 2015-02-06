@@ -2,7 +2,6 @@
 #define _STDAFX_H_
 
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
-#pragma warning(disable:4503)   // Disable warning http://msdn.microsoft.com/en-us/library/074af4b6%28VS.80%29.aspx
 
 // standard includes
 #include <vector>

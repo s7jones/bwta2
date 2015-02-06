@@ -5,6 +5,7 @@
 #include "offline/MapFileParser.h"
 #include "offline/wallingAnalysis.h"
 
+#define DEBUG_DRAW // uncomment to print PNG of the map during analysis
 
 int main (int argc, char * argv[])
 {
@@ -130,5 +131,6 @@ int main (int argc, char * argv[])
 	}
 	fileTxt.close();
 
+	BWTA::cleanMemory();
 	return 0;
 }
