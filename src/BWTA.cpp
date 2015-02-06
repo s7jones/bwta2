@@ -6,6 +6,19 @@
 
 namespace BWTA
 {
+	void cleanMemory()
+	{
+		// clear everything
+		for (auto r : BWTA_Result::regions) delete r;
+		BWTA_Result::regions.clear();
+		for (auto c : BWTA_Result::chokepoints) delete c;
+		BWTA_Result::chokepoints.clear();
+		for (auto p : BWTA_Result::unwalkablePolygons) delete p;
+		BWTA_Result::unwalkablePolygons.clear();
+		for (auto b : BWTA_Result::baselocations) delete b;
+		BWTA_Result::baselocations.clear();
+		BWTA_Result::startlocations.clear();
+	}
   const std::set<Region*>& getRegions()
   {
     return BWTA_Result::regions;

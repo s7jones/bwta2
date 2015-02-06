@@ -62,16 +62,7 @@ namespace BWTA
 
 	void analyze()
 	{
-		// clear everything
-		for (auto r : BWTA_Result::regions) delete static_cast<RegionImpl*>(r);
-		BWTA_Result::regions.clear();
-		for (auto c : BWTA_Result::chokepoints) delete static_cast<BWTA::ChokepointImpl*>(c);
-		BWTA_Result::chokepoints.clear();
-		for (auto p : BWTA_Result::unwalkablePolygons) delete p;
-		BWTA_Result::unwalkablePolygons.clear();
-		for (auto b : BWTA_Result::baselocations) delete static_cast<BWTA::BaseLocationImpl*>(b);
-		BWTA_Result::baselocations.clear();
-		BWTA_Result::startlocations.clear();
+		cleanMemory();
 
 		// timer variables
 		clock_t start;
