@@ -18,7 +18,7 @@ There are two different branches:
 
 ## Dependencies ##
 * **master**
-    * BWAPI 4.0.1
+    * BWAPI 4.1.0
     * Boost 1.56
     * CGAL 4.4
     * Qt 5.3.0 (only for debugging)
