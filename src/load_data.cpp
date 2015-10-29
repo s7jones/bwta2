@@ -49,6 +49,8 @@ namespace BWTA
 			BWTA::MapData::staticNeutralBuildings.push_back(unitTypePosition);
 		}
 
+    MapData::resourcesWalkPositions.clear ();
+
 		// load resources (minerals, gas) and start locations
 		for (auto mineral : BWAPI::Broodwar->getStaticMinerals()) {
 			if (mineral->getInitialResources() > 200) { //filter out all mineral patches under 200
