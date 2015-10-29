@@ -40,18 +40,18 @@ namespace BWTA
 		}
 
 		// load static buildings
+		MapData::staticNeutralBuildings.clear();
 		BWAPI::UnitType unitType;
 		for (auto unit : BWAPI::Broodwar->getStaticNeutralUnits()) {
 			// check if it is a resource container
 			unitType = unit->getType();
 			if (unitType == BWAPI::UnitTypes::Resource_Vespene_Geyser || unitType.isMineralField()) continue;
-			BWTA::UnitTypePosition unitTypePosition = std::make_pair(unitType, unit->getPosition());
-			BWTA::MapData::staticNeutralBuildings.push_back(unitTypePosition);
+			UnitTypePosition unitTypePosition = std::make_pair(unitType, unit->getPosition());
+			MapData::staticNeutralBuildings.push_back(unitTypePosition);
 		}
 
-    MapData::resourcesWalkPositions.clear ();
-
 		// load resources (minerals, gas) and start locations
+		MapData::resourcesWalkPositions.clear();
 		for (auto mineral : BWAPI::Broodwar->getStaticMinerals()) {
 			if (mineral->getInitialResources() > 200) { //filter out all mineral patches under 200
 				BWAPI::WalkPosition unitWalkPosition(mineral->getPosition());
