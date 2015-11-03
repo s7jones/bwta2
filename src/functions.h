@@ -16,56 +16,28 @@
 #define BWTA_FILE_VERSION 6
 namespace BWTA
 {
-	// Choosing the proper kernel is important http://doc.cgal.org/latest/Kernel_23/index.html
-
-//   typedef CGAL::Simple_cartesian< double >					CKD;
-//   typedef CGAL::Filtered_kernel<CKD>						KernelD;
-
+  // Choosing the proper kernel is important http://doc.cgal.org/latest/Kernel_23/index.html
   typedef CGAL::Lazy_exact_nt<CGAL::Gmpq >					NumberType;
-//   typedef CGAL::Simple_cartesian< NumberType >				CK;
-//   typedef CGAL::Filtered_kernel<CK>							Kernel;
-  typedef CGAL::Exact_predicates_exact_constructions_kernel CK;
   typedef CGAL::Exact_predicates_exact_constructions_kernel Kernel;
   typedef CGAL::Segment_Delaunay_graph_traits_2<Kernel>		Gt; 
 
   typedef CGAL::Segment_Delaunay_graph_2<Gt> SDG2;
+  typedef Gt::Segment_2                      Segment_2_Gt;
+  typedef CGAL::Parabola_segment_2<Gt>       Parabola_segment_2_Gt;
 
-  typedef Gt::Point_2		Point_2_Gt;
-  typedef Gt::Line_2		Line_2_Gt;
-  typedef Gt::Ray_2		Ray_2_Gt;
-  typedef Gt::Segment_2	Segment_2_Gt;
-  typedef CGAL::Parabola_segment_2<Gt> Parabola_segment_2_Gt;
+  typedef CGAL::Point_2<Kernel>      Point;
+  typedef CGAL::Polygon_2<Kernel>    PolygonD;
+  typedef CGAL::Line_2<Kernel>       Line;
+  typedef CGAL::Segment_2<Kernel>    Segment;
+  typedef CGAL::Point_set_2<Kernel>  Point_set_2;
+  typedef Point_set_2::Vertex_handle Vertex_handle;
 
-  typedef CGAL::Point_2<CK> Point;
-  typedef CGAL::Polygon_2<CK> PolygonCK;
-  typedef CGAL::Line_2<CK> Line;
-  typedef CGAL::Segment_2<CK> Segment;
-  typedef CGAL::Circle_2<CK> Circle;
-  typedef CGAL::Direction_2<CK> Direction;
-  typedef CGAL::Point_set_2<Kernel> Point_set_2;
-  typedef CGAL::Point_set_2<Kernel>::Vertex_handle  Vertex_handle;
+  typedef CGAL::Arr_segment_traits_2<Kernel>                       Traits_2;
+  typedef Traits_2::Point_2                                        Point_2;
+  typedef Traits_2::X_monotone_curve_2                             Segment_2;
+  typedef CGAL::Arr_extended_dcel<Traits_2,VertexData, Color, int> Dcel;
+  typedef CGAL::Arrangement_2<Traits_2, Dcel>                      Arrangement_2;
 
-//   typedef CGAL::Point_2<KernelD> PointKD;
-//   typedef CGAL::Polygon_2<CKD> PolygonD;
-//   typedef CGAL::Line_2<CKD> LineD;
-//   typedef CGAL::Ray_2<CKD> RayD;
-//   typedef CGAL::Segment_2<CKD> SegmentD;
-//   typedef CGAL::Circle_2<CKD> CircleD;
-//   typedef CGAL::Direction_2<CKD> DirectionD;
-
-  typedef CGAL::Point_2<Kernel> PointKD;
-  typedef CGAL::Polygon_2<CK> PolygonD;
-  typedef CGAL::Line_2<CK> LineD;
-  typedef CGAL::Ray_2<CK> RayD;
-  typedef CGAL::Segment_2<CK> SegmentD;
-  typedef CGAL::Circle_2<CK> CircleD;
-  typedef CGAL::Direction_2<CK> DirectionD;
-
-  typedef CGAL::Arr_segment_traits_2<Kernel>                      Traits_2;
-  typedef Traits_2::Point_2                                       Point_2;
-  typedef Traits_2::X_monotone_curve_2                            Segment_2;
-  typedef CGAL::Arr_extended_dcel<Traits_2,VertexData, Color, int>      Dcel;
-  typedef CGAL::Arrangement_2<Traits_2, Dcel>                     Arrangement_2;
   struct ptcmp
   {
     bool operator()(const Point &a, const Point &b) const

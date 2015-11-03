@@ -20,8 +20,6 @@ namespace BWTA
     for (int k = 1; eit != sdg.finite_edges_end(); ++eit, ++k) {
 		//log("Edge number: " << k);
 		CGAL::Object o = sdg.primal(*eit);
-		//Line_2_Gt l;
-		//Ray_2_Gt r;
 		Segment_2_Gt s;
 		Parabola_segment_2_Gt ps;
 		
