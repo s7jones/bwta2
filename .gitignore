@@ -16,6 +16,9 @@ Release-Log/
 Release-Exe/
 Debug-Exe/
 src/logs/*
+lib/BWTA-log.lib
+lib/BWTA.lib
+lib/BWTAd.lib
 
 # Visual C++ cache files
 ipch/
