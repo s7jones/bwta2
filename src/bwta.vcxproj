@@ -98,24 +98,29 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../interface;../include;$(CGAL_DIR)/include;$(BOOST_INCLUDEDIR);$(QTDIR)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>true</MinimalRebuild>
+      <AdditionalIncludeDirectories>../externalInclude;../include;$(BWAPI_DIR)/include;$(CGAL_DIR)/include;$(BOOST_INCLUDEDIR);$(QTDIR)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NOMINMAX;WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <ProgramDataBaseFileName>$(OutDir)BWTAd.pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>$(IntDir)teeeest.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ForcedIncludeFiles>stdafx.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <BufferSecurityCheck>false</BufferSecurityCheck>
-      <AdditionalOptions>-Zm141 %(AdditionalOptions)</AdditionalOptions>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <AdditionalOptions>-Zm141</AdditionalOptions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <RuntimeTypeInfo>
+      </RuntimeTypeInfo>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>libCGAL-vc120-mt-gd-4.4.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)BWTAd.lib</OutputFile>
-      <AdditionalLibraryDirectories>..\..\dependencies\lib\;..\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
       <Command>
@@ -129,8 +134,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../include;../interface;$(CGAL_DIR)/include;$(BOOST_INCLUDEDIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_SECURE_SCL 0</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../externalInclude;../include;$(BWAPI_DIR)/include;$(CGAL_DIR)/include;$(BOOST_INCLUDEDIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NOMINMAX;WIN32;NDEBUG;_CONSOLE;_SECURE_SCL 0</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -149,7 +154,8 @@
       <AdditionalDependencies>
       </AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>..\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
     </Lib>
@@ -165,8 +171,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../interface;../include;$(CGAL_DIR)/include;$(BOOST_INCLUDEDIR);$(QTDIR)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_SECURE_SCL 0;DEBUG_DRAW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../externalInclude;../include;$(BWAPI_DIR)/include;$(CGAL_DIR)/include;$(BOOST_INCLUDEDIR);$(QTDIR)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NOMINMAX;WIN32;NDEBUG;_CONSOLE;_SECURE_SCL 0;DEBUG_DRAW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -185,7 +191,8 @@
       <AdditionalDependencies>
       </AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>..\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
       <Command>
@@ -199,8 +206,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../interface;../include;$(CGAL_DIR)/include;$(BOOST_INCLUDEDIR);$(QTDIR)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;OFFLINE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../externalInclude;../include;$(BWAPI_DIR)/include;$(CGAL_DIR)/include;$(BOOST_INCLUDEDIR);$(QTDIR)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NOMINMAX;WIN32;NDEBUG;_CONSOLE;OFFLINE;DEBUG_DRAW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -214,7 +221,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>libboost_thread-vc120-mt-1_56.lib;libboost_system-vc120-mt-1_56.lib;libCGAL-vc120-mt-4.4.lib;libgmp-10.lib;libmpfr-4.lib;BWAPI.lib;StormLibRAD.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>../lib/</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../lib/;$(BWAPI_DIR)/lib;</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
@@ -234,8 +241,8 @@
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../interface;../include;$(CGAL_DIR)/include;$(BOOST_INCLUDEDIR);$(QTDIR)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;OFFLINE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../externalInclude;../include;$(BWAPI_DIR)/include;$(CGAL_DIR)/include;$(BOOST_INCLUDEDIR);$(QTDIR)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NOMINMAX;WIN32;_DEBUG;_CONSOLE;OFFLINE;DEBUG_DRAW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>
       </StringPooling>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -252,8 +259,8 @@
       <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>BWAPI-sgd-410.lib;libgmp-10.lib;libmpfr-4.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>../lib/</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libgmp-10.lib;libmpfr-4.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../lib/;$(BWAPI_DIR)/lib</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>
       </LinkTimeCodeGeneration>
       <IgnoreAllDefaultLibraries>
@@ -289,6 +296,8 @@
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="offline\MapFileParser.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Log|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Exe|Win32'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Polygon.cpp" />
     <ClCompile Include="RegionImpl.cpp" />
@@ -306,8 +315,14 @@
     <ClCompile Include="BalanceMetrics.cpp" />
     <ClCompile Include="DistanceTransform.cpp" />
     <ClCompile Include="pathfinding.cpp" />
-    <ClCompile Include="offline\TileSet.cpp" />
-    <ClCompile Include="offline\wallingAnalysis.cpp" />
+    <ClCompile Include="offline\TileSet.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Log|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Exe|Win32'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="offline\wallingAnalysis.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Log|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Exe|Win32'">false</ExcludedFromBuild>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseLocationImpl.h" />
@@ -324,25 +339,39 @@
     <ClInclude Include="Node.h" />
     <ClInclude Include="offline\MapFileParser.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Log|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Exe|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="RegionImpl.h" />
     <ClInclude Include="terrain_analysis.h" />
     <ClInclude Include="util\sha1.h" />
     <ClInclude Include="VertexData.h" />
-    <ClInclude Include="..\interface\BWTA\BaseLocation.h" />
-    <ClInclude Include="..\interface\BWTA.h" />
-    <ClInclude Include="..\interface\BWTA\Chokepoint.h" />
-    <ClInclude Include="..\interface\BWTA\Polygon.h" />
-    <ClInclude Include="..\interface\BWTA\RectangleArray.h" />
-    <ClInclude Include="..\interface\BWTA\Region.h" />
+    <ClInclude Include="..\include\BWTA\BaseLocation.h" />
+    <ClInclude Include="..\include\BWTA.h" />
+    <ClInclude Include="..\include\BWTA\Chokepoint.h" />
+    <ClInclude Include="..\include\BWTA\Polygon.h" />
+    <ClInclude Include="..\include\BWTA\RectangleArray.h" />
+    <ClInclude Include="..\include\BWTA\Region.h" />
     <ClInclude Include="Heap.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="BalanceMetrics.h" />
     <ClInclude Include="DistanceTransform.h" />
-    <ClInclude Include="offline\MiniTileFlags.h" />
-    <ClInclude Include="offline\TileSet.h" />
-    <ClInclude Include="offline\TileType.h" />
-    <ClInclude Include="offline\wallingAnalysis.h" />
+    <ClInclude Include="offline\MiniTileFlags.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Log|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Exe|Win32'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="offline\TileSet.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Log|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Exe|Win32'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="offline\TileType.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Log|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Exe|Win32'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="offline\wallingAnalysis.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Log|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Exe|Win32'">false</ExcludedFromBuild>
+    </ClInclude>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -5,7 +5,6 @@ namespace BWTA
 {
   #ifdef DEBUG_DRAW
     QGraphicsScene* scene_ptr;
-    //QApplication* app_ptr;
 	int argc=0;
     char* argv="";
     QApplication app(argc,&argv);
@@ -118,178 +117,153 @@ namespace BWTA
 // 		}
 	}
 
-  void analyze_map()
-  {
-    #ifdef DEBUG_DRAW
-      //app_ptr=&app;
-      QGraphicsScene scene;
-      scene_ptr=&scene;
-    #endif
+	void analyze_map()
+	{
+#ifdef DEBUG_DRAW
+		QGraphicsScene scene;
+		scene_ptr = &scene;
+#endif
 
-	// time performance
-	clock_t start;
-	clock_t end;
-	double seconds;
+		// time performance
+		clock_t start;
+		clock_t end;
+		double seconds;
 
-	start = clock();
+		start = clock();
 
-	std::vector< std::vector< UnitTypeWalkPosition > > clusters;
-	findMineralClusters(MapData::walkability, MapData::resourcesWalkPositions, clusters);
-	log("  Found " << clusters.size() << " mineral clusters.");
+		std::vector< std::vector< UnitTypeWalkPosition > > clusters;
+		findMineralClusters(MapData::walkability, MapData::resourcesWalkPositions, clusters);
+		log("  Found " << clusters.size() << " mineral clusters.");
 
-	end = clock();
-	seconds = double(end - start) / CLOCKS_PER_SEC;
-	log(" [Clustering done in " << seconds << " seconds]");
-	start = end;
+		end = clock();
+		seconds = double(end - start) / CLOCKS_PER_SEC;
+		log(" [Clustering done in " << seconds << " seconds]");
+		start = end;
 
-	RectangleArray<bool> base_build_map;
-	calculateBaseBuildMap(MapData::buildability, clusters, base_build_map);
+		RectangleArray<bool> base_build_map;
+		calculateBaseBuildMap(MapData::buildability, clusters, base_build_map);
 
-  // Give find_connected_components the walkability data so it can compute the list of connected components,
-  // and determine which component each tile belongs to
-	RectangleArray<ConnectedComponent*> get_component;
-	std::list<ConnectedComponent> components;
-  find_connected_components(MapData::walkability,get_component,components);
-  log("  Calculated connected components.");
+		// Give find_connected_components the walkability data so it can compute the list of connected components,
+		// and determine which component each tile belongs to
+		RectangleArray<ConnectedComponent*> get_component;
+		std::list<ConnectedComponent> components;
+		find_connected_components(MapData::walkability, get_component, components);
+		log("  Calculated connected components.");
 
-  // Give calculate_base_locations the walkability data, base_build_map, and clusters so it can compute the base locations
-//   calculate_base_locations(MapData::walkability, base_build_map, clusters, BWTA_Result::baselocations);
-  calculateBaseLocations(MapData::walkability, base_build_map, clusters, BWTA_Result::baselocations);
-  for (auto i : BWTA_Result::baselocations) {
-	  log("BaseLocation at Position " << i->getPosition().x << "," << i->getPosition().y << " Tile " << i->getTilePosition().x << ", " << i->getTilePosition().y);
-  }
+		// Give calculate_base_locations the walkability data, base_build_map, and clusters so it can compute the base locations
+		calculateBaseLocations(MapData::walkability, base_build_map, clusters, BWTA_Result::baselocations);
+// 		for (auto i : BWTA_Result::baselocations) {
+// 			log("BaseLocation at Position " << i->getPosition().x << "," << i->getPosition().y << " Tile " << i->getTilePosition().x << ", " << i->getTilePosition().y);
+// 		}
+		log("  Calculated base locations.");
 
-  log("  Calculated base locations.");
+		// Give extract_polygons the walkability data and connected components so it can compute the polygonal obstacles
+		std::vector<Polygon> polygons;
+		extract_polygons(MapData::walkability, components, polygons);
+		log("  Extracted " << polygons.size() << " polygons.");
 
-  // Give extract_polygons the walkability data and connected components so it can compute the polygonal obstacles
-  vector<Polygon> polygons;
-	extract_polygons(MapData::walkability,components,polygons);
-  log("  Extracted polygons.");
+		// Discard polygons that are too small
+		int removed = 0;
+		for (size_t p = 0; p < polygons.size();) {
+			if (abs(polygons[p].getArea()) <= 256 && 
+				distance_to_border(polygons[p], MapData::walkability.getWidth(), MapData::walkability.getHeight()) > 1) {
+				polygons.erase(polygons.begin() + p);
+				removed++;
+			} else {
+				p++;
+			}
+		}
+		log("  Removed " << removed << " small polygons.");
 
-  // Discard polygons that are too small
-  for(unsigned int p=0;p<polygons.size();) {
-    if (abs(polygons[p].getArea())<=256 && distance_to_border(polygons[p],MapData::walkability.getWidth(),MapData::walkability.getHeight())>1) {
-      polygons.erase(polygons.begin()+p);
-    } else {
-      p++;
-    }
-  }
+		end = clock();
+		seconds = double(end - start) / CLOCKS_PER_SEC;
+		log(" [Detected polygons in " << seconds << " seconds]");
+		start = end;
 
-	end = clock();
-	seconds = double(end-start)/CLOCKS_PER_SEC;
-	log(" [Detected polygons in " << seconds << " seconds]");
-	start = end;
+		// Save the remaining polygons in BWTA_Result::unwalkablePolygons
+		for (size_t i = 0; i < polygons.size(); i++) {
+			BWTA_Result::unwalkablePolygons.insert(new Polygon(polygons[i]));
+		}
 
-  // Save the remaining polygons in BWTA_Result::unwalkablePolygons
-  for(size_t i=0;i<polygons.size();i++) {
-    BWTA_Result::unwalkablePolygons.insert(new Polygon(polygons[i]));
-  }
+#ifdef DEBUG_DRAW
+		log("Drawing results of step 1");
+		draw_polygons(&polygons);
+		render(1);
+#endif
 
-  #ifdef DEBUG_DRAW
-    log("Drawing results of step 1");
-    draw_border();
-    draw_polygons(&polygons);
-    render(1);
-  #endif
+		// All line segments we create we will store in the segments vector and also insert into the 2d segmented Delaunay graph object sdg
+		// Create the segments vector and 2d segmented Delaunay graph
+		std::vector<SDG2::Site_2> segments;
+		SDG2 sdg;
 
-  // All line segments we create we will store in the sites vector and also insert into the 2d segmented Delaunay graph object sdg
+		// Set vertices of the map
+		Point topLeft(0, 0);
+		Point bottomLeft(0, MapData::walkability.getHeight() - 1);
+		Point bottomRight(MapData::walkability.getWidth() - 1, MapData::walkability.getHeight() - 1);
+		Point topRight(MapData::walkability.getWidth() - 1, 0);
 
-  // Create the sites vector and 2d segmented Delaunay graph
-  vector<SDGS2> sites;
-  SDG2 sdg;
+		// Add line segments of the 4 edges of the map
+		segments.push_back(SDG2::Site_2::construct_site_2(topLeft, bottomLeft));
+		segments.push_back(SDG2::Site_2::construct_site_2(bottomLeft, bottomRight)); // this should be unnecessary since bottom tiles are always unwalkable
+		segments.push_back(SDG2::Site_2::construct_site_2(bottomRight, topRight));
+		segments.push_back(SDG2::Site_2::construct_site_2(topRight, topLeft));
 
-  // Add line segments of the 4 edges of the map to the sites vector
-  sites.push_back(SDGS2::construct_site_2(Point(0,0),Point(0,MapData::walkability.getHeight()-1)));
-  sites.push_back(SDGS2::construct_site_2(Point(0,MapData::walkability.getHeight()-1),Point(MapData::walkability.getWidth()-1,MapData::walkability.getHeight()-1)));
-  sites.push_back(SDGS2::construct_site_2(Point(MapData::walkability.getWidth()-1,MapData::walkability.getHeight()-1),Point(MapData::walkability.getWidth()-1,0)));
-  sites.push_back(SDGS2::construct_site_2(Point(MapData::walkability.getWidth()-1,0),Point(0,0)));
+		// Add the line segments of each polygon
+		for (const auto& polygon : polygons) {
+			// Add the vertices of the polygon
+			for (size_t i = 0; i < polygon.size(); i++) {
+				int j = (i + 1) % polygon.size();
+				Point a(polygon[i].x, polygon[i].y);
+				Point b(polygon[j].x, polygon[j].y);
+				segments.push_back(SDG2::Site_2::construct_site_2(b, a));
+			}
+			// Add the vertices of each hole in the polygon
+			for (const auto& hole : polygon.holes) {
+				for (size_t i = 0; i < hole.size(); i++) {
+					int j = (i + 1) % hole.size();
+					Point a(hole[i].x, hole[i].y);
+					Point b(hole[j].x, hole[j].y);
+					segments.push_back(SDG2::Site_2::construct_site_2(b, a));
+				}
+			}
+		}
 
-  // Add these same line segments to the sdg
-  for(unsigned int i=0;i<sites.size();i++) {
-    sdg.insert(sites[i]);
-  }
-  // Add the line segments of each polygon to sites and sdg
-  for(unsigned int p=0;p<polygons.size();p++)
-  {
-    SDG2::Vertex_handle h;
-    // Add the edges of the border of polygons[p] to sites and sdg
-    for(size_t i=0;i<polygons[p].size();i++)
-    {
-      int j=(i+1)%polygons[p].size();
-	  Point a(polygons[p][i].x,polygons[p][i].y);
-	  Point b(polygons[p][j].x,polygons[p][j].y);
-      sites.push_back(SDGS2::construct_site_2(b,a));
-      if (i==0)
-      {
-        // This is the first vertex of this polygon, so don't specify a vertex handle
-        h=sdg.insert(sites[sites.size()-1]);
-      }
-      else
-      {
-        // This vertex is probably close to the previous vertex of this polygon so give the insert
-        // function the handle of the previous vertex as a hint for where to insert this vertex
-        h=sdg.insert(sites[sites.size()-1],h);
-      }
-    }
-    // Add the edges of each hole in polygons[p] to sites and sdg
-    for(std::vector<Polygon>::iterator hole=polygons[p].holes.begin();hole!=polygons[p].holes.end();hole++)
-    {
-      // Add the edges of this hole to sites and sdg
-      for(size_t i=0;i<hole->size();i++)
-      {
-        int j=(i+1)%hole->size();
-		Point a((*hole)[i].x,(*hole)[i].y);
-		Point b((*hole)[j].x,(*hole)[j].y);
-        sites.push_back(SDGS2::construct_site_2(b,a));
-        h=sdg.insert(sites[sites.size()-1],h);
-      }
-    }
-  }
-  log("  Created voronoi diagram.");
-  // The sites vector and sdg object not contain all of the edges of each polygon as well as
-  // the four edges that form the border of the map
-  // Check to see if the 2d segmented Delaunay graph is still valid
-  assert( sdg.is_valid(true, 1) );
-  //cout << endl << endl;
-  log("  Verified voronoi diagram.");
+		// Add all line segments to the sdg
+		sdg.insert_segments(segments.begin(), segments.end());
 
-  vector< Segment > voronoi_diagram_edges;
-  std::map<Point, std::set< Point >, ptcmp > nearest;
-  std::map<Point, double, ptcmp> distance;
-  get_voronoi_edges(sdg,voronoi_diagram_edges,nearest,distance,polygons);
-  log("  Got voronoi edges.");
-  Arrangement_2 arr;
-  My_observer obs(arr);
-  Graph g(&arr);
+		// Check to see if the 2d segment Delaunay graph is valid
+		assert(sdg.is_valid(true, 1));
+		log("  Created 2D Segment Delaunay Graph.");
 
-  // Insert all line segments from polygons into arrangement
-  for(unsigned int i=0;i<sites.size();i++)
-  {
-    NumberType x0(sites[i].segment().vertex(0).x());
-    NumberType y0(sites[i].segment().vertex(0).y());
-    NumberType x1(sites[i].segment().vertex(1).x());
-    NumberType y1(sites[i].segment().vertex(1).y());
-    if (x0!=x1 || y0!=y1)
-    {
-      if (is_real(x0)!=0 && is_real(y0)!=0
-       && is_real(x1)!=0 && is_real(y1)!=0)
-      {
-        CGAL::insert(arr,Segment_2(Point_2(sites[i].segment().vertex(0).x(),sites[i].segment().vertex(0).y()),Point_2(sites[i].segment().vertex(1).x(),sites[i].segment().vertex(1).y())));
-      }
-    }
-  }
-  log("  Inserted polygons into arrangement.");
-  //color all initial segments and vertices from the polygons BLACK
-  for (Arrangement_2::Edge_iterator eit = arr.edges_begin(); eit != arr.edges_end(); ++eit)
-  {
-    eit->data() = BLACK;
-  }
-  for (Arrangement_2::Vertex_iterator vit = arr.vertices_begin(); vit != arr.vertices_end(); ++vit)
-  {
-    vit->data().c = BLACK;
-  }
+		vector< Segment > voronoi_diagram_edges;
+		std::map<Point, std::set< Point >, ptcmp > nearest;
+		std::map<Point, double, ptcmp> distance;
+		get_voronoi_edges(sdg, voronoi_diagram_edges, nearest, distance, polygons);
+		log("  Got voronoi edges.");
 
-  // Insert into arrangement all segments from voronoi diagram which are not bounded by any polygon
+		Arrangement_2 arr;
+		My_observer obs(arr);
+		Graph g(&arr);
+
+		// Insert all line segments from polygons into arrangement
+		for (const auto& segment : segments) {
+			NumberType x0(segment.segment().vertex(0).x());
+			NumberType y0(segment.segment().vertex(0).y());
+			NumberType x1(segment.segment().vertex(1).x());
+			NumberType y1(segment.segment().vertex(1).y());
+			if (x0 != x1 || y0 != y1) {
+				if (is_real(x0) != 0 && is_real(y0) != 0 && is_real(x1) != 0 && is_real(y1) != 0) {
+					CGAL::insert(arr, Segment_2(Point_2(x0, y0), Point_2(x1, y1)));
+				}
+			}
+		}
+		log("  Inserted polygons into arrangement.");
+
+		//color all initial segments and vertices from the polygons BLACK
+		for (auto eit = arr.edges_begin(); eit != arr.edges_end(); ++eit) eit->data() = BLACK;
+		for (auto vit = arr.vertices_begin(); vit != arr.vertices_end(); ++vit) vit->data().c = BLACK;
+
+  // Insert into arrangement all segments from Voronoi diagram which are not bounded by any polygon
   for(unsigned int i=0;i<voronoi_diagram_edges.size();i++)
   {
     NumberType x0(voronoi_diagram_edges[i].vertex(0).x());
@@ -491,22 +465,35 @@ namespace BWTA
 
   BWTA_Result::chokepoints.clear();
   std::map<Node*,Region*> node2region;
+  std::vector<Polygon> polygonsNotSimple;
   for(std::set<Node*>::iterator r=g.regions_begin();r!=g.regions_end();r++)
   {
     Polygon poly;
     PolygonD pd=(*r)->get_polygon();
-    for(unsigned int i=0;i<pd.size();i++)
-    {
-      poly.push_back(BWAPI::Position((int)(pd[i].x()*8),(int)(pd[i].y()*8)));
+	// Translate CGAL polygon (PolygonD) to BWTA polygon (Polygon)
+	for (size_t i = 0; i<pd.size(); i++) {
+		poly.push_back(BWAPI::Position((int)CGAL::to_double(pd[i].x() * 8), (int)CGAL::to_double(pd[i].y() * 8)));
     }
+	// Check if the polygons are still simple
+	if (!pd.is_simple()) polygonsNotSimple.push_back(poly);
+	// Create the BWTA region
     Region* new_region= new RegionImpl(poly);
     BWTA_Result::regions.insert(new_region);
     node2region.insert(std::make_pair(*r,new_region));
   }
 
+  if (!polygonsNotSimple.empty()) {
+	  log("  ERROR!!! Found " << polygonsNotSimple.size() << " polygons not simple");
+#ifdef DEBUG_DRAW
+	  draw_polygons(&polygonsNotSimple);
+	  render(90);
+#endif
+  }
+
 	end = clock();
 	seconds = double(end-start)/CLOCKS_PER_SEC;
-	log(" [Finding regions in " << seconds << " seconds]");
+	// Computed the polygon from the face of a 2D arrangement
+	log(" [Creating BWTA regions in " << seconds << " seconds]");
 	start = end;
 
   #ifdef DEBUG_DRAW
@@ -547,7 +534,7 @@ namespace BWTA
         QVector<QPointF> qp;
         for(unsigned int i=0;i<boundary.size();i++)
         {
-          qp.push_back(QPointF(boundary.vertex(i).x(),boundary.vertex(i).y()));
+			qp.push_back(QPointF(cast_to_double(boundary.vertex(i).x()), cast_to_double(boundary.vertex(i).y())));
         }
         scene.addPolygon(QPolygonF(qp),QPen(QColor(0,0,0)),QBrush(hsl2rgb((*r)->hue,1.0,0.75)));    
       }
@@ -598,7 +585,7 @@ namespace BWTA
   #ifdef DEBUG_DRAW
     int render(int step)
     {
-		QImage* image = new QImage(MapData::mapWidth*8,MapData::mapHeight*8, QImage::Format_ARGB32_Premultiplied);
+		QImage* image = new QImage(MapData::mapWidth * 8, MapData::mapHeight * 8, QImage::Format_ARGB32_Premultiplied);
         QPainter* p = new QPainter(image);
         p->setRenderHint(QPainter::Antialiasing);
         scene_ptr->render(p);
@@ -606,10 +593,7 @@ namespace BWTA
 
         // Save it..
         std::string filename(BWTA_PATH);
-        filename += MapData::mapFileName;
-		char numstr[2];
-		sprintf_s(numstr, sizeof(numstr), "%d", step);
-		filename = filename + "-" + numstr + ".png";
+        filename += MapData::mapFileName + "-" + std::to_string(step) + ".png";
         image->save(filename.c_str(), "PNG");
 
 		scene_ptr->clear();
@@ -659,17 +643,14 @@ namespace BWTA
       }
       scene_ptr->addPolygon(QPolygonF(qp),QPen(QColor(0,0,0)),QBrush(qc));  
     }
-    void draw_polygons(vector<Polygon>* polygons_ptr)
+    void draw_polygons(std::vector<Polygon>* polygons)
     {
-      for(int i=0;i<(int)polygons_ptr->size();i++)
-      {
-        Polygon boundary=(*polygons_ptr)[i];
-        draw_polygon(boundary,QColor(180,180,180));
-        for(vector<Polygon>::iterator h=boundary.holes.begin();h!=boundary.holes.end();h++)
-        {
-          draw_polygon(*h,QColor(255,100,255));
-        }
-      }
+		for (auto& polygon : *polygons) {
+			draw_polygon(polygon, QColor(180, 180, 180));
+			for (auto& hole : polygon.holes) {
+				draw_polygon(hole, QColor(255, 100, 255));
+			}
+		}
     }
   #endif
   void remove_voronoi_diagram_from_arrangement(Arrangement_2* arr_ptr)

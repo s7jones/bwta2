@@ -154,22 +154,22 @@
     <ClInclude Include="VertexData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\interface\BWTA\BaseLocation.h">
+    <ClInclude Include="..\include\BWTA\BaseLocation.h">
       <Filter>Interface</Filter>
     </ClInclude>
-    <ClInclude Include="..\interface\BWTA.h">
+    <ClInclude Include="..\include\BWTA.h">
       <Filter>Interface</Filter>
     </ClInclude>
-    <ClInclude Include="..\interface\BWTA\Chokepoint.h">
+    <ClInclude Include="..\include\BWTA\Chokepoint.h">
       <Filter>Interface</Filter>
     </ClInclude>
-    <ClInclude Include="..\interface\BWTA\Polygon.h">
+    <ClInclude Include="..\include\BWTA\Polygon.h">
       <Filter>Interface</Filter>
     </ClInclude>
-    <ClInclude Include="..\interface\BWTA\RectangleArray.h">
+    <ClInclude Include="..\include\BWTA\RectangleArray.h">
       <Filter>Interface</Filter>
     </ClInclude>
-    <ClInclude Include="..\interface\BWTA\Region.h">
+    <ClInclude Include="..\include\BWTA\Region.h">
       <Filter>Interface</Filter>
     </ClInclude>
     <ClInclude Include="Heap.h">

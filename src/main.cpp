@@ -5,7 +5,7 @@
 #include "offline/MapFileParser.h"
 #include "offline/wallingAnalysis.h"
 
-#define DEBUG_DRAW // uncomment to print PNG of the map during analysis
+#include "functions.h"
 
 int main (int argc, char * argv[])
 {
@@ -98,6 +98,9 @@ int main (int argc, char * argv[])
 	std::cout << "All info loaded, analyzing map as regular..." << std::endl;
 	BWTA::analyze();
 	std::cout << "DONE" << std::endl;
+
+	BWTA::cleanMemory();
+	return 0;
 
 	// Generate the grids around all chokepoints:
 	std::ofstream fileTxt("logs/output.txt"); 

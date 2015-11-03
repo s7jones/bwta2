@@ -27,7 +27,7 @@ namespace BWTA
       Arrangement_2::Ccb_halfedge_const_circulator start=c;
       do
       {
-        poly.push_back(PointD(cast_to_double(c->source()->point().x()),cast_to_double(c->source()->point().y())));
+		  poly.push_back(c->source()->point());
         c++;
       } while (c!=start);
     }

@@ -17,11 +17,11 @@ namespace BWTA
   {
     return this->_id;
   }
-  PointD ConnectedComponent::top_left() const
+  Point ConnectedComponent::top_left() const
   {
     return this->top_left_tile;
   }
-  void ConnectedComponent::set_top_left(PointD top_left_tile)
+  void ConnectedComponent::set_top_left(Point top_left_tile)
   {
     this->top_left_tile=top_left_tile;
   }

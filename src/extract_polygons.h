@@ -12,8 +12,10 @@ namespace BWTA
                        ,std::vector<Polygon> &polygons);
 
   void flood_fill_with_component(const RectangleArray<bool> &read_map
-                                ,const PointD start
+                                ,const Point start
                                 ,ConnectedComponent* component
                                 ,int fill_type
                                 ,RectangleArray<ConnectedComponent*> &write_map);
+
+  void anchorToBorder(Polygon &polygon, int mapWidth, int mapHeight);
 }

@@ -62,10 +62,10 @@ namespace BWTA
       polygonDs[this]=PolygonD();
       for(unsigned int i=0;i<size();i++)
       {
-        polygonDs[this].push_back(PointD((*this)[i].x,(*this)[i].y));
+        polygonDs[this].push_back(Point((*this)[i].x,(*this)[i].y));
       }
     }
-    PointD query_pt(p.x,p.y);
+    Point query_pt(p.x,p.y);
     if (polygonDs[this].bounded_side(query_pt)==CGAL::ON_UNBOUNDED_SIDE)
       return false;
     for(std::vector<Polygon>::const_iterator i=holes.begin();i!=holes.end();i++)

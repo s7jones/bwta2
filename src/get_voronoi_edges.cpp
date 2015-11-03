@@ -4,10 +4,10 @@
 
 namespace BWTA
 {
-  bool inside_a_polygon(PointD pt, const std::vector<Polygon> &polygons)
+  bool inside_a_polygon(Point pt, const std::vector<Polygon> &polygons)
   {
     for(unsigned int p=0;p<polygons.size();p++)
-      if (polygons[p].isInside(BWAPI::Position(int(pt.x()),int(pt.y())))==CGAL::ON_BOUNDED_SIDE)
+		if (polygons[p].isInside(BWAPI::Position(int(CGAL::to_double(pt.x())), int(CGAL::to_double(pt.y())))) == CGAL::ON_BOUNDED_SIDE)
         return true;
     return false;
   }
@@ -39,10 +39,7 @@ namespace BWTA
 				if (is_real(s.vertex(0).x())!=0 && is_real(s.vertex(0).y())!=0
 					&& is_real(s.vertex(1).x())!=0 && is_real(s.vertex(1).y())!=0) 
 				{
-					PointD p1(cast_to_double(s.vertex(0).x()),cast_to_double(s.vertex(0).y()));
-					PointD p2(cast_to_double(s.vertex(1).x()),cast_to_double(s.vertex(1).y()));
-
-					if (inside_a_polygon(p1,polygons)==false && inside_a_polygon(p2,polygons)==false) {
+					if (inside_a_polygon(s.vertex(0), polygons) == false && inside_a_polygon(s.vertex(1), polygons) == false) {
 						bool added = false;
 						Point v0(s.vertex(0).x(),s.vertex(0).y());
 						Point v1(s.vertex(1).x(),s.vertex(1).y());
@@ -139,9 +136,7 @@ namespace BWTA
 					if (is_real(points[i].x())!=0 && is_real(points[i].y())!=0
 						&& is_real(points[j].x())!=0 && is_real(points[j].y())!=0)
 					{
-						PointD p1(cast_to_double(points[i].x()),cast_to_double(points[i].y()));
-						PointD p2(cast_to_double(points[j].x()),cast_to_double(points[j].y()));
-						if (inside_a_polygon(p1,polygons)==false && inside_a_polygon(p2,polygons)==false) {
+						if (inside_a_polygon(points[i], polygons) == false && inside_a_polygon(points[j], polygons) == false) {
 							voronoi_diagram_edges.push_back(Segment(points[i],points[j]));
 						}
 					}
@@ -149,8 +144,7 @@ namespace BWTA
 			}
 			for(unsigned int i=0;i<points.size();i++)  {
 				if (is_real(points[i].x())!=0 && is_real(points[i].y())!=0) {
-					PointD p1(cast_to_double(points[i].x()),cast_to_double(points[i].y()));
-					if (inside_a_polygon(p1,polygons)==false) {
+					if (inside_a_polygon(points[i], polygons) == false) {
 						Point nearest0;
 						Point nearest1;
 						if (v[0]->site().is_point()) {

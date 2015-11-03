@@ -49,16 +49,11 @@ namespace BWTA
   {
     return q+1>q;
   }
-  #ifdef USE_EXACT
   double get_distance(Point a, Point b)
   {
     return sqrt(cast_to_double((a.x()-b.x())*(a.x()-b.x())+(a.y()-b.y())*(a.y()-b.y())));
   }
-  #endif
-  double get_distance(PointD a, PointD b)
-  {
-    return sqrt((a.x()-b.x())*(a.x()-b.x())+(a.y()-b.y())*(a.y()-b.y()));
-  }
+
   int str2int(std::string str) {
     std::stringstream t(str);
     int x;
@@ -66,17 +61,8 @@ namespace BWTA
     return x;
   }
 
-  std::string int2str(int number) {
-    std::stringstream t;
-    t<<number;
-    std::string str=t.str();
-    return str;
-  }
-
   int max(int a, int b) {return (a>b) ? a : b;}
   int min(int a, int b) {return (a<b) ? a : b;}
-
-
 
   double distance_to_border(Polygon& polygon,int width, int height)
   {

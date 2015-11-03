@@ -16,15 +16,15 @@ namespace BWTA
                        ,const std::list<ConnectedComponent> &components
                        ,std::vector<Polygon> &polygons)
   {
-    PointD pos;
+    Point pos;
     std::vector<Polygon> walkable_polygons;
     for(std::list<ConnectedComponent>::const_iterator c=components.begin();c!=components.end();c++)
     {
       bool walkable=c->isWalkable();
       int nextx=1;
       int nexty=2;
-      int cx=(int)c->top_left().x();
-      int cy=(int)c->top_left().y();
+      int cx=(int)CGAL::to_double(c->top_left().x());
+	  int cy = (int)CGAL::to_double(c->top_left().y());
       bool adjcol[3][3];
       Polygon newpoly;
       newpoly.push_back(BWAPI::Position(cx,cy));
@@ -93,15 +93,16 @@ namespace BWTA
         }
       }
     }
-    for(size_t i=0;i<polygons.size();i++)
-    {
-      simplify(polygons[i],1.0);
-      for(std::vector<Polygon>::iterator h=polygons[i].holes.begin();h!=polygons[i].holes.end();h++)
-      {
-        simplify(*h,1.0);
-      }
-    }
-    //log("Simplified polygons.");
+
+	// Simplify polygons
+	for (auto& polygon : polygons) {
+		simplify(polygon, 1.0);
+		anchorToBorder(polygon, walkability.getWidth(), walkability.getHeight());
+		for (auto& hole : polygon.holes) {
+			simplify(hole, 1.0);
+			anchorToBorder(hole, walkability.getWidth(), walkability.getHeight());
+		}
+	}
   }
 
   void rotate_cw(int &x,int &y) {
@@ -217,6 +218,19 @@ namespace BWTA
     }
   }
 
+  // anchor vertices near borders of the map to the border
+  // used to fix errors from simplify polygon
+  void anchorToBorder(Polygon &polygon, int mapWidth, int mapHeight)
+  {
+	  const int ANCHOR_MARGIN = 2;
+	  for (auto& vertex : polygon) {
+		  if (vertex.x <= ANCHOR_MARGIN) vertex.x = 0;
+		  if (vertex.y <= ANCHOR_MARGIN) vertex.y = 0;
+		  if (vertex.x >= mapWidth - 1 - ANCHOR_MARGIN) vertex.x = mapWidth - 1;
+		  if (vertex.y >= mapHeight - 1 - ANCHOR_MARGIN) vertex.y = mapHeight - 1;
+	  }
+  }
+
   void find_connected_components(const RectangleArray<bool> &simplified_map
                                 ,RectangleArray<ConnectedComponent*> &get_component
                                 ,std::list<ConnectedComponent> &components)
@@ -224,11 +238,8 @@ namespace BWTA
     int currentID=1;
     components.clear();
     get_component.resize(simplified_map.getWidth(),simplified_map.getHeight());
-    for (unsigned int x = 0; x < simplified_map.getWidth(); x++) {
-      for (unsigned int y = 0; y < simplified_map.getHeight(); y++) {
-        get_component[x][y]=NULL;
-      }
-    }
+	get_component.setTo(NULL);
+
     for (unsigned int x = 0; x < simplified_map.getWidth(); x++) {
       for (unsigned int y = 0; y < simplified_map.getHeight(); y++) {
         if (get_component[x][y] == NULL) {
@@ -236,33 +247,33 @@ namespace BWTA
           ConnectedComponent *current_component=&(components.back());
           int fill_type=0;
           if (simplified_map[x][y]==false) fill_type=2;
-          current_component->set_top_left(PointD(x,y));
-          flood_fill_with_component(simplified_map,PointD(x,y),current_component,fill_type,get_component);
+          current_component->set_top_left(Point(x,y));
+          flood_fill_with_component(simplified_map,Point(x,y),current_component,fill_type,get_component);
         }
       }
     }
   }
 
   void flood_fill_with_component(const RectangleArray<bool> &read_map
-                                ,const PointD start
+                                ,const Point start
                                 ,ConnectedComponent* component
                                 ,int fill_type
                                 ,RectangleArray<ConnectedComponent*> &write_map)
   {
     if (component==NULL)
       return;
-    int fill_count=0;
-    std::list< PointD > q;
+	std::list<Point> q;
     q.push_back(start);
+	bool fill = false;
     while (!q.empty())
     {
-      PointD p=q.front();
+	  Point p = q.front();
       if (p.x()<component->top_left().x() || (p.x()==component->top_left().x() && p.y()<component->top_left().y()))
       {
         component->set_top_left(p);
       }
-      int x=(int)p.x();
-      int y=(int)p.y();
+	  int x = (int)CGAL::to_double(p.x());
+	  int y = (int)CGAL::to_double(p.y());
       q.pop_front();
       if (write_map[x][y]==NULL)
       {
@@ -275,33 +286,22 @@ namespace BWTA
         {
           for(int iy=min_y;iy<=max_y;iy++)
           {
-            int fill=0;
-            if (fill_type==0) {//4-directional movement
-              if (x==ix||y==iy) {
-                if (read_map[ix][iy]==component->isWalkable() && write_map[ix][iy]==NULL)
-                {
-                  fill=1;
-                }
-              }
-            } else if (fill_type==1) {//limited 8-directional movement
-              if (x==ix||y==iy || read_map[x][iy]==component->isWalkable()
-                               || read_map[ix][y]==component->isWalkable()) {
-                if (read_map[ix][iy]==component->isWalkable() && write_map[ix][iy]==NULL)
-                {
-                  fill=1;
-                }
-              }
-              
-            } else if (fill_type==2) {//full 8-directional movement
-              if (read_map[ix][iy]==component->isWalkable() && write_map[ix][iy]==NULL)
-              {
-                fill=1;
-              }
-            }
-            if (fill) {
-              fill_count++;
-              q.push_back(PointD(ix,iy));
-            }
+			  fill = false;
+			  if (fill_type == 0) { //4-directional movement
+				  if (x == ix || y == iy) {
+					  if (read_map[ix][iy] == component->isWalkable() && write_map[ix][iy] == NULL) fill = true;
+				  }
+			  } else if (fill_type == 1) { //limited 8-directional movement
+				  if (x == ix || y == iy || read_map[x][iy] == component->isWalkable()
+					  || read_map[ix][y] == component->isWalkable()) {
+					  if (read_map[ix][iy] == component->isWalkable() && write_map[ix][iy] == NULL) fill = true;
+				  }
+			  } else if (fill_type == 2) { //full 8-directional movement
+				  if (read_map[ix][iy] == component->isWalkable() && write_map[ix][iy] == NULL) fill = true;
+			  }
+			  if (fill) {
+				  q.push_back(Point(ix, iy));
+			  }
           }
         }
       }

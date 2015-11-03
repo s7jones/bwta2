@@ -6,24 +6,26 @@
 #include <BWTA/RectangleArray.h>
 #include <BWTA/BaseLocation.h>
 #include <BWTA/Polygon.h>
+
 #ifdef DEBUG_DRAW
-  #include <QtGui/QtGui>
-  #include <QtWidgets/QApplication>
-  #include <QtWidgets/QGraphicsScene>
+#include <QtGui/QtGui>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsScene>
 #endif
+
 #define BWTA_FILE_VERSION 6
 namespace BWTA
 {
-  #define USE_EXACT
-
 	// Choosing the proper kernel is important http://doc.cgal.org/latest/Kernel_23/index.html
 
-  typedef CGAL::Simple_cartesian< double >					CKD;
-  typedef CGAL::Filtered_kernel<CKD>						KernelD;
+//   typedef CGAL::Simple_cartesian< double >					CKD;
+//   typedef CGAL::Filtered_kernel<CKD>						KernelD;
 
   typedef CGAL::Lazy_exact_nt<CGAL::Gmpq >					NumberType;
-  typedef CGAL::Simple_cartesian< NumberType >				CK;
-  typedef CGAL::Filtered_kernel<CK>							Kernel;
+//   typedef CGAL::Simple_cartesian< NumberType >				CK;
+//   typedef CGAL::Filtered_kernel<CK>							Kernel;
+  typedef CGAL::Exact_predicates_exact_constructions_kernel CK;
+  typedef CGAL::Exact_predicates_exact_constructions_kernel Kernel;
   typedef CGAL::Segment_Delaunay_graph_traits_2<Kernel>		Gt; 
 
   typedef CGAL::Segment_Delaunay_graph_2<Gt> SDG2;
@@ -34,7 +36,6 @@ namespace BWTA
   typedef Gt::Segment_2	Segment_2_Gt;
   typedef CGAL::Parabola_segment_2<Gt> Parabola_segment_2_Gt;
 
-  typedef CGAL::Segment_Delaunay_graph_site_2< CK > SDGS2;
   typedef CGAL::Point_2<CK> Point;
   typedef CGAL::Polygon_2<CK> PolygonCK;
   typedef CGAL::Line_2<CK> Line;
@@ -44,14 +45,21 @@ namespace BWTA
   typedef CGAL::Point_set_2<Kernel> Point_set_2;
   typedef CGAL::Point_set_2<Kernel>::Vertex_handle  Vertex_handle;
 
-  typedef CGAL::Point_2<CKD> PointD;
-  typedef CGAL::Point_2<KernelD> PointKD;
-  typedef CGAL::Polygon_2<CKD> PolygonD;
-  typedef CGAL::Line_2<CKD> LineD;
-  typedef CGAL::Ray_2<CKD> RayD;
-  typedef CGAL::Segment_2<CKD> SegmentD;
-  typedef CGAL::Circle_2<CKD> CircleD;
-  typedef CGAL::Direction_2<CKD> DirectionD;
+//   typedef CGAL::Point_2<KernelD> PointKD;
+//   typedef CGAL::Polygon_2<CKD> PolygonD;
+//   typedef CGAL::Line_2<CKD> LineD;
+//   typedef CGAL::Ray_2<CKD> RayD;
+//   typedef CGAL::Segment_2<CKD> SegmentD;
+//   typedef CGAL::Circle_2<CKD> CircleD;
+//   typedef CGAL::Direction_2<CKD> DirectionD;
+
+  typedef CGAL::Point_2<Kernel> PointKD;
+  typedef CGAL::Polygon_2<CK> PolygonD;
+  typedef CGAL::Line_2<CK> LineD;
+  typedef CGAL::Ray_2<CK> RayD;
+  typedef CGAL::Segment_2<CK> SegmentD;
+  typedef CGAL::Circle_2<CK> CircleD;
+  typedef CGAL::Direction_2<CK> DirectionD;
 
   typedef CGAL::Arr_segment_traits_2<Kernel>                      Traits_2;
   typedef Traits_2::Point_2                                       Point_2;
@@ -86,7 +94,6 @@ namespace BWTA
 
   bool createDir(std::string& path);
   double get_distance(Point a, Point b);
-  double get_distance(PointD a, PointD b);
   double cast_to_double( double q);
   double cast_to_double( CGAL::MP_Float q);
   double cast_to_double( CGAL::Quotient<CGAL::MP_Float> q);
@@ -100,7 +107,6 @@ namespace BWTA
   void loadMapFromBWAPI();
   void loadMap();
   int str2int(std::string str);
-  std::string int2str(int number);
   int max(int a, int b);
   int min(int a, int b);
   //void writeFile(const char* filename, const char* text, ...);
