@@ -62,7 +62,7 @@ namespace BWTA
 		unsigned char *CHKdata = NULL;
 
 		// Open an archive
-		if (!SFileOpenArchive(archive, 0, 0, &hMpq)) {
+		if (!SFileOpenArchive(archive, 0, SFILE_OPEN_FROM_MPQ, &hMpq)) {
 			printError(archive, "Cannot open archive", archive, GetLastError());
 			return NULL;
 		}
@@ -80,7 +80,7 @@ namespace BWTA
 		}
 
 		if (chkFilefound) {
-			// std::cout << "CHK file found: " << SFileFindData.cFileName << ", size: " << SFileFindData.dwFileSize << "\n";
+// 			 std::cout << "CHK file found: " << SFileFindData.cFileName << ", size: " << SFileFindData.dwFileSize << "\n";
 
 			// Closing previous file handle
 			if (hFileFind != (HANDLE)0xFFFFFFFF)

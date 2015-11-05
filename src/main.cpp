@@ -1,4 +1,5 @@
 #include <windows.h>
+#include <StormLib.h>
 
 #include "MapData.h"
 #include "util/sha1.h"
@@ -34,14 +35,31 @@ int main (int argc, char * argv[])
 	std::cout << "Successfully extracted the CHK file (size " << dataSize << ")" << std::endl;
 	//BWTA::printCHKchunks(CHKdata, dataSize);
 
-	// Calculate hash
+	// Calculate hash from MPQ (not only the CHK)
+	// ==========================================
 	unsigned char hash[20];
-	char hexstring[42];
-	sha1::calc(CHKdata, dataSize, hash);
+	char hexstring[sizeof(hash) * 2 + 1];
+	HANDLE hFile = nullptr;
+
+	// Open file
+	SFileOpenFileEx(nullptr, argv[1], SFILE_OPEN_LOCAL_FILE, &hFile);
+	size_t fileSize = SFileGetFileSize(hFile, nullptr);
+	std::vector<char> data(fileSize);
+	
+	// Read file
+	DWORD read = 0;
+	SFileReadFile(hFile, data.data(), fileSize, &read, 0);
+	
+	// Calculate hash
+	sha1::calc(data.data(), fileSize, hash);
 	sha1::toHexString(hash, hexstring);
+
+	// Save and close
 	BWTA::MapData::hash = std::string(hexstring);
+	SFileCloseFile(hFile);
 
 	// Load map dimensions
+	// ====================
 	unsigned int width = 0, height = 0;
 	BWTA::getDimensions(CHKdata, dataSize, &width, &height);
 	std::cout << "Map is " << width << "x" << height << "\n";
@@ -99,11 +117,9 @@ int main (int argc, char * argv[])
 	BWTA::analyze();
 	std::cout << "DONE" << std::endl;
 
-	BWTA::cleanMemory();
-	return 0;
 
 	// Generate the grids around all chokepoints:
-	std::ofstream fileTxt("logs/output.txt"); 
+/*	std::ofstream fileTxt("logs/output.txt"); 
 	const std::set<BWTA::Chokepoint*> chokePoints = BWTA::getChokepoints();
 	for(std::set<BWTA::Chokepoint*>::const_iterator c = chokePoints.begin(); c!=chokePoints.end();++c) {
 		BWTA::Chokepoint *cp = (*c);
@@ -133,6 +149,7 @@ int main (int argc, char * argv[])
 		}
 	}
 	fileTxt.close();
+*/
 
 	BWTA::cleanMemory();
 	return 0;
