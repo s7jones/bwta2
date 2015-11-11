@@ -17,6 +17,10 @@
       <Configuration>Release-Log</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseOffline|Win32">
+      <Configuration>ReleaseOffline</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
@@ -31,6 +35,12 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Exe|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseOffline|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
     <PlatformToolset>v120</PlatformToolset>
@@ -64,6 +74,9 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release-Exe|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseOffline|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Exe|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -86,14 +99,19 @@
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release-Log|Win32'">$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release-Log|Win32'">$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release-Exe|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='ReleaseOffline|Win32'">$(Configuration)\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug-Exe|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release-Exe|Win32'">$(Configuration)\</IntDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug-Exe|Win32'">$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='ReleaseOffline|Win32'">$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug-Exe|Win32'">$(Configuration)-old\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release-Log|Win32'">BWTA-log</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">BWTA</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetName>BWTAd</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseOffline|Win32'">
+    <TargetName>BWTAOffline</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -134,7 +152,7 @@
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <AdditionalIncludeDirectories>../externalInclude;../include;$(BWAPI_DIR)/include;$(CGAL_DIR)/include;$(BOOST_INCLUDEDIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NOMINMAX;WIN32;NDEBUG;_CONSOLE;_SECURE_SCL 0</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;WIN32;NDEBUG;_CONSOLE;_SECURE_SC=0</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -170,7 +188,7 @@
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <AdditionalIncludeDirectories>../externalInclude;../include;$(BWAPI_DIR)/include;$(CGAL_DIR)/include;$(BOOST_INCLUDEDIR);$(QTDIR)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NOMINMAX;WIN32;NDEBUG;_CONSOLE;_SECURE_SCL 0;DEBUG_DRAW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;WIN32;NDEBUG;_CONSOLE;_SECURE_SCL=0;DEBUG_DRAW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -231,6 +249,40 @@
       </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseOffline|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>../externalInclude;../include;$(BWAPI_DIR)/include;$(CGAL_DIR)/include;$(BOOST_INCLUDEDIR);$(QTDIR)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NOMINMAX;WIN32;NDEBUG;_CONSOLE;OFFLINE;DEBUG_DRAW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ForcedIncludeFiles>stdafx.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <AdditionalOptions>-Zm141 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>libboost_thread-vc120-mt-1_56.lib;libboost_system-vc120-mt-1_56.lib;libCGAL-vc120-mt-4.4.lib;libgmp-10.lib;libmpfr-4.lib;BWAPI.lib;StormLibRAD.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../lib/;$(BWAPI_DIR)/lib;</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <IgnoreAllDefaultLibraries>
+      </IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <PostBuildEvent>
+      <Command>COPY /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)lib\$(TargetName)$(TargetExt)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Exe|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
@@ -273,102 +325,63 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BaseLocationImpl.cpp" />
-    <ClCompile Include="BWTA.cpp" />
-    <ClCompile Include="BWTA_Result.cpp" />
-    <ClCompile Include="calculate_connectivity.cpp" />
-    <ClCompile Include="ChokepointImpl.cpp" />
-    <ClCompile Include="ConnectedComponent.cpp" />
-    <ClCompile Include="extract_polygons.cpp" />
-    <ClCompile Include="find_base_locations.cpp" />
-    <ClCompile Include="get_voronoi_edges.cpp" />
-    <ClCompile Include="Graph.cpp" />
-    <ClCompile Include="load_data.cpp" />
-    <ClCompile Include="main.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Log|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="MapData.cpp" />
-    <ClCompile Include="Node.cpp" />
-    <ClCompile Include="offline\MapFileParser.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Log|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Exe|Win32'">false</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Polygon.cpp" />
-    <ClCompile Include="RegionImpl.cpp" />
-    <ClCompile Include="terrain_analysis.cpp" />
-    <ClCompile Include="util.cpp" />
-    <ClCompile Include="util\sha1.cpp" />
-    <ClCompile Include="VertexData.cpp" />
-    <ClCompile Include="stdafx.cpp">
+    <ClCompile Include="Source\BaseLocationImpl.cpp" />
+    <ClCompile Include="Source\BWTA.cpp" />
+    <ClCompile Include="Source\BWTA_Result.cpp" />
+    <ClCompile Include="Source\calculate_connectivity.cpp" />
+    <ClCompile Include="Source\ChokepointImpl.cpp" />
+    <ClCompile Include="Source\ConnectedComponent.cpp" />
+    <ClCompile Include="Source\extract_polygons.cpp" />
+    <ClCompile Include="Source\find_base_locations.cpp" />
+    <ClCompile Include="Source\get_voronoi_edges.cpp" />
+    <ClCompile Include="Source\Graph.cpp" />
+    <ClCompile Include="Source\load_data.cpp" />
+    <ClCompile Include="Source\MapData.cpp" />
+    <ClCompile Include="Source\Node.cpp" />
+    <ClCompile Include="Source\Polygon.cpp" />
+    <ClCompile Include="Source\RegionImpl.cpp" />
+    <ClCompile Include="Source\terrain_analysis.cpp" />
+    <ClCompile Include="Source\util.cpp" />
+    <ClCompile Include="Source\VertexData.cpp" />
+    <ClCompile Include="Source\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release-Exe|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseOffline|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug-Exe|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release-Log|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="BalanceMetrics.cpp" />
-    <ClCompile Include="DistanceTransform.cpp" />
-    <ClCompile Include="pathfinding.cpp" />
-    <ClCompile Include="offline\TileSet.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Log|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Exe|Win32'">false</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="offline\wallingAnalysis.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Log|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Exe|Win32'">false</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="Source\BalanceMetrics.cpp" />
+    <ClCompile Include="Source\DistanceTransform.cpp" />
+    <ClCompile Include="Source\pathfinding.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BaseLocationImpl.h" />
-    <ClInclude Include="BWTA_Result.h" />
-    <ClInclude Include="ChokepointImpl.h" />
-    <ClInclude Include="Color.h" />
-    <ClInclude Include="ConnectedComponent.h" />
-    <ClInclude Include="extract_polygons.h" />
-    <ClInclude Include="find_base_locations.h" />
-    <ClInclude Include="functions.h" />
-    <ClInclude Include="Globals.h" />
-    <ClInclude Include="Graph.h" />
-    <ClInclude Include="MapData.h" />
-    <ClInclude Include="Node.h" />
-    <ClInclude Include="offline\MapFileParser.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Log|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Exe|Win32'">false</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="RegionImpl.h" />
-    <ClInclude Include="terrain_analysis.h" />
-    <ClInclude Include="util\sha1.h" />
-    <ClInclude Include="VertexData.h" />
+    <ClInclude Include="Source\BaseLocationImpl.h" />
+    <ClInclude Include="Source\BWTA_Result.h" />
+    <ClInclude Include="Source\ChokepointImpl.h" />
+    <ClInclude Include="Source\Color.h" />
+    <ClInclude Include="Source\ConnectedComponent.h" />
+    <ClInclude Include="Source\extract_polygons.h" />
+    <ClInclude Include="Source\find_base_locations.h" />
+    <ClInclude Include="Source\functions.h" />
+    <ClInclude Include="Source\Globals.h" />
+    <ClInclude Include="Source\Graph.h" />
+    <ClInclude Include="Source\MapData.h" />
+    <ClInclude Include="Source\Node.h" />
+    <ClInclude Include="Source\RegionImpl.h" />
+    <ClInclude Include="Source\terrain_analysis.h" />
+    <ClInclude Include="Source\VertexData.h" />
     <ClInclude Include="..\include\BWTA\BaseLocation.h" />
     <ClInclude Include="..\include\BWTA.h" />
     <ClInclude Include="..\include\BWTA\Chokepoint.h" />
     <ClInclude Include="..\include\BWTA\Polygon.h" />
     <ClInclude Include="..\include\BWTA\RectangleArray.h" />
     <ClInclude Include="..\include\BWTA\Region.h" />
-    <ClInclude Include="Heap.h" />
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="BalanceMetrics.h" />
-    <ClInclude Include="DistanceTransform.h" />
-    <ClInclude Include="offline\MiniTileFlags.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Log|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Exe|Win32'">false</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="offline\TileSet.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Log|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Exe|Win32'">false</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="offline\TileType.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Log|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Exe|Win32'">false</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="offline\wallingAnalysis.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Log|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Exe|Win32'">false</ExcludedFromBuild>
-    </ClInclude>
+    <ClInclude Include="Source\Heap.h" />
+    <ClInclude Include="Source\stdafx.h" />
+    <ClInclude Include="Source\BalanceMetrics.h" />
+    <ClInclude Include="Source\DistanceTransform.h" />
+    <ClInclude Include="Source\TileType.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

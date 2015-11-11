@@ -21,137 +21,119 @@
     <Filter Include="Pathfinding">
       <UniqueIdentifier>{a342873c-5ba3-4b2f-924b-f0e66e0c3f90}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Offline">
-      <UniqueIdentifier>{884c48ec-1bb2-4a5b-b8b3-66fa66c477fa}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BaseLocationImpl.cpp">
+    <ClCompile Include="Source\BaseLocationImpl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BWTA.cpp">
+    <ClCompile Include="Source\BWTA.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BWTA_Result.cpp">
+    <ClCompile Include="Source\BWTA_Result.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="calculate_connectivity.cpp">
+    <ClCompile Include="Source\calculate_connectivity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ChokepointImpl.cpp">
+    <ClCompile Include="Source\ChokepointImpl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ConnectedComponent.cpp">
+    <ClCompile Include="Source\ConnectedComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="extract_polygons.cpp">
+    <ClCompile Include="Source\extract_polygons.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="find_base_locations.cpp">
+    <ClCompile Include="Source\find_base_locations.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="get_voronoi_edges.cpp">
+    <ClCompile Include="Source\get_voronoi_edges.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Graph.cpp">
+    <ClCompile Include="Source\Graph.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="load_data.cpp">
+    <ClCompile Include="Source\load_data.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="Source\MapData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MapData.cpp">
+    <ClCompile Include="Source\Node.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Node.cpp">
+    <ClCompile Include="Source\Polygon.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Polygon.cpp">
+    <ClCompile Include="Source\RegionImpl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RegionImpl.cpp">
+    <ClCompile Include="Source\terrain_analysis.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="terrain_analysis.cpp">
+    <ClCompile Include="Source\util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="util.cpp">
+    <ClCompile Include="Source\VertexData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VertexData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="stdafx.cpp">
+    <ClCompile Include="Source\stdafx.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="BalanceMetrics.cpp">
+    <ClCompile Include="Source\BalanceMetrics.cpp">
       <Filter>Balance</Filter>
     </ClCompile>
-    <ClCompile Include="DistanceTransform.cpp">
+    <ClCompile Include="Source\DistanceTransform.cpp">
       <Filter>Balance</Filter>
     </ClCompile>
-    <ClCompile Include="pathfinding.cpp">
+    <ClCompile Include="Source\pathfinding.cpp">
       <Filter>Pathfinding</Filter>
     </ClCompile>
-    <ClCompile Include="offline\TileSet.cpp">
-      <Filter>Offline</Filter>
-    </ClCompile>
-    <ClCompile Include="offline\wallingAnalysis.cpp">
-      <Filter>Offline</Filter>
-    </ClCompile>
-    <ClCompile Include="offline\MapFileParser.cpp">
-      <Filter>Offline</Filter>
-    </ClCompile>
-    <ClCompile Include="util\sha1.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BaseLocationImpl.h">
+    <ClInclude Include="Source\BaseLocationImpl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BWTA_Result.h">
+    <ClInclude Include="Source\BWTA_Result.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ChokepointImpl.h">
+    <ClInclude Include="Source\ChokepointImpl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Color.h">
+    <ClInclude Include="Source\Color.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ConnectedComponent.h">
+    <ClInclude Include="Source\ConnectedComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="extract_polygons.h">
+    <ClInclude Include="Source\extract_polygons.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="find_base_locations.h">
+    <ClInclude Include="Source\find_base_locations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="functions.h">
+    <ClInclude Include="Source\functions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Globals.h">
+    <ClInclude Include="Source\Globals.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Graph.h">
+    <ClInclude Include="Source\Graph.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MapData.h">
+    <ClInclude Include="Source\MapData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Node.h">
+    <ClInclude Include="Source\Node.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RegionImpl.h">
+    <ClInclude Include="Source\RegionImpl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="terrain_analysis.h">
+    <ClInclude Include="Source\terrain_analysis.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VertexData.h">
+    <ClInclude Include="Source\VertexData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\BWTA\BaseLocation.h">
@@ -172,35 +154,20 @@
     <ClInclude Include="..\include\BWTA\Region.h">
       <Filter>Interface</Filter>
     </ClInclude>
-    <ClInclude Include="Heap.h">
+    <ClInclude Include="Source\Heap.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="stdafx.h">
+    <ClInclude Include="Source\stdafx.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="BalanceMetrics.h">
+    <ClInclude Include="Source\BalanceMetrics.h">
       <Filter>Balance</Filter>
     </ClInclude>
-    <ClInclude Include="DistanceTransform.h">
+    <ClInclude Include="Source\DistanceTransform.h">
       <Filter>Balance</Filter>
     </ClInclude>
-    <ClInclude Include="offline\MiniTileFlags.h">
-      <Filter>Offline</Filter>
-    </ClInclude>
-    <ClInclude Include="offline\TileSet.h">
-      <Filter>Offline</Filter>
-    </ClInclude>
-    <ClInclude Include="offline\TileType.h">
-      <Filter>Offline</Filter>
-    </ClInclude>
-    <ClInclude Include="offline\wallingAnalysis.h">
-      <Filter>Offline</Filter>
-    </ClInclude>
-    <ClInclude Include="offline\MapFileParser.h">
-      <Filter>Offline</Filter>
-    </ClInclude>
-    <ClInclude Include="util\sha1.h">
-      <Filter>Utils</Filter>
+    <ClInclude Include="Source\TileType.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

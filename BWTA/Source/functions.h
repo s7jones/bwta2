@@ -1,7 +1,5 @@
 #pragma once
 
-#include <boost/filesystem.hpp>
-
 #include "VertexData.h"
 #include <BWTA/RectangleArray.h>
 #include <BWTA/BaseLocation.h>

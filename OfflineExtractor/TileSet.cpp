@@ -1,6 +1,7 @@
+#include "..\BWTA\Source\MapData.h"
+#include "..\BWTA\Source\TileType.h"
 #include "TileSet.h"
-#include "TileType.h"
-#include "../MapData.h"
+
 
 TileType* TileSet::getTileType(TileID tileID)
 {

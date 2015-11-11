@@ -1,25 +1,24 @@
-#include "../stdafx.h"
 #include "MapFileParser.h"
 
 namespace BWTA
 {
 
-	void printError(const char * archive, const char * message, const char * file, int errnum) {
-		char * error = NULL;
+	void printError(const char* archive, const char* message, const char* file, int errnum) {
+		char* error = NULL;
 		char cCurrentPath[FILENAME_MAX];
 		_getcwd(cCurrentPath, sizeof(cCurrentPath));
 
 		switch (errnum) {
 		case 105:
-			error = (char *)"Bad format"; break;
+			error = (char*)"Bad format"; break;
 		case 106:
-			error = (char *)"No more files"; break;
+			error = (char*)"No more files"; break;
 		case 107:
-			error = (char *)"Handle EOF"; break;
+			error = (char*)"Handle EOF"; break;
 		case 108:
-			error = (char *)"Cannot compile"; break;
+			error = (char*)"Cannot compile"; break;
 		case 109:
-			error = (char *)"File corrupted"; break;
+			error = (char*)"File corrupted"; break;
 		default:
 			char msg[128];
 			strerror_s(msg, sizeof(msg), errnum);
@@ -32,13 +31,13 @@ namespace BWTA
 	/*
 	Check whether the string 'fullString' ends with the string 'ending'
 	*/
-	bool hasEnding(const char *fullString, const char *ending)
+	bool hasEnding(const char* fullString, const char* ending)
 	{
-		int l1 = strlen(fullString);
-		int l2 = strlen(ending);
+		size_t l1 = strlen(fullString);
+		size_t l2 = strlen(ending);
 		if (l1 >= l2) {
 			int start = l1 - l2;
-			for (int idx = 0; idx<l2; idx++) {
+			for (size_t idx = 0; idx<l2; idx++) {
 				if (fullString[start + idx] != ending[idx]) return false;
 			}
 			return true;
@@ -53,13 +52,13 @@ namespace BWTA
 	- a pointer to the data in the .chk file
 	- the size of the .chk file (in 'dataSize')
 	*/
-	unsigned char *extractCHKfile(const char *archive, DWORD *dataSize)
+	unsigned char* extractCHKfile(const char* archive, DWORD* dataSize)
 	{
-		HANDLE hMpq = NULL;          // Open archive handle
-		HANDLE hFileFind = NULL;          // Archived file handle
-		SFILE_FIND_DATA SFileFindData;     // Data of the archived file
-		bool chkFilefound = false;		   // Whether the chk file was found in the archive
-		unsigned char *CHKdata = NULL;
+		HANDLE hMpq = NULL;            // Open archive handle
+		HANDLE hFileFind = NULL;       // Archived file handle
+		SFILE_FIND_DATA SFileFindData; // Data of the archived file
+		bool chkFilefound = false;     // Whether the chk file was found in the archive
+		unsigned char* CHKdata = NULL;
 
 		// Open an archive
 		if (!SFileOpenArchive(archive, 0, SFILE_OPEN_FROM_MPQ, &hMpq)) {
@@ -113,7 +112,7 @@ namespace BWTA
 	/*
 	Decodes a 4 byte integer from a string of characters
 	*/
-	unsigned long decode4ByteUnsigned(unsigned char *ptr) {
+	unsigned long decode4ByteUnsigned(unsigned char* ptr) {
 		unsigned long ul = 0;
 		ul += ((unsigned long)ptr[0]) << 0;
 		ul += ((unsigned long)ptr[1]) << 8;
@@ -126,7 +125,7 @@ namespace BWTA
 	/*
 	Decodes a 2 byte integer from a string of characters
 	*/
-	unsigned int decode2ByteUnsigned(unsigned char *ptr) {
+	unsigned int decode2ByteUnsigned(unsigned char* ptr) {
 		unsigned int ui = 0;
 		ui += ((unsigned int)ptr[0]) << 0;
 		ui += ((unsigned int)ptr[1]) << 8;
@@ -162,7 +161,7 @@ namespace BWTA
 	/*
 	Finds a given chunk inside CHK data and returns a pointer to it, and its length (in 'desiredChunkLength')
 	*/
-	unsigned char *getChunkPointer(unsigned char *desiredChunk, unsigned char *CHKdata, DWORD size, DWORD *desiredChunkLength) {
+	unsigned char* getChunkPointer(unsigned char* desiredChunk, unsigned char* CHKdata, DWORD size, DWORD* desiredChunkLength) {
 		DWORD position = 0;
 
 		while (position<size) {
@@ -188,13 +187,13 @@ namespace BWTA
 	/*
 	This function gets the dimensions of a StarCraft map from the CHKdata, and returns them in 'width', and 'height'
 	*/
-	void getDimensions(unsigned char *CHKdata, DWORD size, unsigned int *width, unsigned int *height) {
+	void getDimensions(unsigned char* CHKdata, DWORD size, unsigned int& width, unsigned int& height) {
 		DWORD chunkSize = 0;
-		unsigned char *DIMdata = getChunkPointer((unsigned char *)"DIM ", CHKdata, size, &chunkSize);
+		unsigned char* DIMdata = getChunkPointer((unsigned char*)"DIM ", CHKdata, size, &chunkSize);
 
 		if (DIMdata != NULL) {
-			*width = decode2ByteUnsigned(DIMdata);
-			*height = decode2ByteUnsigned(DIMdata + 2);
+			width = decode2ByteUnsigned(DIMdata);
+			height = decode2ByteUnsigned(DIMdata + 2);
 		}
 	}
 
@@ -203,9 +202,9 @@ namespace BWTA
 	This function will decode the unit information from a CHK map, and return a list of all the units with their
 	types, players and coordinates.
 	*/
-	void getUnits(unsigned char *CHKdata, DWORD size) {
+	void getUnits(unsigned char* CHKdata, DWORD size) {
 		DWORD chunkSize = 0;
-		unsigned char *UNITdata = getChunkPointer((unsigned char *)"UNIT", CHKdata, size, &chunkSize);
+		unsigned char* UNITdata = getChunkPointer((unsigned char*)"UNIT", CHKdata, size, &chunkSize);
 
 		if (UNITdata != NULL) {
 			int bytesPerUnit = 36;
@@ -253,9 +252,9 @@ namespace BWTA
 	This function decode the doodads information from a CHK map, 
 	and store the neutral buildings positions in BWTA::MapData::staticNeutralBuildings
 	*/
-	void getDoodads(unsigned char *CHKdata, DWORD size) {
+	void getDoodads(unsigned char* CHKdata, DWORD size) {
 		DWORD chunkSize = 0;
-		unsigned char *UNITdata = getChunkPointer((unsigned char *)"THG2", CHKdata, size, &chunkSize);
+		unsigned char* UNITdata = getChunkPointer((unsigned char*)"THG2", CHKdata, size, &chunkSize);
 
 		if (UNITdata != NULL) {
 			int bytesPerUnit = 8;
@@ -292,9 +291,9 @@ namespace BWTA
 	/*
 	This function returns the tilset ID of a StarCraft map from the CHKdata
 	*/
-	unsigned int getTileset(unsigned char *CHKdata, DWORD size) {
+	unsigned int getTileset(unsigned char* CHKdata, DWORD size) {
 		DWORD chunkSize = 0;
-		unsigned char *ERAdata = getChunkPointer((unsigned char *)"ERA ", CHKdata, size, &chunkSize);
+		unsigned char* ERAdata = getChunkPointer((unsigned char*)"ERA ", CHKdata, size, &chunkSize);
 
 		if (ERAdata != NULL) {
 			// StarCraft masks the tileset indicator's bit value, 
@@ -312,8 +311,8 @@ namespace BWTA
 	/*
 	Finds a given chunk inside CHK data and returns a pointer to it, and its length (in 'desiredChunkLength')
 	*/
-	unsigned char *getFileBuffer(const char *filename) {
-		unsigned char *buffer = NULL;
+	unsigned char* getFileBuffer(const char* filename) {
+		unsigned char* buffer = NULL;
 		std::ifstream file(filename, std::ios::in | std::ios::binary);
 		if (file.is_open()) {
 			file.seekg(0, std::ios::end);
@@ -321,7 +320,7 @@ namespace BWTA
 			file.seekg(0, std::ios::beg);
 
 			buffer = new unsigned char[static_cast<unsigned int>(size)];
-			if (!file.read((char *)buffer, size)) {
+			if (!file.read((char*)buffer, size)) {
 				printError(filename, "Error reading file", filename, GetLastError());
 			}
 			file.close();
@@ -396,7 +395,104 @@ namespace BWTA
 		}
 	}
 
+	bool parseMapFile(const char* mapFilePath)
+	{
+		// check if logs folder exists
+		if (!boost::filesystem::exists("logs")) {
+			boost::filesystem::path dir("logs");
+			boost::filesystem::create_directories(dir);
+		}
+
+		// Save map name
+		std::string strName = mapFilePath;
+		unsigned found = strName.find_last_of("/\\");
+		BWTA::MapData::mapFileName = strName.substr(found + 1);
+		std::cout << "START PARSING FILE " << BWTA::MapData::mapFileName << std::endl;
+
+		DWORD dataSize = 0;
+		unsigned char* CHKdata = BWTA::extractCHKfile(mapFilePath, &dataSize);
+		if (CHKdata == NULL) return 0;
+
+		std::cout << "Successfully extracted the CHK file (size " << dataSize << ")" << std::endl;
+		//BWTA::printCHKchunks(CHKdata, dataSize);
+
+		// Calculate hash from MPQ (not only the CHK)
+		// ==========================================
+		unsigned char hash[20];
+		char hexstring[sizeof(hash) * 2 + 1];
+		HANDLE hFile = nullptr;
+
+		// Open file
+		SFileOpenFileEx(nullptr, mapFilePath, SFILE_OPEN_LOCAL_FILE, &hFile);
+		size_t fileSize = SFileGetFileSize(hFile, nullptr);
+		std::vector<char> data(fileSize);
+
+		// Read file
+		DWORD read = 0;
+		SFileReadFile(hFile, data.data(), fileSize, &read, 0);
+
+		// Calculate hash
+		sha1::calc(data.data(), fileSize, hash);
+		sha1::toHexString(hash, hexstring);
+
+		// Save and close
+		BWTA::MapData::hash = std::string(hexstring);
+		SFileCloseFile(hFile);
+
+		// Load map dimensions
+		// ====================
+		unsigned int width = 0, height = 0;
+		BWTA::getDimensions(CHKdata, dataSize, width, height);
+		std::cout << "Map is " << width << "x" << height << "\n";
+		BWTA::MapData::mapWidth = width;
+		BWTA::MapData::mapHeight = height;
+
+		// Load neutral units (minerals, gas, and starting locations)
+		BWTA::getUnits(CHKdata, dataSize);
+
+		// Some doodads (buildings) are not walkable
+		BWTA::getDoodads(CHKdata, dataSize);
+
+		// Get map tileset ID
+		unsigned int tileset = BWTA::getTileset(CHKdata, dataSize);
+		if (tileset > 7) {
+			std::cout << "Tileset Unknown (" << tileset << ")\n";
+			return 0;
+		}
+		std::cout << "Map's tilset: " << BWTA::tileSetName[tileset] << "\n";
+
+		// Load TileSet file (tileSetName[tileset].cv5) into BWTA::MapData::TileSet
+		std::string cv5FileName = "tileset/" + BWTA::tileSetName[tileset] + ".cv5";
+		BWTA::MapData::TileSet = (TileType*)BWTA::getFileBuffer(cv5FileName.c_str());
 
 
+		// Load MiniTileFlags file (tileSetName[tileset].vf4) into BWTA::MapData::MiniTileFlags
+		std::string vf4FileName = "tileset/" + BWTA::tileSetName[tileset] + ".vf4";
+		BWTA::MapData::MiniTileFlags = (BWTA::MapData::MiniTileMaps_type*)BWTA::getFileBuffer(vf4FileName.c_str());
+
+
+		// Load Map Tiles
+		DWORD chunkSize = 0;
+		BWTA::MapData::TileArray = (TileID*)BWTA::getChunkPointer((unsigned char *)"MTXM", CHKdata, dataSize, &chunkSize);
+
+
+		// Set walkability
+		BWTA::MapData::rawWalkability.resize(BWTA::MapData::mapWidth * 4, BWTA::MapData::mapHeight * 4);
+		BWTA::setOfflineWalkability(BWTA::MapData::rawWalkability);
+		// Test walkability data
+		BWTA::MapData::rawWalkability.saveToFile("logs/walkable.txt");
+
+
+		// Set buildability
+		BWTA::MapData::buildability.resize(BWTA::MapData::mapWidth, BWTA::MapData::mapHeight);
+		BWTA::setOfflineBuildability(BWTA::MapData::buildability);
+		// Test buildability data
+		BWTA::MapData::buildability.saveToFile("logs/buildable.txt");
+
+
+		delete CHKdata;
+		std::cout << "END PARSING FILE" << std::endl;
+		return 1;
+	}
 
 }

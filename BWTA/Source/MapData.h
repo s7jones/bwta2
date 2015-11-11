@@ -1,7 +1,7 @@
 #pragma once
 
 #include <BWTA.h>
-#include "offline/TileType.h"
+#include "TileType.h"
 
 namespace BWTA
 {

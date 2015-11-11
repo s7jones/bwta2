@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="OfflineExtractor.cpp" />
+    <ClCompile Include="MapFileParser.cpp">
+      <Filter>Offline</Filter>
+    </ClCompile>
+    <ClCompile Include="TileSet.cpp">
+      <Filter>Offline</Filter>
+    </ClCompile>
+    <ClCompile Include="sha1.cpp">
+      <Filter>Offline</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Offline">
+      <UniqueIdentifier>{bccb24db-27d6-47ed-97e3-def48edef5cf}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MapFileParser.h">
+      <Filter>Offline</Filter>
+    </ClInclude>
+    <ClInclude Include="MiniTileFlags.h">
+      <Filter>Offline</Filter>
+    </ClInclude>
+    <ClInclude Include="TileSet.h">
+      <Filter>Offline</Filter>
+    </ClInclude>
+    <ClInclude Include="sha1.h">
+      <Filter>Offline</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h" />
+  </ItemGroup>
+</Project>

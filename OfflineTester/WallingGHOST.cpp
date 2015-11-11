@@ -1,32 +1,66 @@
-#include <stack>
+#include "WallingGHOST.h"
 
-#include "../MapData.h"
+
+void wallingGHOST()
+{
+	// Generate the grids around all chokepoints:
+	std::ofstream fileTxt("logs/output.txt");
+	const std::set<BWTA::Chokepoint*> chokePoints = BWTA::getChokepoints();
+	for (std::set<BWTA::Chokepoint*>::const_iterator c = chokePoints.begin(); c != chokePoints.end(); ++c) {
+		BWTA::Chokepoint *cp = (*c);
+		BWTA::RectangleArray<int> chokeGrid = BWTA::getChokeGrid(cp);
+		// Print grid
+		BWAPI::TilePosition center = BWAPI::TilePosition(cp->getCenter());
+		int radius = int(cp->getWidth() / TILE_SIZE);
+		BWAPI::TilePosition region1 = BWAPI::TilePosition(cp->getRegions().first->getCenter());
+		BWAPI::TilePosition region2 = BWAPI::TilePosition(cp->getRegions().second->getCenter());
+		fileTxt << "Chokepoint:\n";
+		fileTxt << "Region 1: " << radius + region1.x - center.x << "," << radius + region1.y - center.y << std::endl;
+		fileTxt << "Region 2: " << radius + region2.x - center.x << "," << radius + region2.y - center.y << std::endl;
+		BWAPI::TilePosition side1 = BWAPI::TilePosition(cp->getSides().first);
+		BWAPI::TilePosition side2 = BWAPI::TilePosition(cp->getSides().second);
+		int s1x = radius + side1.x - center.x;
+		int s1y = radius + side1.y - center.y;
+// 		fileTxt << "Side 1: " << s1x << "," << s1y << " is " << chokeGrid[s1x][s1y] << std::endl;
+		int s2x = radius + side2.x - center.x;
+		int s2y = radius + side2.y - center.y;
+// 		fileTxt << "Side 2: " << s2x << "," << s2y << " is " << chokeGrid[s2x][s2y] << std::endl;
+		BWTA::generateWallStartingPoints(chokeGrid, s1x, s1y, s2x, s2y, &fileTxt);
+		for (unsigned int y = 0; y < chokeGrid.getHeight(); ++y) {
+			for (unsigned int x = 0; x < chokeGrid.getWidth(); ++x) {
+				fileTxt << chokeGrid[x][y];
+			}
+			fileTxt << std::endl;
+		}
+	}
+	fileTxt.close();
+}
+
 
 namespace BWTA
 {
-
 	/*
 	Given a center and a offset, it returns the buildability grid around the center
 	*/
 	RectangleArray<int> getChokeGrid(BWAPI::TilePosition center, int offset)
 	{
-		BWTA::RectangleArray<int> grid;
+		RectangleArray<int> grid;
 		unsigned int gridSize = (offset * 2) + 1;
 		int BUILD_TO_WALK_TILE = 4;
 		grid.resize(gridSize, gridSize);
-		//  std::cout << BWTA::MapData::walkability.getWidth() << "," << BWTA::MapData::buildability.getWidth() << std::endl;
+// 		std::cout << BWTA::MapData::walkability.getWidth() << "," << BWTA::MapData::buildability.getWidth() << std::endl;
 		//TODO we don't check offset out of range!!
 		for (unsigned int y = 0; y < gridSize; ++y) {
 			unsigned int ay = center.y - offset + y;
 			for (unsigned int x = 0; x < gridSize; ++x) {
 				unsigned int ax = center.x - offset + x;
 				if (ax >= 0 && ay >= 0 &&
-					ax < BWTA::MapData::buildability.getWidth() &&
-					ay < BWTA::MapData::buildability.getHeight()) {
-					grid[x][y] = BWTA::MapData::walkability[(center.x - offset + x)*BUILD_TO_WALK_TILE]
+					ax < MapData::buildability.getWidth() &&
+					ay < MapData::buildability.getHeight()) {
+					grid[x][y] = MapData::walkability[(center.x - offset + x)*BUILD_TO_WALK_TILE]
 						[(center.y - offset + y)*BUILD_TO_WALK_TILE]
 					+
-						BWTA::MapData::buildability[center.x - offset + x]
+						MapData::buildability[center.x - offset + x]
 						[center.y - offset + y];
 				} else {
 					grid[x][y] = 4;
@@ -35,6 +69,7 @@ namespace BWTA
 		}
 		return grid;
 	}
+
 	/*
 	Given a chokepoint, it returns the buildability grid around the center of the choke
 	and using the width as an offset
@@ -43,24 +78,24 @@ namespace BWTA
 	{
 		BWAPI::Position center = chokepoint->getCenter();
 		double chokeWidth = chokepoint->getWidth();
-		//  std::cout << "Choke pixel center (" << center.x() << "," << center.y() << ") width " << chokeWidth << "\n";
+// 		std::cout << "Choke pixel center (" << center.x() << "," << center.y() << ") width " << chokeWidth << "\n";
 		// Translate from pixel position to tile position
 		BWAPI::TilePosition centerTile(center);
 		int chokeWidthTiles = (int)(chokeWidth / TILE_SIZE);
-		//  std::cout << "Choke tile center (" << centerTile.x() << "," << centerTile.y() << ") width " << chokeWidthTiles << "\n";
+// 		std::cout << "Choke tile center (" << centerTile.x() << "," << centerTile.y() << ") width " << chokeWidthTiles << "\n";
 		// generate grid
 		return getChokeGrid(centerTile, chokeWidthTiles);
 	}
 
 	/*
-		This function does the following:
-		- finds the center point of s1x,s1y and s2x,s2y
-		- then it computes a line starting at the center point, and that crosses both points
-		- it extends this line until the tile type is different from that at the center
-		- it returns the two extremes
-		- if previous == true, it returns the edges right before changing tile type
-		- if previous == false, it returns the edges right after changing tile type
-		*/
+	This function does the following:
+	- finds the center point of s1x,s1y and s2x,s2y
+	- then it computes a line starting at the center point, and that crosses both points
+	- it extends this line until the tile type is different from that at the center
+	- it returns the two extremes
+	- if previous == true, it returns the edges right before changing tile type
+	- if previous == false, it returns the edges right after changing tile type
+	*/
 	int *findExtremes(BWTA::RectangleArray<int> chokeGrid, int s1x, int s1y, int s2x, int s2y, bool previous)
 	{
 		int centerx = (s1x + s2x) / 2;
@@ -87,9 +122,9 @@ namespace BWTA
 			if (centery < s1y) sy = 1;
 			else sy = -1;
 			int err = dx - dy;
-			//		std::cout << "line " << centerx << "," << centery << " to " << s1x << "," << s1y << std::endl;
+// 			std::cout << "line " << centerx << "," << centery << " to " << s1x << "," << s1y << std::endl;
 			do {
-				//			std::cout << x << "," << y << std::endl;
+// 				std::cout << x << "," << y << std::endl;
 				// check for a wall
 				if (chokeGrid[x][y] != type) {
 					// extreme 1 found:
@@ -104,7 +139,7 @@ namespace BWTA
 				}
 				oldx = x;
 				oldy = y;
-				//			if (x==s1x && y==s1y) break;
+// 				if (x==s1x && y==s1y) break;
 				int e2 = 2 * err;
 				if (e2 > -dy) {
 					err -= dy;
@@ -143,7 +178,7 @@ namespace BWTA
 				}
 				oldx = x;
 				oldy = y;
-				//			if (x==s2x && y==s2y) break;
+// 				if (x==s2x && y==s2y) break;
 				int e2 = 2 * err;
 				if (e2 > -dy) {
 					err -= dy;
@@ -161,11 +196,10 @@ namespace BWTA
 	}
 
 
-
 	/*
-		Generate the starting and end points of a wall for those chokepoints that have the middle tile as "buildable"
-		(i.e. those that are not on a ramp)
-		*/
+	Generate the starting and end points of a wall for those chokepoints that have the middle tile as "buildable"
+	(i.e. those that are not on a ramp)
+	*/
 	void generateWallStartingPointsNoRamp(BWTA::RectangleArray<int> chokeGrid, int s1x, int s1y, int s2x, int s2y, std::ofstream *out)
 	{
 		int *edges = findExtremes(chokeGrid, s1x, s1y, s2x, s2y, true);
@@ -174,11 +208,10 @@ namespace BWTA
 	}
 
 
-
-	BWTA::RectangleArray<int> floodFill(BWTA::RectangleArray<int> chokeGrid, int x, int y) {
+	RectangleArray<int> floodFill(RectangleArray<int> chokeGrid, int x, int y) {
 		int w = chokeGrid.getWidth();
 		int h = chokeGrid.getHeight();
-		BWTA::RectangleArray<int> result;
+		RectangleArray<int> result;
 		result.resize(w, h);
 		for (int i = 0; i < h; i++)
 			for (int j = 0; j < w; j++) result[j][i] = 0;
@@ -209,10 +242,10 @@ namespace BWTA
 
 
 	/*
-		Generate the starting and end points of a wall for those chokepoints that have the middle tile as "walkable"
-		(i.e. those that are on a ramp)
-		*/
-	void generateWallStartingPointsRamp(BWTA::RectangleArray<int> chokeGrid, int s1x, int s1y, int s2x, int s2y, std::ofstream *out)
+	Generate the starting and end points of a wall for those chokepoints that have the middle tile as "walkable"
+	(i.e. those that are on a ramp)
+	*/
+	void generateWallStartingPointsRamp(RectangleArray<int> chokeGrid, int s1x, int s1y, int s2x, int s2y, std::ofstream *out)
 	{
 		int w = chokeGrid.getWidth();
 		int h = chokeGrid.getHeight();
@@ -223,16 +256,16 @@ namespace BWTA
 		int rotated_dx = -dy;
 		int rotated_dy = dx;
 
-		// draw a line perpendicular to the chokepoint sides, until we get out of the floodfilled area in both directions:
+		// draw a line perpendicular to the chokepoint sides, until we get out of the flood filled area in both directions:
 		int *edges = findExtremes(chokeGrid, centerx - rotated_dx, centery - rotated_dy,
 			centerx + rotated_dx, centery + rotated_dy, false);
-		//	*out << "rotated edges are " << edges[0] << "," << edges[1] << " to " << edges[2] << "," << edges[3] << std::endl;
+// 		*out << "rotated edges are " << edges[0] << "," << edges[1] << " to " << edges[2] << "," << edges[3] << std::endl;
 
 		if (edges[0] != -1 && edges[1] != -1) {
 			// First direction:
-			//		(*out) << "first direction" << std::endl;
-			BWTA::RectangleArray<int> fillCenter = floodFill(chokeGrid, centerx, centery);
-			BWTA::RectangleArray<int> fillOutside = floodFill(chokeGrid, edges[0], edges[1]);
+// 			(*out) << "first direction" << std::endl;
+			RectangleArray<int> fillCenter = floodFill(chokeGrid, centerx, centery);
+			RectangleArray<int> fillOutside = floodFill(chokeGrid, edges[0], edges[1]);
 			int offx[4] = { -1, 0, 1, 0 };
 			int offy[4] = { 0, -1, 0, 1 };
 			std::vector<std::pair<int, int>> border;
@@ -251,7 +284,7 @@ namespace BWTA
 								border.push_back(std::pair<int, int>(j, i));
 								borderCenterX += j;
 								borderCenterY += i;
-								//							(*out) << j << "," << i << " : " << chokeGrid[j][i] << std::endl;
+// 								(*out) << j << "," << i << " : " << chokeGrid[j][i] << std::endl;
 								break;
 							}
 						}
@@ -291,9 +324,9 @@ namespace BWTA
 
 		if (edges[2] != -1 && edges[3] != -1) {
 			// First direction:
-			//		(*out) << "second direction" << std::endl;
-			BWTA::RectangleArray<int> fillCenter = floodFill(chokeGrid, centerx, centery);
-			BWTA::RectangleArray<int> fillOutside = floodFill(chokeGrid, edges[2], edges[3]);
+// 			(*out) << "second direction" << std::endl;
+			RectangleArray<int> fillCenter = floodFill(chokeGrid, centerx, centery);
+			RectangleArray<int> fillOutside = floodFill(chokeGrid, edges[2], edges[3]);
 			int offx[4] = { -1, 0, 1, 0 };
 			int offy[4] = { 0, -1, 0, 1 };
 			std::vector<std::pair<int, int>> border;
@@ -312,7 +345,7 @@ namespace BWTA
 								border.push_back(std::pair<int, int>(j, i));
 								borderCenterX += j;
 								borderCenterY += i;
-								//							(*out) << j << "," << i << " : " << chokeGrid[j][i] << std::endl;
+// 								(*out) << j << "," << i << " : " << chokeGrid[j][i] << std::endl;
 								break;
 							}
 						}
@@ -355,7 +388,7 @@ namespace BWTA
 
 
 
-	void generateWallStartingPoints(BWTA::RectangleArray<int> chokeGrid, int s1x, int s1y, int s2x, int s2y, std::ofstream *out)
+	void generateWallStartingPoints(RectangleArray<int> chokeGrid, int s1x, int s1y, int s2x, int s2y, std::ofstream *out)
 	{
 		int centerx = (s1x + s2x) / 2;
 		int centery = (s1y + s2y) / 2;

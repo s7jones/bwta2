@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Offline">
+      <UniqueIdentifier>{821b9812-6da6-4055-bf6a-1f7b4b766fee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tests">
+      <UniqueIdentifier>{96ea606c-3b65-47ea-83a3-30fbb850e6f1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\OfflineExtractor\MapFileParser.h">
+      <Filter>Offline</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OfflineExtractor\MiniTileFlags.h">
+      <Filter>Offline</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OfflineExtractor\sha1.h">
+      <Filter>Offline</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OfflineExtractor\TileSet.h">
+      <Filter>Offline</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="WallingASP.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="WallingGHOST.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\OfflineExtractor\MapFileParser.cpp">
+      <Filter>Offline</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OfflineExtractor\sha1.cpp">
+      <Filter>Offline</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OfflineExtractor\TileSet.cpp">
+      <Filter>Offline</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="OfflineTester.cpp" />
+    <ClCompile Include="WallingASP.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="WallingGHOST.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

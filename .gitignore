@@ -13,12 +13,12 @@ bld/
 [Bb]in/
 [Oo]bj/
 Release-Log/
-Release-Exe/
-Debug-Exe/
-src/logs/*
-lib/BWTA-log.lib
+ReleaseOffline/
+logs/
 lib/BWTA.lib
 lib/BWTAd.lib
+lib/BWTA-log.lib
+lib/BWTAOffline.lib
 
 # Visual C++ cache files
 ipch/

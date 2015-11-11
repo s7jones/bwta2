@@ -17,6 +17,9 @@
 // BWAPI
 #include <BWAPI.h>
 
+// BOOST
+#include <boost/filesystem.hpp>
+
 // CGAL
 #include <CGAL/MP_Float.h>
 #include <CGAL/Quotient.h>
