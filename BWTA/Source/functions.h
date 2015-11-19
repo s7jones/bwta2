@@ -5,12 +5,6 @@
 #include <BWTA/BaseLocation.h>
 #include <BWTA/Polygon.h>
 
-#ifdef DEBUG_DRAW
-#include <QtGui/QtGui>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QGraphicsScene>
-#endif
-
 #define BWTA_FILE_VERSION 6
 namespace BWTA
 {
@@ -128,7 +122,7 @@ namespace BWTA
   std::vector<BWAPI::TilePosition> AstarSearchPath(BWAPI::TilePosition start, BWAPI::TilePosition end);
   std::vector<BWAPI::TilePosition> AstarSearchPath(BWAPI::TilePosition start, std::set<BWAPI::TilePosition> end);
   
-#ifdef DEBUG_DRAW
-  QColor hsl2rgb(double h, double sl, double l);
-#endif
+// #ifdef DEBUG_DRAW
+//   QColor hsl2rgb(double h, double sl, double l);
+// #endif
 }

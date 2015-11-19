@@ -18,10 +18,15 @@ namespace BWTA
     bool has_region(Node* region);
     bool has_chokepoint(Node* ckpt);
 
+	// TODO probably we can delete the following methods
     std::set<Node*>::iterator regions_begin();
     std::set<Node*>::iterator regions_end();
     std::set<Node*>::iterator chokepoints_begin();
     std::set<Node*>::iterator chokepoints_end();
+
+	std::set<Node*> getRegions() { return regions; };
+	std::set<Node*> getChokepoints() { return chokepoints; };
+
     private:
     void connect_nodes(Node* a,Node* b);
     void disconnect_nodes(Node* a,Node* b);

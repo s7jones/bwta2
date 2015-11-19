@@ -338,6 +338,7 @@
     <ClCompile Include="Source\load_data.cpp" />
     <ClCompile Include="Source\MapData.cpp" />
     <ClCompile Include="Source\Node.cpp" />
+    <ClCompile Include="Source\Painter.cpp" />
     <ClCompile Include="Source\Polygon.cpp" />
     <ClCompile Include="Source\RegionImpl.cpp" />
     <ClCompile Include="Source\terrain_analysis.cpp" />
@@ -368,6 +369,7 @@
     <ClInclude Include="Source\Graph.h" />
     <ClInclude Include="Source\MapData.h" />
     <ClInclude Include="Source\Node.h" />
+    <ClInclude Include="Source\Painter.h" />
     <ClInclude Include="Source\RegionImpl.h" />
     <ClInclude Include="Source\terrain_analysis.h" />
     <ClInclude Include="Source\VertexData.h" />

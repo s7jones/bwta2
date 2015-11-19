@@ -4,6 +4,7 @@ namespace BWTA
 {
   namespace BWTA_Result
   {
+	  // TODO instead of set should be vector?
     extern std::set<Region*> regions;
     extern std::set<Chokepoint*> chokepoints;
     extern std::set<BaseLocation*> baselocations;

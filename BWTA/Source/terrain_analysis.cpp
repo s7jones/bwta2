@@ -3,13 +3,6 @@
 using namespace std;
 namespace BWTA
 {
-  #ifdef DEBUG_DRAW
-    QGraphicsScene* scene_ptr;
-	int argc=0;
-    char* argv="";
-    QApplication app(argc,&argv);
-  #endif
-
     bool createDir(std::string& path)
     {
         boost::filesystem::path dir(path);
@@ -120,8 +113,7 @@ namespace BWTA
 	void analyze_map()
 	{
 #ifdef DEBUG_DRAW
-		QGraphicsScene scene;
-		scene_ptr = &scene;
+		Painter painter;
 #endif
 
 		// time performance
@@ -187,8 +179,8 @@ namespace BWTA
 
 #ifdef DEBUG_DRAW
 		log("Drawing results of step 1");
-		draw_polygons(&polygons);
-		render(1);
+		painter.drawPolygons(polygons);
+		painter.render(1);
 #endif
 
 		// All line segments we create we will store in the segments vector and also insert into the 2d segmented Delaunay graph object sdg
@@ -324,9 +316,9 @@ namespace BWTA
 
   #ifdef DEBUG_DRAW
     log("Drawing results of step 2");
-    draw_polygons(&polygons);
-    draw_arrangement(&arr);
-    render(2);
+    painter.drawPolygons(polygons);
+    painter.drawArrangement(&arr);
+    painter.render(2);
   #endif
 
   simplify_voronoi_diagram(&arr,&distance);
@@ -338,9 +330,9 @@ namespace BWTA
 
   #ifdef DEBUG_DRAW
     log("Drawing results of step 3");
-    draw_polygons(&polygons);
-    draw_arrangement(&arr);
-    render(3);
+    painter.drawPolygons(polygons);
+    painter.drawArrangement(&arr);
+    painter.render(3);
   #endif
 
   identify_region_nodes(&arr,&g);
@@ -352,14 +344,10 @@ namespace BWTA
 
   #ifdef DEBUG_DRAW
     log("Drawing results of step 4");
-    draw_polygons(&polygons);
-    draw_arrangement(&arr);
-    for(std::set<Node*>::iterator r=g.regions_begin();r!=g.regions_end();r++) {
-		double x0=cast_to_double((*r)->point.x());
-		double y0=cast_to_double((*r)->point.y());
-		scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(0,0,255)),QBrush(QColor(0,0,255)));
-    }
-    render(4);
+	painter.drawPolygons(polygons);
+    painter.drawArrangement(&arr);
+	painter.drawNodes(g.getRegions(), Qt::blue);
+    painter.render(4);
   #endif
 
   identify_chokepoint_nodes(&g,&distance,&nearest);
@@ -371,21 +359,11 @@ namespace BWTA
 
   #ifdef DEBUG_DRAW
     log("Drawing results of step 5");
-    draw_polygons(&polygons);
-    draw_arrangement(&arr);
-    for(std::set<Node*>::iterator r=g.regions_begin();r!=g.regions_end();r++)
-    {
-      double x0=cast_to_double((*r)->point.x());
-      double y0=cast_to_double((*r)->point.y());
-      scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(0,0,255)),QBrush(QColor(0,0,255)));
-    }
-    for(std::set<Node*>::iterator c=g.chokepoints_begin();c!=g.chokepoints_end();c++)
-    {
-      double x0=cast_to_double((*c)->point.x());
-      double y0=cast_to_double((*c)->point.y());
-      scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(255,0,0)),QBrush(QColor(255,0,0)));
-    }
-    render(5);
+    painter.drawPolygons(polygons);
+    painter.drawArrangement(&arr);
+	painter.drawNodes(g.getRegions(), Qt::blue);
+	painter.drawNodes(g.getChokepoints(), Qt::red);
+    painter.render(5);
   #endif
 
   merge_adjacent_regions(&g);
@@ -401,31 +379,11 @@ namespace BWTA
 
   #ifdef DEBUG_DRAW
     log("Drawing results of step 6");
-    draw_polygons(&polygons);
-    draw_arrangement(&arr);
-    for(std::set<Node*>::iterator r=g.regions_begin();r!=g.regions_end();r++)
-    {
-      double x0=cast_to_double((*r)->point.x());
-      double y0=cast_to_double((*r)->point.y());  
-      for(std::set<Node*>::iterator n=(*r)->neighbors.begin();n!=(*r)->neighbors.end();n++)
-      {
-        double x1=cast_to_double((*n)->point.x());
-        double y1=cast_to_double((*n)->point.y());
-        QPen qp(QColor(0,0,0));
-        qp.setWidth(2);
-        scene.addLine(QLineF(x0,y0,x1,y1),qp);
-      }
-      scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(0,0,255)),QBrush(QColor(0,0,255)));
-    }
-    for(std::set<Node*>::iterator c=g.chokepoints_begin();c!=g.chokepoints_end();c++)
-    {
-      double x0=cast_to_double((*c)->point.x());
-      double y0=cast_to_double((*c)->point.y());
-      scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(255,0,0)),QBrush(QColor(255,0,0)));
-      if (calculate_merge_value(*c)>0)
-        scene.addEllipse(QRectF(x0-(*c)->radius,y0-(*c)->radius,2*(*c)->radius,2*(*c)->radius));
-    }
-    render(6);
+    painter.drawPolygons(polygons);
+    painter.drawArrangement(&arr);
+	painter.drawNodesAndConnectToNeighbors(g.getRegions(), Qt::blue);
+	painter.drawNodes(g.getChokepoints(), Qt::red);
+    painter.render(6);
   #endif
 
   wall_off_chokepoints(&g,&arr);
@@ -437,30 +395,11 @@ namespace BWTA
 
   #ifdef DEBUG_DRAW
     log("Drawing results of step 7");
-    draw_polygons(&polygons);
-    draw_arrangement(&arr);
-    for(std::set<Node*>::iterator r=g.regions_begin();r!=g.regions_end();r++)
-    {
-      double x0=cast_to_double((*r)->point.x());
-      double y0=cast_to_double((*r)->point.y());  
-      for(std::set<Node*>::iterator n=(*r)->neighbors.begin();n!=(*r)->neighbors.end();n++)
-      {
-        double x1=cast_to_double((*n)->point.x());
-        double y1=cast_to_double((*n)->point.y());
-        QPen qp(QColor(0,0,0));
-        qp.setWidth(2);
-        scene.addLine(QLineF(x0,y0,x1,y1),qp);
-      }
-      scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(0,0,255)),QBrush(QColor(0,0,255)));
-    }
-    for(std::set<Node*>::iterator c=g.chokepoints_begin();c!=g.chokepoints_end();c++)
-    {
-      double x0=cast_to_double((*c)->point.x());
-      double y0=cast_to_double((*c)->point.y());
-      scene.addEllipse(QRectF(x0-6,y0-6,12,12),QPen(QColor(255,0,0)),QBrush(QColor(255,0,0)));
-
-    }
-    render(7);
+	painter.drawPolygons(polygons);
+	painter.drawArrangement(&arr);
+	painter.drawNodesAndConnectToNeighbors(g.getRegions(), Qt::blue);
+	painter.drawNodes(g.getChokepoints(), Qt::red);
+    painter.render(7);
   #endif
 
   BWTA_Result::chokepoints.clear();
@@ -485,8 +424,8 @@ namespace BWTA
   if (!polygonsNotSimple.empty()) {
 	  log("  ERROR!!! Found " << polygonsNotSimple.size() << " polygons not simple");
 #ifdef DEBUG_DRAW
-	  draw_polygons(&polygonsNotSimple);
-	  render(90);
+	  painter.drawPolygons(polygonsNotSimple);
+	  painter.render(90);
 #endif
   }
 
@@ -496,52 +435,13 @@ namespace BWTA
 	log(" [Creating BWTA regions in " << seconds << " seconds]");
 	start = end;
 
-  #ifdef DEBUG_DRAW
-    log("Drawing results of step 8");
-    draw_polygons(&polygons);
-    
-      for(std::set<Node*>::iterator r=g.regions_begin();r!=g.regions_end();r++)
-      {
-        (*r)->hue=rand()*1.0/RAND_MAX;
-      }
-      for(int l=0;l<6;l++)
-      {
-        for(std::set<Node*>::iterator r=g.regions_begin();r!=g.regions_end();r++)
-        {
-          for(std::set<Node*>::iterator n=(*r)->neighbors.begin();n!=(*r)->neighbors.end();n++)
-          {
-            Node* r2=(*n)->other_neighbor(*r);
-            double d=r2->hue-(*r)->hue;
-            if (d>0.5) d=d-1.0;
-            if (d<-0.5) d=d+1.0;
-            double s=d-0.5;
-            if (d<0) s+=1.0;
-            s*=0.05;
-            (*r)->hue+=s;
-            r2->hue-=s;
-            while ((*r)->hue<0) (*r)->hue+=1.0;
-            while ((*r)->hue>=1.0) (*r)->hue-=1.0;
-            while (r2->hue<0) r2->hue+=1.0;
-            while (r2->hue>=1.0) r2->hue-=1.0;
-          }
-        }
-      }
-      for(std::set<Node*>::iterator r=g.regions_begin();r!=g.regions_end();r++)
-      {
-        double x0=cast_to_double((*r)->point.x());
-        double y0=cast_to_double((*r)->point.y());
-        PolygonD boundary=(*r)->get_polygon();
-        QVector<QPointF> qp;
-        for(unsigned int i=0;i<boundary.size();i++)
-        {
-			qp.push_back(QPointF(cast_to_double(boundary.vertex(i).x()), cast_to_double(boundary.vertex(i).y())));
-        }
-        scene.addPolygon(QPolygonF(qp),QPen(QColor(0,0,0)),QBrush(hsl2rgb((*r)->hue,1.0,0.75)));    
-      }
-    
-  draw_arrangement(&arr);
-  render(8);
-  #endif
+#ifdef DEBUG_DRAW
+	log("Drawing results of step 8");
+	painter.drawPolygons(polygons);
+	painter.drawFourColorMap(g.getRegions());
+	painter.drawArrangement(&arr);
+	painter.render(8);
+#endif
 
   log("  Finding chokepoints and linking them to regions.");
   std::map<Node*,Chokepoint*> node2chokepoint;
@@ -580,79 +480,9 @@ namespace BWTA
 	end = clock();
 	seconds = double(end-start)/CLOCKS_PER_SEC;
 	log(" [Calculated base location properties in " << seconds << " seconds]");
+
   }
 
-  #ifdef DEBUG_DRAW
-    int render(int step)
-    {
-		QImage* image = new QImage(MapData::mapWidth * 8, MapData::mapHeight * 8, QImage::Format_ARGB32_Premultiplied);
-        QPainter* p = new QPainter(image);
-        p->setRenderHint(QPainter::Antialiasing);
-        scene_ptr->render(p);
-        p->end();
-
-        // Save it..
-        std::string filename(BWTA_PATH);
-        filename += MapData::mapFileName + "-" + std::to_string(step) + ".png";
-        image->save(filename.c_str(), "PNG");
-
-		scene_ptr->clear();
-		return 0;
-    }
-
-    void draw_arrangement(Arrangement_2* arr_ptr)
-    {
-      for (Arrangement_2::Edge_iterator eit = arr_ptr->edges_begin(); eit != arr_ptr->edges_end(); ++eit)
-      {
-        double x0=cast_to_double(eit->curve().source().x());
-        double y0=cast_to_double(eit->curve().source().y());
-        double x1=cast_to_double(eit->curve().target().x());
-        double y1=cast_to_double(eit->curve().target().y());
-        QColor color(0,0,0);
-        if (eit->data() == BLUE) {
-          color=QColor(0,0,255);
-        } else if (eit->data() == BLACK)  {
-          color=QColor(0,0,0);
-        } else if (eit->data()==RED) {
-          color=QColor(255,0,0);
-        } else {
-          color=QColor(0,180,0);
-        }
-        QPen qp(color);
-        qp.setWidth(2);
-        scene_ptr->addLine(QLineF(x0,y0,x1,y1),qp);
-      }
-    }
-    void draw_border()
-    {
-      QPen qp(QColor(0,0,0));
-      qp.setWidth(2);
-      scene_ptr->addLine(QLineF(0,0,0,MapData::walkability.getHeight()-1),qp);
-      scene_ptr->addLine(QLineF(0,MapData::walkability.getHeight()-1,MapData::walkability.getWidth()-1,MapData::walkability.getHeight()-1),qp);
-      scene_ptr->addLine(QLineF(MapData::walkability.getWidth()-1,MapData::walkability.getHeight()-1,MapData::walkability.getWidth()-1,0),qp);
-      scene_ptr->addLine(QLineF(MapData::walkability.getWidth()-1,0,0,0),qp);
-    }
-    void draw_polygon(Polygon& p, QColor qc)
-    {
-      QVector<QPointF> qp;
-      for(int i=0;i<(int)p.size();i++)
-      {
-        int j=(i+1)%p.size();
-        //scene_ptr->addLine(QLineF(p[i].x(),p[i].y(),p[j].x(),p[j].y()),qc);
-        qp.push_back(QPointF(p[i].x,p[i].y));
-      }
-      scene_ptr->addPolygon(QPolygonF(qp),QPen(QColor(0,0,0)),QBrush(qc));  
-    }
-    void draw_polygons(std::vector<Polygon>* polygons)
-    {
-		for (auto& polygon : *polygons) {
-			draw_polygon(polygon, QColor(180, 180, 180));
-			for (auto& hole : polygon.holes) {
-				draw_polygon(hole, QColor(255, 100, 255));
-			}
-		}
-    }
-  #endif
   void remove_voronoi_diagram_from_arrangement(Arrangement_2* arr_ptr)
   {
     bool redo=true;

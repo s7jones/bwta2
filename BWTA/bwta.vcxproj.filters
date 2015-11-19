@@ -89,6 +89,9 @@
     <ClCompile Include="Source\pathfinding.cpp">
       <Filter>Pathfinding</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Painter.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\BaseLocationImpl.h">
@@ -168,6 +171,9 @@
     </ClInclude>
     <ClInclude Include="Source\TileType.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Painter.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef DEBUG_DRAW
+#include "Painter.h"
+#endif
+
 #include "Color.h"
 #include "VertexData.h"
 #include "functions.h"
@@ -23,15 +27,6 @@ namespace BWTA
   void load_data(std::string filename);
   void save_data(std::string filename);
   void save_data_xml();
-
-  #ifdef DEBUG_DRAW
-	extern QApplication app;
-    int render(int step);
-    void draw_border();
-    void draw_arrangement(Arrangement_2* arr_ptr);
-	void draw_polygon(Polygon& p, QColor qc);
-	void draw_polygons(std::vector<Polygon>* polygons_ptr);
-  #endif
 
   void simplify_voronoi_diagram(Arrangement_2* arr_ptr, std::map<Point, double, ptcmp>* distance);
   void identify_region_nodes(Arrangement_2* arr_ptr,Graph* g_ptr);
