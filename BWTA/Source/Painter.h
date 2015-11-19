@@ -5,6 +5,7 @@
 #include <QtGui/QPainter>
 #include <QtGui/QColor>
 #include <QtGui/QPen>
+#include <QtSvg/QSvgGenerator>
 
 #include "MapData.h"
 #include "functions.h"
@@ -15,7 +16,7 @@ namespace BWTA {
 	public:
 		Painter();
 		~Painter();
-		void render(int step);
+		void render(const std::string& label = std::string());
 		void drawMapBorder();
 		void drawArrangement(Arrangement_2* arrangement);
 		void drawPolygon(Polygon& polygon, QColor color);
@@ -30,6 +31,8 @@ namespace BWTA {
 	private:
 		QPainter* painter;
 		QImage* image;
+		QSvgGenerator* svg;
+		int renderCounter;
 
 		QColor hsl2rgb(double h, double sl, double l);
 		void getHeatMapColor(float value, float &red, float &green, float &blue);

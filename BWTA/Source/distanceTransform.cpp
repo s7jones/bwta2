@@ -91,7 +91,7 @@ namespace BWTA
 		painter.drawHeatMap(MapData::distanceTransform, (float)MapData::maxDistanceTransform);
 		painter.drawMapBorder();
 		painter.drawPolygons(BWTA_Result::unwalkablePolygons);
-		painter.render(88);
+		painter.render("DT");
 #endif
 	}
 }

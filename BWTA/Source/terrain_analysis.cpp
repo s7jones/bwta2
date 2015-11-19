@@ -180,7 +180,7 @@ namespace BWTA
 #ifdef DEBUG_DRAW
 		log("Drawing results of step 1");
 		painter.drawPolygons(polygons);
-		painter.render(1);
+		painter.render();
 #endif
 
 		// All line segments we create we will store in the segments vector and also insert into the 2d segmented Delaunay graph object sdg
@@ -318,7 +318,7 @@ namespace BWTA
     log("Drawing results of step 2");
     painter.drawPolygons(polygons);
     painter.drawArrangement(&arr);
-    painter.render(2);
+    painter.render();
   #endif
 
   simplify_voronoi_diagram(&arr,&distance);
@@ -332,7 +332,7 @@ namespace BWTA
     log("Drawing results of step 3");
     painter.drawPolygons(polygons);
     painter.drawArrangement(&arr);
-    painter.render(3);
+    painter.render();
   #endif
 
   identify_region_nodes(&arr,&g);
@@ -347,7 +347,7 @@ namespace BWTA
 	painter.drawPolygons(polygons);
     painter.drawArrangement(&arr);
 	painter.drawNodes(g.getRegions(), Qt::blue);
-    painter.render(4);
+    painter.render();
   #endif
 
   identify_chokepoint_nodes(&g,&distance,&nearest);
@@ -363,7 +363,7 @@ namespace BWTA
     painter.drawArrangement(&arr);
 	painter.drawNodes(g.getRegions(), Qt::blue);
 	painter.drawNodes(g.getChokepoints(), Qt::red);
-    painter.render(5);
+    painter.render();
   #endif
 
   merge_adjacent_regions(&g);
@@ -383,7 +383,7 @@ namespace BWTA
     painter.drawArrangement(&arr);
 	painter.drawNodesAndConnectToNeighbors(g.getRegions(), Qt::blue);
 	painter.drawNodes(g.getChokepoints(), Qt::red);
-    painter.render(6);
+    painter.render();
   #endif
 
   wall_off_chokepoints(&g,&arr);
@@ -399,7 +399,7 @@ namespace BWTA
 	painter.drawArrangement(&arr);
 	painter.drawNodesAndConnectToNeighbors(g.getRegions(), Qt::blue);
 	painter.drawNodes(g.getChokepoints(), Qt::red);
-    painter.render(7);
+    painter.render();
   #endif
 
   BWTA_Result::chokepoints.clear();
@@ -425,7 +425,7 @@ namespace BWTA
 	  log("  ERROR!!! Found " << polygonsNotSimple.size() << " polygons not simple");
 #ifdef DEBUG_DRAW
 	  painter.drawPolygons(polygonsNotSimple);
-	  painter.render(90);
+	  painter.render("Error-PolygonsNotSimple");
 #endif
   }
 
@@ -440,7 +440,7 @@ namespace BWTA
 	painter.drawPolygons(polygons);
 	painter.drawFourColorMap(g.getRegions());
 	painter.drawArrangement(&arr);
-	painter.render(8);
+	painter.render();
 #endif
 
   log("  Finding chokepoints and linking them to regions.");

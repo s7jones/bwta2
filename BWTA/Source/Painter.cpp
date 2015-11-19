@@ -1,24 +1,61 @@
 #include "Painter.h"
 
 namespace BWTA {
-	Painter::Painter() {
+	Painter::Painter() :
+		renderCounter(1)
+	{
+		// PNG
 		image = new QImage(MapData::mapWidth * 4, MapData::mapHeight * 4, QImage::Format_ARGB32_Premultiplied);
 		painter = new QPainter(image);
 		painter->setRenderHint(QPainter::Antialiasing);
+
+		// SVG
+// 		std::string filename(BWTA_PATH);
+// 		filename += MapData::mapFileName + "-" + std::to_string(renderCounter) + ".svg";
+// 		renderCounter++;
+// 		svg = new QSvgGenerator();
+// 		svg->setFileName(filename.c_str());
+// 		svg->setSize(QSize(MapData::mapWidth * 4, MapData::mapHeight * 4));
+// 		svg->setViewBox(QRect(0, 0, MapData::mapWidth * 4, MapData::mapHeight * 4));
+// 		painter = new QPainter();
+// 		painter->begin(svg);
 	}
 
-	Painter::~Painter() {
+	Painter::~Painter()
+	{
 		delete painter;
 		delete image;
+// 		delete svg;
 	}
 
-	void Painter::render(int step) {
+	void Painter::render(const std::string& label)
+	{
+		// save PNG
 		std::string filename(BWTA_PATH);
-		filename += MapData::mapFileName + "-" + std::to_string(step) + ".png";
-		image->save(filename.c_str(), "PNG");
+		if (label.empty()) {
+			filename += MapData::mapFileName + "-" + std::to_string(renderCounter) + ".png";
+			renderCounter++;
+		} else {
+			filename += MapData::mapFileName + "-" + label + ".png";
+		}
 
-		// set background to white again
-		image->fill(Qt::white);
+		image->save(filename.c_str(), "PNG");
+		image->fill(Qt::white); // set background to white again
+
+		// save SVG
+// 		std::string filename(BWTA_PATH);
+// 		filename += MapData::mapFileName + "-" + std::to_string(renderCounter) + ".svg";
+// 		renderCounter++;
+// 
+// 		painter->end();
+// 		delete painter;
+// 		delete svg;
+// 		svg = new QSvgGenerator();
+// 		svg->setFileName(filename.c_str());
+// 		svg->setSize(QSize(MapData::mapWidth * 4, MapData::mapHeight * 4));
+// 		svg->setViewBox(QRect(0, 0, MapData::mapWidth * 4, MapData::mapHeight * 4));
+// 		painter = new QPainter();
+// 		painter->begin(svg);
 	}
 
 	void Painter::drawMapBorder() {
