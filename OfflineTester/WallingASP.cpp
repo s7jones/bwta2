@@ -5,32 +5,17 @@ std::vector<BWAPI::TilePosition> outsideTiles;
 std::vector<BWAPI::TilePosition> walkableTiles;
 std::vector<BWAPI::TilePosition> supplyTiles;
 std::vector<BWAPI::TilePosition> barracksTiles;
-BWTA::BaseLocation* homeBase;
-BWTA::Region* homeRegion;
 bool optimizeGap = true;
 
-void wallingASP()
+void wallingASP(BWTA::Chokepoint* chokepointToWall, BWTA::BaseLocation* homeBase)
 {
-	// get the first startLocation as home
-	homeBase = *BWTA::getStartLocations().begin();
-	homeRegion = homeBase->getRegion();
 
-	// iterate through all chokepoints and look for the one with the smallest gap (least width)
-	double minWidth = std::numeric_limits<double>::max();
-	BWTA::Chokepoint* smallestChokepoint = nullptr;
-	for (const auto& chokepoint : homeRegion->getChokepoints()) {
-		if (chokepoint->getWidth() < minWidth) {
-			minWidth = chokepoint->getWidth();
-			smallestChokepoint = chokepoint;
-		}
-	}
-
-	analyzeChoke(smallestChokepoint);
-	initClingoProgramSource();
+	analyzeChoke(chokepointToWall, homeBase);
+	initClingoProgramSource(homeBase);
 	// 	runASPSolver();
 }
 
-void analyzeChoke(BWTA::Chokepoint* choke)
+void analyzeChoke(BWTA::Chokepoint* choke, BWTA::BaseLocation* homeBase)
 {
 	int x = choke->getCenter().x;
 	int y = choke->getCenter().y;
@@ -44,7 +29,7 @@ void analyzeChoke(BWTA::Chokepoint* choke)
 		for (int j = tileY - maxDist; j <= tileY + maxDist; ++j){
 			BWAPI::TilePosition currentTile(i, j);
 			// if the tile is in home region
-			if (BWTA::getRegion(currentTile) == homeRegion){
+			if (BWTA::getRegion(currentTile) == homeBase->getRegion()){
 				// and it is buildable, add it to the buildTiles
 				if (BWTA::MapData::buildability[i][j]){
 					buildTiles.push_back(currentTile);
@@ -98,7 +83,7 @@ bool canBuildHere(BWAPI::TilePosition position, BWAPI::UnitType type)
 	return true;
 }
 
-void initClingoProgramSource()
+void initClingoProgramSource(BWTA::BaseLocation* homeBase)
 {
 	std::ofstream file;
 

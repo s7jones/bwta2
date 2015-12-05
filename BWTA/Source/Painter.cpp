@@ -1,3 +1,4 @@
+#ifdef DEBUG_DRAW
 #include "Painter.h"
 
 namespace BWTA {
@@ -292,3 +293,4 @@ namespace BWTA {
 		}
 	}
 }
+#endif

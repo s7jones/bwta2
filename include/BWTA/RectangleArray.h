@@ -49,7 +49,8 @@ namespace BWTA
         */
        void setItem(unsigned int x, unsigned int y, Type *item);
        void resize(unsigned int width, unsigned int height);
-       void saveToFile(const std::string& fileName);
+	   void saveToFile(const std::string& fileName);
+	   void saveToFile(std::ofstream& out);
        /** Sets all fields of the array to the specified value */
        void setTo(const Type& value);
        void setBorderTo(const Type& value);
@@ -236,13 +237,18 @@ namespace BWTA
 	  if (!outputFile)
 		  exit(1);
 
+	  saveToFile(outputFile);
+	  outputFile.close();
+  }
+  template <class Type>
+  void RectangleArray<Type>::saveToFile(std::ofstream& out)
+  {
 	  for (unsigned int y = 0; y < this->getHeight(); ++y) {
 		  for (unsigned int x = 0; x < this->getWidth(); ++x) {
-			  outputFile << this->getColumn(x)[y];
+			  out << this->getColumn(x)[y];
 		  }
-		  outputFile << std::endl;
+		  out << std::endl;
 	  }
-	  outputFile.close();
   }
   //------------------------------------------------- SET TO -------------------------------------------------
   template <class Type>

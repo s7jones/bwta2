@@ -8,13 +8,12 @@ extern std::vector<BWAPI::TilePosition> outsideTiles;
 extern std::vector<BWAPI::TilePosition> walkableTiles;
 extern std::vector<BWAPI::TilePosition> supplyTiles;
 extern std::vector<BWAPI::TilePosition> barracksTiles;
-extern BWTA::BaseLocation* homeBase;
-extern BWTA::Region* homeRegion;
 extern bool optimizeGap;
 
-void wallingASP();
-void analyzeChoke(BWTA::Chokepoint* choke);
+void wallingASP(BWTA::Chokepoint* chokepointToWall, BWTA::BaseLocation* homeBase);
+
+void analyzeChoke(BWTA::Chokepoint* choke, BWTA::BaseLocation* homeBase);
 bool canBuildHere(BWAPI::TilePosition position, BWAPI::UnitType type); // simplier version of BWAPI::canBuildHere()
-void initClingoProgramSource();
+void initClingoProgramSource(BWTA::BaseLocation* homeBase);
 BWAPI::TilePosition findClosestTile(const std::vector<BWAPI::TilePosition>& tiles, BWAPI::TilePosition targetTile);
 BWAPI::TilePosition findFarthestTile(const std::vector<BWAPI::TilePosition>& tiles, BWAPI::TilePosition targetTile);
