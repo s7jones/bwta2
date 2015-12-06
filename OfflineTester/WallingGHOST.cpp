@@ -1,7 +1,6 @@
 #include "WallingGHOST.h"
 
-// BWTA::BaseLocation* homeBase;
-// BWTA::Region* homeRegion;
+
 
 void wallingGHOST(BWTA::Chokepoint* chokepointToWall)
 {
@@ -40,20 +39,20 @@ void wallingGHOST(BWTA::Chokepoint* chokepointToWall)
 	std::ofstream fileTxt("logs/output.txt");
 	fileTxt << "Chokepoint:" << std::endl;
 	BWAPI::TilePosition center(chokepointToWall->getCenter());
-	fileTxt << "Center: " << center.x << "," << center.y << std::endl;
+	fileTxt << "Center: " << center << std::endl;
 	
 	int radius = BWTA::getRadius(chokepointToWall);
 	BWTA::RectangleArray<int> chokeGrid = BWTA::getChokeGrid(center, radius);
 	BWAPI::TilePosition side1(chokepointToWall->getSides().first);
 	BWAPI::TilePosition side2(chokepointToWall->getSides().second);
-	int s1x = radius + side1.x - center.x;
-	int s1y = radius + side1.y - center.y;
-	int s2x = radius + side2.x - center.x;
-	int s2y = radius + side2.y - center.y;
-	fileTxt << "Side 1: " << side1.x << "," << side1.y << " - " << s1x << "," << s1y << std::endl;
-	fileTxt << "Side 2: " << side2.x << "," << side2.y << " - " << s2x << "," << s2y << std::endl;
+	// transform BwPosition to gridPosition
+	BWAPI::TilePosition gridOffset(center.x - radius, center.y - radius);
+	BWAPI::TilePosition gridSide1(side1 - gridOffset);
+	BWAPI::TilePosition gridSide2(side2 - gridOffset);
+	fileTxt << "Side 1: " << side1 << " - " << gridSide1 << std::endl;
+	fileTxt << "Side 2: " << side2 << " - " << gridSide2 << std::endl;
 	
-	BWTA::generateWallStartingPoints(chokeGrid, s1x, s1y, s2x, s2y, &fileTxt);
+	BWTA::generateWallStartingPoints(chokeGrid, gridSide1, gridSide2, fileTxt);
 	chokeGrid.saveToFile(fileTxt);
 	fileTxt.close();
 }
@@ -75,7 +74,6 @@ namespace BWTA
 		int BUILD_TO_WALK_TILE = 4;
 		grid.resize(gridSize, gridSize);
 // 		std::cout << BWTA::MapData::walkability.getWidth() << "," << BWTA::MapData::buildability.getWidth() << std::endl;
-		//TODO we don't check offset out of range!!
 		for (unsigned int y = 0; y < gridSize; ++y) {
 			unsigned int ay = center.y - offset + y;
 			for (unsigned int x = 0; x < gridSize; ++x) {
@@ -83,11 +81,7 @@ namespace BWTA
 				if (ax >= 0 && ay >= 0 &&
 					ax < MapData::buildability.getWidth() &&
 					ay < MapData::buildability.getHeight()) {
-					grid[x][y] = MapData::walkability[(center.x - offset + x)*BUILD_TO_WALK_TILE]
-						[(center.y - offset + y)*BUILD_TO_WALK_TILE]
-					+
-						MapData::buildability[center.x - offset + x]
-						[center.y - offset + y];
+					grid[x][y] = MapData::walkability[ax*BUILD_TO_WALK_TILE][ay*BUILD_TO_WALK_TILE] + MapData::buildability[ax][ay];
 				} else {
 					grid[x][y] = 4;
 				}
@@ -161,13 +155,12 @@ namespace BWTA
 	- it returns the two extremes
 	Warning: you are on charge to delete the output
 	*/
-	int* findExtremes(BWTA::RectangleArray<int> chokeGrid, int s1x, int s1y, int s2x, int s2y)
+	int* findExtremes(BWTA::RectangleArray<int> chokeGrid, BWAPI::TilePosition s1, BWAPI::TilePosition s2)
 	{
-		std::cout << "Sides: " << s1x << "," << s1y << " - " << s2x << "," << s2y << std::endl;
-		int centerx = (s1x + s2x) / 2;
-		int centery = (s1y + s2y) / 2;
-		int dx = abs(s2x - s1x);
-		int dy = abs(s2y - s1y);
+		std::cout << "Sides: " << s1 << " - " << s2 << std::endl;
+		BWAPI::TilePosition center((s1 + s2) / 2);
+		int dx = abs(s2.x - s1.x);
+		int dy = abs(s2.y - s1.y);
 		int *edges = new int[4];
 		edges[0] = -1;
 		edges[1] = -1;
@@ -175,8 +168,8 @@ namespace BWTA
 		edges[3] = -1;
 
 		// Do Bresenham towards each side until a non buildable is found:
-		extendLineUntilBuildableTile(chokeGrid, centerx, centery, s1x, s1y, dx, dy, edges[0], edges[1]);
-		extendLineUntilBuildableTile(chokeGrid, centerx, centery, s2x, s2y, dx, dy, edges[2], edges[3]);
+		extendLineUntilBuildableTile(chokeGrid, center.x, center.y, s1.x, s1.y, dx, dy, edges[0], edges[1]);
+		extendLineUntilBuildableTile(chokeGrid, center.x, center.y, s2.x, s2.y, dx, dy, edges[2], edges[3]);
 
 		return edges;
 	}
@@ -186,11 +179,10 @@ namespace BWTA
 	Generate the starting and end points of a wall for those chokepoints that have the middle tile as "buildable"
 	(i.e. those that are not on a ramp)
 	*/
-	void generateWallStartingPointsNoRamp(BWTA::RectangleArray<int> chokeGrid, int s1x, int s1y, int s2x, int s2y, std::ofstream *out)
+	void generateWallStartingPointsNoRamp(BWTA::RectangleArray<int> chokeGrid, BWAPI::TilePosition s1, BWAPI::TilePosition s2, std::ofstream& out)
 	{
-		std::cout << "generateWallStartingPointsRamp" << std::endl;
-		int *edges = findExtremes(chokeGrid, s1x, s1y, s2x, s2y);
-		*out << "wall from " << edges[0] << "," << edges[1] << " to " << edges[2] << "," << edges[3] << std::endl;
+		int *edges = findExtremes(chokeGrid, s1, s2);
+		out << "wall from " << edges[0] << "," << edges[1] << " to " << edges[2] << "," << edges[3] << std::endl;
 		delete[]edges;
 	}
 
@@ -226,18 +218,17 @@ namespace BWTA
 		return result;
 	}
 
-	void rotateAroundPoint(int pointX, int pointY, int pivotX, int pivotY, int& resX, int &resY)
+	BWAPI::TilePosition rotateAroundPoint(BWAPI::TilePosition point, BWAPI::TilePosition pivot)
 	{
-		resX = -pointY + pivotX + pivotY;
-		resY = pointX - pivotX + pivotY;
+		return BWAPI::TilePosition(-point.y + pivot.x + pivot.y, point.x - pivot.x + pivot.y);
 	}
 
-	void findFarthestBorderPositions(const RectangleArray<int>& chokeGrid, int centerX, int centerY, int edgeX, int edgeY, std::ofstream& out)
+	void findFarthestBorderPositions(const RectangleArray<int>& chokeGrid, BWAPI::TilePosition center, int edgeX, int edgeY, std::ofstream& out)
 	{
 		const int w = chokeGrid.getWidth();
 		const int h = chokeGrid.getHeight();
 
-		RectangleArray<int> fillCenter = floodFill(chokeGrid, centerX, centerY);
+		RectangleArray<int> fillCenter = floodFill(chokeGrid, center.x, center.y);
 		RectangleArray<int> fillOutside = floodFill(chokeGrid, edgeX, edgeY);
 		int offx[4] = { -1, 0, 1, 0 };
 		int offy[4] = { 0, -1, 0, 1 };
@@ -298,25 +289,22 @@ namespace BWTA
 	Generate the starting and end points of a wall for those chokepoints that have the middle tile as "walkable"
 	(i.e. those that are on a ramp)
 	*/
-	void generateWallStartingPointsRamp(RectangleArray<int> chokeGrid, int s1x, int s1y, int s2x, int s2y, std::ofstream *out)
+	void generateWallStartingPointsRamp(RectangleArray<int> chokeGrid, BWAPI::TilePosition s1, BWAPI::TilePosition s2, std::ofstream& out)
 	{
-		std::cout << "generateWallStartingPointsRamp" << std::endl;
-		int centerx = (s1x + s2x) / 2;
-		int centery = (s1y + s2y) / 2;
-		int r1x, r1y, r2x, r2y;
-		rotateAroundPoint(s1x, s1y, centerx, centery, r1x, r1y);
-		rotateAroundPoint(s2x, s2y, centerx, centery, r2x, r2y);
+		BWAPI::TilePosition center((s1 + s2) / 2);
+		BWAPI::TilePosition r1 = rotateAroundPoint(s1, center);
+		BWAPI::TilePosition r2 = rotateAroundPoint(s2, center);
 
 		// draw a line perpendicular to the chokepoint sides, until we get out of the flood filled area in both directions:
-		int *edges = findExtremes(chokeGrid, r1x, r1y, r2x, r2y);
+		int *edges = findExtremes(chokeGrid, r1, r2);
 		std::cout << "extremes of ramp: " << edges[0] << "," << edges[1] << " and " << edges[2] << "," << edges[3] << std::endl;
 
 		// TODO in fact we only need one wall (the closest to the base?)
 		if (edges[0] != -1 && edges[1] != -1) {
-			findFarthestBorderPositions(chokeGrid, centerx, centery, edges[0], edges[1], *out);
+			findFarthestBorderPositions(chokeGrid, center, edges[0], edges[1], out);
 		}
 		if (edges[2] != -1 && edges[3] != -1) {
-			findFarthestBorderPositions(chokeGrid, centerx, centery, edges[2], edges[3], *out);
+			findFarthestBorderPositions(chokeGrid, center, edges[2], edges[3], out);
 		}
 
 		delete[]edges;
@@ -324,13 +312,12 @@ namespace BWTA
 
 
 
-	void generateWallStartingPoints(RectangleArray<int> chokeGrid, int s1x, int s1y, int s2x, int s2y, std::ofstream *out)
+	void generateWallStartingPoints(RectangleArray<int> chokeGrid, BWAPI::TilePosition s1, BWAPI::TilePosition s2, std::ofstream& out)
 	{
-		int centerx = (s1x + s2x) / 2;
-		int centery = (s1y + s2y) / 2;
-		int centerType = chokeGrid[centerx][centery];
+		BWAPI::TilePosition center((s1 + s2) / 2);
+		int centerType = chokeGrid[center.x][center.y];
 
-		if (centerType == 2) generateWallStartingPointsNoRamp(chokeGrid, s1x, s1y, s2x, s2y, out);
-		if (centerType == 1) generateWallStartingPointsRamp(chokeGrid, s1x, s1y, s2x, s2y, out);
+		if (centerType == 2) generateWallStartingPointsNoRamp(chokeGrid, s1, s2, out);
+		if (centerType == 1) generateWallStartingPointsRamp(chokeGrid, s1, s2, out);
 	}
 }
