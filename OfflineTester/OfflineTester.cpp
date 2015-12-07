@@ -28,7 +28,7 @@ int main(int argc, char * argv[])
 	}
 
 
-	wallingGHOST(smallestChokepoint); // Test GHOST walling
+	wallingGHOST(smallestChokepoint, homeRegion); // Test GHOST walling
 // 	wallingASP(smallestChokepoint, homeBase); // Test Certicky's walling
 
 
