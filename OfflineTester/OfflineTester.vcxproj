@@ -1,6 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="DebugOffline|Win32">
+      <Configuration>DebugOffline</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
@@ -29,6 +33,13 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugOffline|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
@@ -38,11 +49,17 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugOffline|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugOffline|Win32'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -51,12 +68,17 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../externalInclude;../include;$(BWAPI_DIR)/include;$(BOOST_INCLUDEDIR)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\externalInclude;..\include;$(BWAPI_DIR)include;$(BOOST_INCLUDEDIR)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../lib/;$(BWAPI_DIR)/lib;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\lib\;$(BWAPI_DIR)lib;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libgmp-10.lib;libmpfr-4.lib;BWAPId.lib;StormLibDAD.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Svg.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -82,7 +104,45 @@
       <ProgramDatabaseFile />
     </Link>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugOffline|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\externalInclude;..\include;$(BWAPI_DIR)include;$(BOOST_INCLUDEDIR)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
+      <ProgramDataBaseFileName>
+      </ProgramDataBaseFileName>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>..\lib;$(BWAPI_DIR)lib;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>BWAPI.lib;libgmp-10.lib;libmpfr-4.lib;StormLibRAD.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Svg.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ProgramDatabaseFile>
+      </ProgramDatabaseFile>
+    </Link>
+  </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\GHOST\include\constraints\constraint.hpp" />
+    <ClInclude Include="..\..\GHOST\include\constraints\wallinConstraint.hpp" />
+    <ClInclude Include="..\..\GHOST\include\domains\domain.hpp" />
+    <ClInclude Include="..\..\GHOST\include\domains\wallinDomain.hpp" />
+    <ClInclude Include="..\..\GHOST\include\misc\races.hpp" />
+    <ClInclude Include="..\..\GHOST\include\misc\random.hpp" />
+    <ClInclude Include="..\..\GHOST\include\misc\wallinProtoss.hpp" />
+    <ClInclude Include="..\..\GHOST\include\misc\wallinTerran.hpp" />
+    <ClInclude Include="..\..\GHOST\include\objectives\objective.hpp" />
+    <ClInclude Include="..\..\GHOST\include\objectives\wallinObjective.hpp" />
+    <ClInclude Include="..\..\GHOST\include\solver.hpp" />
+    <ClInclude Include="..\..\GHOST\include\variables\building.hpp" />
+    <ClInclude Include="..\..\GHOST\include\variables\variable.hpp" />
     <ClInclude Include="..\OfflineExtractor\MapFileParser.h" />
     <ClInclude Include="..\OfflineExtractor\MiniTileFlags.h" />
     <ClInclude Include="..\OfflineExtractor\sha1.h" />
@@ -92,6 +152,11 @@
     <ClInclude Include="WallingGHOST.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\GHOST\src\constraints\wallinConstraint.cpp" />
+    <ClCompile Include="..\..\GHOST\src\domains\wallinDomain.cpp" />
+    <ClCompile Include="..\..\GHOST\src\objectives\wallinObjective.cpp" />
+    <ClCompile Include="..\..\GHOST\src\variables\building.cpp" />
+    <ClCompile Include="..\..\GHOST\src\variables\variable.cpp" />
     <ClCompile Include="..\OfflineExtractor\MapFileParser.cpp" />
     <ClCompile Include="..\OfflineExtractor\sha1.cpp" />
     <ClCompile Include="..\OfflineExtractor\TileSet.cpp" />
@@ -99,6 +164,7 @@
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugOffline|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="WallingASP.cpp" />
     <ClCompile Include="WallingGHOST.cpp" />

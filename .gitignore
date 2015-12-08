@@ -14,11 +14,13 @@ bld/
 [Oo]bj/
 Release-Log/
 ReleaseOffline/
+DebugOffline/
 logs/
 lib/BWTA.lib
 lib/BWTAd.lib
 lib/BWTA-log.lib
 lib/BWTAOffline.lib
+lib/BWTAOfflined.lib
 
 # Visual C++ cache files
 ipch/

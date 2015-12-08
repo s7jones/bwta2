@@ -7,6 +7,9 @@
     <Filter Include="Tests">
       <UniqueIdentifier>{96ea606c-3b65-47ea-83a3-30fbb850e6f1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GHOST">
+      <UniqueIdentifier>{1b680772-7ab6-435d-8f05-fd0293d545dc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\OfflineExtractor\MapFileParser.h">
@@ -28,6 +31,45 @@
     <ClInclude Include="WallingGHOST.h">
       <Filter>Tests</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\GHOST\include\solver.hpp">
+      <Filter>GHOST</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\GHOST\include\constraints\constraint.hpp">
+      <Filter>GHOST</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\GHOST\include\constraints\wallinConstraint.hpp">
+      <Filter>GHOST</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\GHOST\include\domains\domain.hpp">
+      <Filter>GHOST</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\GHOST\include\domains\wallinDomain.hpp">
+      <Filter>GHOST</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\GHOST\include\misc\random.hpp">
+      <Filter>GHOST</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\GHOST\include\misc\wallinProtoss.hpp">
+      <Filter>GHOST</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\GHOST\include\misc\wallinTerran.hpp">
+      <Filter>GHOST</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\GHOST\include\objectives\objective.hpp">
+      <Filter>GHOST</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\GHOST\include\objectives\wallinObjective.hpp">
+      <Filter>GHOST</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\GHOST\include\variables\building.hpp">
+      <Filter>GHOST</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\GHOST\include\variables\variable.hpp">
+      <Filter>GHOST</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\GHOST\include\misc\races.hpp">
+      <Filter>GHOST</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\OfflineExtractor\MapFileParser.cpp">
@@ -46,6 +88,21 @@
     </ClCompile>
     <ClCompile Include="WallingGHOST.cpp">
       <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\GHOST\src\constraints\wallinConstraint.cpp">
+      <Filter>GHOST</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\GHOST\src\domains\wallinDomain.cpp">
+      <Filter>GHOST</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\GHOST\src\objectives\wallinObjective.cpp">
+      <Filter>GHOST</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\GHOST\src\variables\building.cpp">
+      <Filter>GHOST</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\GHOST\src\variables\variable.cpp">
+      <Filter>GHOST</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

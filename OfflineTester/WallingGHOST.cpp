@@ -1,5 +1,14 @@
 #include "WallingGHOST.h"
 
+#include "../../GHOST/include/variables/building.hpp"
+#include "../../GHOST/include/domains/wallinDomain.hpp"
+#include "../../GHOST/include/constraints/wallinConstraint.hpp"
+#include "../../GHOST/include/objectives/wallinObjective.hpp"
+#include "../../GHOST/include/misc/wallinTerran.hpp"
+#include "../../GHOST/include/solver.hpp"
+
+using namespace ghost;
+
 BWAPI::TilePosition gridOffset;
 
 void wallingGHOST(BWTA::Chokepoint* chokepointToWall, BWTA::Region* prefRegion)
@@ -56,6 +65,35 @@ void wallingGHOST(BWTA::Chokepoint* chokepointToWall, BWTA::Region* prefRegion)
 	fileTxt << "wall from " << extremes.side1 << " to " << extremes.side2 << std::endl;
 	chokeGrid.saveToFile(fileTxt);
 	fileTxt.close();
+
+	// GHOST solver
+	// ========================
+
+	// list of unbuildable tiles
+	// now read the map:
+	std::vector< std::pair<int, int> > unbuildables;
+	const int MAX_X = static_cast<int>(chokeGrid.getWidth());
+	const int MAX_Y = static_cast<int>(chokeGrid.getHeight());
+	for (int x = 0; x < MAX_X; ++x) {
+		for (int y = 0; y < MAX_Y; ++y) {
+			if (chokeGrid[x][y] != 2) unbuildables.push_back(std::pair<int, int>(x, y));
+		}
+	}
+
+	std::vector<Building> vec = makeTerranBuildings();
+	WallinDomain domain(MAX_X, MAX_Y, unbuildables, &vec, extremes.side1.x, extremes.side1.y, extremes.side2.x, extremes.side2.y);
+	std::vector< shared_ptr<WallinConstraint> > vecConstraints = makeTerranConstraints(&vec, &domain);
+
+	std::cout << "map size: " << MAX_X << "," << MAX_Y << std::endl;
+	std::cout << "calling solver..." << std::endl;
+
+	shared_ptr<WallinObjective> objective = make_shared<GapObj>();
+	Solver<Building, WallinDomain, WallinConstraint> solver(&vec, &domain, vecConstraints, objective);
+
+	const int timeLimit = 80;
+	solver.solve(timeLimit, 160);
+
+	std::cout << domain << std::endl;
 }
 
 
@@ -158,7 +196,7 @@ namespace BWTA
 	*/
 	int* findExtremes(BWTA::RectangleArray<int> chokeGrid, BWAPI::TilePosition s1, BWAPI::TilePosition s2)
 	{
-		std::cout << "Sides: " << s1 << " - " << s2 << std::endl;
+// 		std::cout << "Sides: " << s1 << " - " << s2 << std::endl;
 		BWAPI::TilePosition center((s1 + s2) / 2);
 		int dx = abs(s2.x - s1.x);
 		int dy = abs(s2.y - s1.y);
@@ -290,7 +328,7 @@ namespace BWTA
 		int *edges = findExtremes(chokeGrid, r1, r2);
 		ExtremePoints rampExtremes(edges[0], edges[1], edges[2], edges[3]);
 		delete[]edges;
-		std::cout << "extremes of ramp: " << rampExtremes.side1 << " and " << rampExtremes.side2 << std::endl;
+// 		std::cout << "extremes of ramp: " << rampExtremes.side1 << " and " << rampExtremes.side2 << std::endl;
 
 		// We only need one wall (the one in prefRegion)
 		if (rampExtremes.side1.isValid() && BWTA::getRegion(rampExtremes.side1 + gridOffset) == prefRegion) {
@@ -299,7 +337,6 @@ namespace BWTA
 			extremes = getFarthestBorderPositions(chokeGrid, center, rampExtremes.side2);
 		}
 
-		
 		return extremes;
 	}
 
