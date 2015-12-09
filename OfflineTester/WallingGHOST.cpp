@@ -84,16 +84,22 @@ void wallingGHOST(BWTA::Chokepoint* chokepointToWall, BWTA::Region* prefRegion)
 	WallinDomain domain(MAX_X, MAX_Y, unbuildables, &vec, extremes.side1.x, extremes.side1.y, extremes.side2.x, extremes.side2.y);
 	std::vector< shared_ptr<WallinConstraint> > vecConstraints = makeTerranConstraints(&vec, &domain);
 
-	std::cout << "map size: " << MAX_X << "," << MAX_Y << std::endl;
+// 	std::cout << "map size: " << MAX_X << "," << MAX_Y << std::endl;
 	std::cout << "calling solver..." << std::endl;
 
 	shared_ptr<WallinObjective> objective = make_shared<GapObj>();
 	Solver<Building, WallinDomain, WallinConstraint> solver(&vec, &domain, vecConstraints, objective);
 
-	const int timeLimit = 20;
 	solver.solve(20, 150);
 
 	std::cout << domain << std::endl;
+	std::cout << "Wall solution :" << std::endl;
+	for (const auto& building : vec) {
+		if (building.isSelected()) {
+			pair<int, int> pos = domain.lin2mat(building.getValue());
+			std::cout << building.getFullName() << " (" << pos.first << "," << pos.second << ")" << std::endl;
+		}
+	}
 }
 
 
