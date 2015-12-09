@@ -65,7 +65,7 @@ void wallingGHOST(BWTA::Chokepoint* chokepointToWall, BWTA::Region* prefRegion)
 	fileTxt << "wall from " << extremes.side1 << " to " << extremes.side2 << std::endl;
 	chokeGrid.saveToFile(fileTxt);
 	fileTxt.close();
-
+	
 	// GHOST solver
 	// ========================
 
@@ -90,8 +90,8 @@ void wallingGHOST(BWTA::Chokepoint* chokepointToWall, BWTA::Region* prefRegion)
 	shared_ptr<WallinObjective> objective = make_shared<GapObj>();
 	Solver<Building, WallinDomain, WallinConstraint> solver(&vec, &domain, vecConstraints, objective);
 
-	const int timeLimit = 80;
-	solver.solve(timeLimit, 160);
+	const int timeLimit = 20;
+	solver.solve(20, 150);
 
 	std::cout << domain << std::endl;
 }
@@ -328,7 +328,10 @@ namespace BWTA
 		int *edges = findExtremes(chokeGrid, r1, r2);
 		ExtremePoints rampExtremes(edges[0], edges[1], edges[2], edges[3]);
 		delete[]edges;
+
 // 		std::cout << "extremes of ramp: " << rampExtremes.side1 << " and " << rampExtremes.side2 << std::endl;
+// 		std::cout << "Region(" << prefRegion << ") side1 region(" << BWTA::getRegion(rampExtremes.side1 + gridOffset) 
+// 			<< ") side2 region(" << BWTA::getRegion(rampExtremes.side2 + gridOffset) << ")" << std::endl;
 
 		// We only need one wall (the one in prefRegion)
 		if (rampExtremes.side1.isValid() && BWTA::getRegion(rampExtremes.side1 + gridOffset) == prefRegion) {
@@ -349,11 +352,13 @@ namespace BWTA
 		int centerType = chokeGrid[center.x][center.y];
 
 		if (centerType == 2) { // No ramp
+// 			std::cout << "The checkpoint is NOT a ramp" << std::endl;
 			int *edges = findExtremes(chokeGrid, s1, s2);
 			extremes = ExtremePoints(edges[0], edges[1], edges[2], edges[3]);
 			delete[]edges;
 		}
 		if (centerType == 1) { // Ramp
+// 			std::cout << "The checkpoint IS a ramp" << std::endl;
 			extremes = getWallExtremePointsRamp(chokeGrid, s1, s2, prefRegion);
 		}
 
