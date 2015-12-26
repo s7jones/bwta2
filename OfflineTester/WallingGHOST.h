@@ -20,4 +20,4 @@ namespace BWTA
 	ExtremePoints getWallExtremePoints(RectangleArray<int> chokeGrid, BWAPI::TilePosition s1, BWAPI::TilePosition s2, BWTA::Region* prefRegion);
 }
 
-void wallingGHOST(BWTA::Chokepoint* chokepointToWall, BWTA::Region* prefRegion);
+double wallingGHOST(BWTA::Chokepoint* chokepointToWall, BWTA::Region* prefRegion);

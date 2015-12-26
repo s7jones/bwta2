@@ -10,8 +10,9 @@
 using namespace ghost;
 
 BWAPI::TilePosition gridOffset;
+std::vector<Building> vec = makeTerranBuildings();
 
-void wallingGHOST(BWTA::Chokepoint* chokepointToWall, BWTA::Region* prefRegion)
+double wallingGHOST(BWTA::Chokepoint* chokepointToWall, BWTA::Region* prefRegion)
 {
 	// Generate the grids around ALL chokepoints:
 // 	std::ofstream fileTxt("logs/output.txt");
@@ -80,26 +81,27 @@ void wallingGHOST(BWTA::Chokepoint* chokepointToWall, BWTA::Region* prefRegion)
 		}
 	}
 
-	std::vector<Building> vec = makeTerranBuildings();
+// 	std::vector<Building> vec = makeTerranBuildings(); // TODO because the internal id we can only call this once....
 	WallinDomain domain(MAX_X, MAX_Y, unbuildables, &vec, extremes.side1.x, extremes.side1.y, extremes.side2.x, extremes.side2.y);
 	std::vector< shared_ptr<WallinConstraint> > vecConstraints = makeTerranConstraints(&vec, &domain);
 
-// 	std::cout << "map size: " << MAX_X << "," << MAX_Y << std::endl;
 	std::cout << "calling solver..." << std::endl;
 
 	shared_ptr<WallinObjective> objective = make_shared<GapObj>();
 	Solver<Building, WallinDomain, WallinConstraint> solver(&vec, &domain, vecConstraints, objective);
 
-	solver.solve(20, 150);
+// 	solver.solve(20, 150);
+	double cost = solver.solve(5, 20);
 
-	std::cout << domain << std::endl;
-	std::cout << "Wall solution :" << std::endl;
-	for (const auto& building : vec) {
-		if (building.isSelected()) {
-			pair<int, int> pos = domain.lin2mat(building.getValue());
-			std::cout << building.getFullName() << " (" << pos.first << "," << pos.second << ")" << std::endl;
-		}
-	}
+// 	std::cout << domain << std::endl;
+// 	std::cout << "Wall solution :" << std::endl;
+// 	for (const auto& building : vec) {
+// 		if (building.isSelected()) {
+// 			pair<int, int> pos = domain.lin2mat(building.getValue());
+// 			std::cout << building.getFullName() << " (" << pos.first << "," << pos.second << ")" << std::endl;
+// 		}
+// 	}
+	return cost;
 }
 
 

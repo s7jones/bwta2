@@ -15,5 +15,6 @@ void wallingASP(BWTA::Chokepoint* chokepointToWall, BWTA::BaseLocation* homeBase
 void analyzeChoke(BWTA::Chokepoint* choke, BWTA::BaseLocation* homeBase);
 bool canBuildHere(BWAPI::TilePosition position, BWAPI::UnitType type); // simplier version of BWAPI::canBuildHere()
 void initClingoProgramSource(BWTA::BaseLocation* homeBase);
+void runASPSolver();
 BWAPI::TilePosition findClosestTile(const std::vector<BWAPI::TilePosition>& tiles, BWAPI::TilePosition targetTile);
 BWAPI::TilePosition findFarthestTile(const std::vector<BWAPI::TilePosition>& tiles, BWAPI::TilePosition targetTile);

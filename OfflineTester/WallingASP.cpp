@@ -9,10 +9,9 @@ bool optimizeGap = true;
 
 void wallingASP(BWTA::Chokepoint* chokepointToWall, BWTA::BaseLocation* homeBase)
 {
-
 	analyzeChoke(chokepointToWall, homeBase);
 	initClingoProgramSource(homeBase);
-	// 	runASPSolver();
+	runASPSolver();
 }
 
 void analyzeChoke(BWTA::Chokepoint* choke, BWTA::BaseLocation* homeBase)
@@ -243,6 +242,88 @@ void initClingoProgramSource(BWTA::BaseLocation* homeBase)
 	} else {
 		std::cout << "Error Opening File" << std::endl;
 	}
+}
+
+void runASPSolver()
+{
+	// TODO use relative path
+	system("c:/devel/clingo-4.5.4-win64/clingo.exe c:/BWTA2/logs/ASPwall.txt > c:/BWTA2/logs/ASPwallout.txt");
+
+	std::vector<std::string> lines;
+	std::string line;
+	unsigned lineCounter = 0;
+	std::ifstream file("c:/BWTA2/logs/ASPwallout.txt");
+	if (file.is_open()){
+		while (getline(file, line)){
+			if (*(line.end() - 1) == '\r')
+				line.erase(line.end() - 1);
+			lines.push_back(line);
+			if (line == "OPTIMUM FOUND"){
+				line = lines[lineCounter - 2];	// contains final answer that will be parsed
+				break;
+			}
+			if (line == "UNSATISFIABLE"){	   // error in solver
+				std::cout << "Solver failed finding a solution!" << std::endl;
+				return;
+			}
+			lineCounter++;
+		}
+
+		// parse the answer, example output below
+		// place(supplyDepot1,119,46) place(supplyDepot2,122,44) place(barracks1,116,52) 
+		std::stringstream ss;
+		std::string token;
+		while (line != ""){	 // tokenized the whole line
+			std::vector<int> coords;
+			BWAPI::UnitType type;
+			int val;
+
+
+			ss << line.substr(6, line.find(")") - 6);   // place( = 6 chars
+			while (getline(ss, token, ',')){	   // tokenizing the individual place() statements
+				std::istringstream iss(token);
+				iss >> val;
+
+				if (iss.fail()){
+					std::size_t found = token.find("supplyDepot");	// search for supply depot
+
+					// if found its supply depot, if not found its barracks (early wall)
+					type = found != std::string::npos ? BWAPI::UnitTypes::Terran_Supply_Depot : BWAPI::UnitTypes::Terran_Barracks;
+				} else{   // coordinates
+					coords.push_back(val);
+				}
+			}
+
+			// erase the parsed part including the closing parenthesis and space
+			line.erase(0, line.find(")") + 2);
+
+			// clear buffers
+			ss.clear();
+			token.clear();
+
+			// add the result to data structure after successful parsing for each place() statement
+// 			wallLayout.push_back(std::make_pair(type, BWAPI::TilePosition(coords[0], coords[1])));
+			std::cout << type.c_str() << BWAPI::TilePosition(coords[0], coords[1]) << std::endl;
+		}
+
+		// save results into bots memory
+// 		ITUBot::_wall = wallLayout;
+
+		file.close();
+
+		// finally, add choke point width to the output file
+// 		std::ofstream  oFile("D:/SCAI/IT_WORKS/StarCraft/bwapi-data/AI/out.txt", std::ios::app);
+// 
+// 		if (oFile.is_open()){
+// 			oFile << "Choke Width: " << choke->getWidth() << endl;
+// 			oFile.close();
+// 		} else{
+// 			std::cout << "Error opening output file" << std::endl;
+// 		}
+	} else
+		std::cout << "** ERROR OPENING SOLVER OUTPUT FILE" << std::endl;
+
+
 }
 
 BWAPI::TilePosition findClosestTile(const std::vector<BWAPI::TilePosition>& tiles, BWAPI::TilePosition targetTile)
