@@ -121,7 +121,7 @@ namespace BWTA
 				  if (f > 10) { f = 14; }
 				  int v = distance + f;
 				  if (distance_map[ix][iy] > v) {
-					  heap.set(BWAPI::WalkPosition(x, y), v);
+					  heap.push(std::make_pair(BWAPI::WalkPosition(x, y), v));
 					  distance_map[ix][iy] = v;
 				  } else {
 					  if (distance_map[ix][iy] == -1 && read_map[ix][iy] == true) {
@@ -171,7 +171,7 @@ namespace BWTA
           if (f>10) {f=14;}
           int v=distance+f;
           if (distance_map[ix][iy]>v) {
-            heap.set(BWAPI::Position(x,y),v);
+            heap.push(std::make_pair(BWAPI::Position(x, y), v));
             distance_map[ix][iy]=v;
           } else {
             if (distance_map[ix][iy]==-1 && MapData::rawWalkability[ix][iy]==true) {

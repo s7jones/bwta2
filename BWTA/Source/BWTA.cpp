@@ -239,7 +239,7 @@ namespace BWTA
           if (f>32) {f=45;}
           int v=distance+f;
           if (distanceMap[ix][iy]>v) {
-            heap.set(BWAPI::TilePosition(x,y),v);
+            heap.push(std::make_pair(BWAPI::TilePosition(x, y), v));
             distanceMap[ix][iy]=v;
           } else {
             if (distanceMap[ix][iy]==-1 && MapData::lowResWalkability[ix][iy]==true) {
@@ -288,7 +288,7 @@ namespace BWTA
           int v=distance+f;
           if (distanceMap[ix][iy]>v)
           {
-            heap.set(BWAPI::TilePosition(x,y),v);
+              heap.push(std::make_pair(BWAPI::TilePosition(x, y), v));
             distanceMap[ix][iy]=v;
           } else {
             if (distanceMap[ix][iy]==-1)

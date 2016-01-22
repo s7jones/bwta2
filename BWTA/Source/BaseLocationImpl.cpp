@@ -25,14 +25,14 @@ namespace BWTA
   int BaseLocationImpl::minerals() const
   {
     int count=0;
-    for each (BWAPI::Unit m in this->staticMinerals)
+    for (BWAPI::Unit m : this->staticMinerals)
 		count += m->getResources();
     return count;
   }
   int BaseLocationImpl::gas() const
   {
     int count=0;
-    for each (BWAPI::Unit g in this->geysers)
+    for (BWAPI::Unit g : this->geysers)
 		count += g->getResources();
     return count;
   }
