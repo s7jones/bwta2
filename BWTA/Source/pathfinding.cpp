@@ -393,21 +393,23 @@ namespace BWTA
 	int getGroundDistance2(BWAPI::TilePosition start, BWAPI::TilePosition target)
 	{
 		// TODO check if buildChokeNodes was called (MapData::chokeNodes was populated)
-		// TODO add case where start and target are in the same region
-		//log("Regions: " << BWTA::getRegion(start) << " - " << BWTA::getRegion(target));
-		if (BWTA::getRegion(start) == BWTA::getRegion(target)) {
+		BWTA::Region* startRegion = BWTA::getRegion(start);
+		BWTA::Region* targetRegion = BWTA::getRegion(target);
+		if (startRegion == nullptr || targetRegion == nullptr) {
+			return -1;
+		}
+		if (startRegion == targetRegion) {
 			return (int)AstarSearchDistance(start,target);
 		}
 		// copy chokeNodeGraph and add final nodes
 		ChokepointGraph tmpChokeNodes = MapData::chokeNodes;
-		BWTA::Region* region = BWTA::getRegion(BWAPI::TilePosition(target));
-		std::set<BWTA::Chokepoint*> chokes = region->getChokepoints();
+		std::set<BWTA::Chokepoint*> chokes = targetRegion->getChokepoints();
 		// get cost to each entrance of the target
-		for (std::set<BWTA::Chokepoint*>::const_iterator it = chokes.begin(); it != chokes.end(); ++it) {
+		for (const auto& choke : chokes) {
 			// get cost to target
-			int cost = (int)AstarSearchDistance(target, BWAPI::TilePosition((*it)->getCenter()));
+			int cost = (int)AstarSearchDistance(target, BWAPI::TilePosition(choke->getCenter()));
 			//log("[TARGET] Cost to chokepoint (" << BWAPI::TilePosition((*it)->getCenter()).x() << "," << BWAPI::TilePosition((*it)->getCenter()).y() << ": " << cost );
-			if (cost != -1) tmpChokeNodes[(*it)].insert(std::make_pair((BWTA::Chokepoint *)NULL, cost));
+			if (cost != -1) tmpChokeNodes[choke].insert(std::make_pair((BWTA::Chokepoint *)NULL, cost));
 		}
 
 		// Execute A* on tmpChokeNodes graph
@@ -418,17 +420,16 @@ namespace BWTA
 		std::set<BWTA::Chokepoint*> closedNodes;
 
 		// set first nodes as the cost to get to region start entrances
-		region = BWTA::getRegion(BWAPI::TilePosition(start));
-		chokes = region->getChokepoints();
+		chokes = startRegion->getChokepoints();
 		// get cost to each entrance of the start
-		for (std::set<BWTA::Chokepoint*>::const_iterator it = chokes.begin(); it != chokes.end(); ++it) {
+		for (const auto& choke : chokes) {
 			// get cost to start
-			int cost = (int)AstarSearchDistance(start, BWAPI::TilePosition((*it)->getCenter()));
+			int cost = (int)AstarSearchDistance(start, BWAPI::TilePosition(choke->getCenter()));
 			//log("[START] Cost to chokepoint (" << BWAPI::TilePosition((*it)->getCenter()).x() << "," << BWAPI::TilePosition((*it)->getCenter()).y() << ": " << cost );
 			if (cost != -1) {
-				openNodes.insert(std::make_pair(cost, *it));
-				gmap[*it] = cost;
-				parent[*it] = *it;
+				openNodes.insert(std::make_pair(cost, choke));
+				gmap[choke] = cost;
+				parent[choke] = choke;
 			}
 		}
 

@@ -147,6 +147,7 @@
     <ClInclude Include="..\OfflineExtractor\MiniTileFlags.h" />
     <ClInclude Include="..\OfflineExtractor\sha1.h" />
     <ClInclude Include="..\OfflineExtractor\TileSet.h" />
+    <ClInclude Include="Pathfinding.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="WallingASP.h" />
     <ClInclude Include="WallingGHOST.h" />
@@ -161,6 +162,7 @@
     <ClCompile Include="..\OfflineExtractor\sha1.cpp" />
     <ClCompile Include="..\OfflineExtractor\TileSet.cpp" />
     <ClCompile Include="OfflineTester.cpp" />
+    <ClCompile Include="Pathfinding.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

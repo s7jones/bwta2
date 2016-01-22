@@ -7,14 +7,14 @@ std::vector<BWAPI::TilePosition> supplyTiles;
 std::vector<BWAPI::TilePosition> barracksTiles;
 bool optimizeGap = true;
 
-void wallingASP(BWTA::Chokepoint* chokepointToWall, BWTA::BaseLocation* homeBase)
+void wallingASP(BWTA::Chokepoint* chokepointToWall, BWTA::Region* homeRegion, BWAPI::TilePosition homeTilePosition)
 {
-	analyzeChoke(chokepointToWall, homeBase);
-	initClingoProgramSource(homeBase);
+	analyzeChoke(chokepointToWall, homeRegion);
+	initClingoProgramSource(homeTilePosition);
 	runASPSolver();
 }
 
-void analyzeChoke(BWTA::Chokepoint* choke, BWTA::BaseLocation* homeBase)
+void analyzeChoke(BWTA::Chokepoint* choke, BWTA::Region* homeRegion)
 {
 	int x = choke->getCenter().x;
 	int y = choke->getCenter().y;
@@ -28,7 +28,7 @@ void analyzeChoke(BWTA::Chokepoint* choke, BWTA::BaseLocation* homeBase)
 		for (int j = tileY - maxDist; j <= tileY + maxDist; ++j){
 			BWAPI::TilePosition currentTile(i, j);
 			// if the tile is in home region
-			if (BWTA::getRegion(currentTile) == homeBase->getRegion()){
+			if (BWTA::getRegion(currentTile) == homeRegion){
 				// and it is buildable, add it to the buildTiles
 				if (BWTA::MapData::buildability[i][j]){
 					buildTiles.push_back(currentTile);
@@ -82,7 +82,7 @@ bool canBuildHere(BWAPI::TilePosition position, BWAPI::UnitType type)
 	return true;
 }
 
-void initClingoProgramSource(BWTA::BaseLocation* homeBase)
+void initClingoProgramSource(BWAPI::TilePosition baseTilePosition)
 {
 	std::ofstream file;
 
@@ -163,8 +163,8 @@ void initClingoProgramSource(BWTA::BaseLocation* homeBase)
 
 		////////////////////////
 
-		BWAPI::TilePosition insideBase = findClosestTile(buildTiles, homeBase->getTilePosition());
-		BWAPI::TilePosition outsideBase = findFarthestTile(outsideTiles, homeBase->getTilePosition());
+		BWAPI::TilePosition insideBase = findClosestTile(buildTiles, baseTilePosition);
+		BWAPI::TilePosition outsideBase = findFarthestTile(outsideTiles, baseTilePosition);
 		file << "insideBase(" << insideBase.x << ", " << insideBase.y << ").\t";
 		file << "outsideBase(" << outsideBase.x << ", " << outsideBase.y << ")." << std::endl << std::endl
 

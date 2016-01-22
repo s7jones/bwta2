@@ -1,19 +1,40 @@
 #include "..\OfflineExtractor\MapFileParser.h"
 #include "WallingGHOST.h"
 #include "WallingASP.h"
+#include "Pathfinding.h"
 
 #include <tlhelp32.h>
 #include <chrono>
 
+void wallingTest();
+void patfhindingTest();
+
 int main(int argc, char * argv[])
 {
 	// Off-line map file parsing
-	bool ok = BWTA::parseMapFile("maps\\(3)Aztec.scx");
+	bool ok = BWTA::parseMapFile("maps\\(2)Destination.scx");
 	if (!ok) return 1;
 	// Normal procedure to analyze map
 	BWTA::analyze();
 
 
+	patfhindingTest();
+// 	wallingTest(); // Tests with "maps\\(3)Aztec.scx"
+
+
+	BWTA::cleanMemory();
+	return 0;
+}
+
+void patfhindingTest() {
+	BWTA::buildChokeNodes();
+
+	compareDistance(BWAPI::TilePosition(28, 116), BWAPI::TilePosition(69, 122));
+	compareDistance(BWAPI::TilePosition(32, 97), BWAPI::TilePosition(48, 64));
+}
+
+void wallingTest()
+{
 	// get the first startLocation as home
 	BWTA::BaseLocation* homeBase = nullptr;
 	// get start location with lowest y position
@@ -35,13 +56,29 @@ int main(int argc, char * argv[])
 			smallestChokepoint = chokepoint;
 		}
 	}
-	std::cout << "walling chokepoint " << smallestChokepoint->getCenter() << " and pref region " << homeRegion->getCenter() << std::endl;
+	std::cout << "walling chokepoint " << smallestChokepoint->getCenter() << " (width: " << minWidth << ") and pref region " << homeRegion->getCenter() << std::endl;
+	// iterate through all chokepoints and look for the one with the smallest gap (least width)
+	double maxWidth = std::numeric_limits<double>::min();
+	BWTA::Chokepoint* biggestChokepoint = nullptr;
+	for (const auto& chokepoint : BWTA::getChokepoints()) {
+		if (chokepoint->getWidth() > maxWidth && chokepoint->getWidth() < 300) {
+			maxWidth = chokepoint->getWidth();
+			biggestChokepoint = chokepoint;
+		}
+	}
+	std::cout << "walling chokepoint " << biggestChokepoint->getCenter() << " (width: " << maxWidth << ") and pref region " << (biggestChokepoint->getRegions().first)->getCenter() << std::endl;
 
-	const int loops = 20;
+	const int loops = 1;
 	int i = 0;
 	double totalTime = 0;
 	double success = 0;
 	bool runGhost = true;
+	// 	BWTA::Chokepoint* selectedChokepoint = biggestChokepoint;
+	// 	BWTA::Region* selectedRegion = biggestChokepoint->getRegions().first;
+	// 	BWAPI::TilePosition selectedPosition = BWAPI::TilePosition(selectedRegion->getCenter());
+	BWTA::Chokepoint* selectedChokepoint = smallestChokepoint;
+	BWTA::Region* selectedRegion = homeRegion;
+	BWAPI::TilePosition selectedPosition = homeBase->getTilePosition();
 	double result;
 
 	for (i; i < loops; ++i) {
@@ -49,9 +86,9 @@ int main(int argc, char * argv[])
 		auto start = std::chrono::steady_clock::now();
 
 		if (runGhost)
-			result = wallingGHOST(smallestChokepoint, homeRegion); // Test GHOST walling
+			result = wallingGHOST(selectedChokepoint, selectedRegion); // Test GHOST walling
 		else
-			wallingASP(smallestChokepoint, homeBase); // Test Certicky's walling
+			wallingASP(selectedChokepoint, selectedRegion, selectedPosition); // Test Certicky's walling
 
 		auto end = std::chrono::steady_clock::now();
 		auto diff = end - start;
@@ -59,9 +96,6 @@ int main(int argc, char * argv[])
 		if (runGhost && result == 1) ++success;
 	}
 	std::cout << "=================" << std::endl;
-	std::cout << "Time: " << totalTime/(double)loops << " ms" << std::endl;
-	if (runGhost) std::cout << "Success: " << (success / (double)loops)*100 << " %" << std::endl;
-
-	BWTA::cleanMemory();
-	return 0;
+	std::cout << "Time: " << totalTime / (double)loops << " ms" << std::endl;
+	if (runGhost) std::cout << "Success: " << (success / (double)loops) * 100 << " %" << std::endl;
 }

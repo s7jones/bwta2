@@ -73,8 +73,10 @@ double wallingGHOST(BWTA::Chokepoint* chokepointToWall, BWTA::Region* prefRegion
 	// list of unbuildable tiles
 	// now read the map:
 	std::vector< std::pair<int, int> > unbuildables;
-	const int MAX_X = static_cast<int>(chokeGrid.getWidth());
-	const int MAX_Y = static_cast<int>(chokeGrid.getHeight());
+// 	const int MAX_X = static_cast<int>(chokeGrid.getWidth());
+// 	const int MAX_Y = static_cast<int>(chokeGrid.getHeight());
+	const int MAX_X = 9;
+	const int MAX_Y = 8;
 	for (int x = 0; x < MAX_X; ++x) {
 		for (int y = 0; y < MAX_Y; ++y) {
 			if (chokeGrid[x][y] != 2) unbuildables.push_back(std::pair<int, int>(x, y));
@@ -83,6 +85,7 @@ double wallingGHOST(BWTA::Chokepoint* chokepointToWall, BWTA::Region* prefRegion
 
 // 	std::vector<Building> vec = makeTerranBuildings(); // TODO because the internal id we can only call this once....
 	WallinDomain domain(MAX_X, MAX_Y, unbuildables, &vec, extremes.side1.x, extremes.side1.y, extremes.side2.x, extremes.side2.y);
+// 	WallinDomain domain(MAX_X, MAX_Y, unbuildables, &vec, 5, 8, 10, 5);
 	std::vector< shared_ptr<WallinConstraint> > vecConstraints = makeTerranConstraints(&vec, &domain);
 
 	std::cout << "calling solver..." << std::endl;
@@ -91,16 +94,16 @@ double wallingGHOST(BWTA::Chokepoint* chokepointToWall, BWTA::Region* prefRegion
 	Solver<Building, WallinDomain, WallinConstraint> solver(&vec, &domain, vecConstraints, objective);
 
 // 	solver.solve(20, 150);
-	double cost = solver.solve(5, 20);
+	double cost = solver.solve(5, 30);
 
-// 	std::cout << domain << std::endl;
+	std::cout << domain << std::endl;
 // 	std::cout << "Wall solution :" << std::endl;
-// 	for (const auto& building : vec) {
-// 		if (building.isSelected()) {
-// 			pair<int, int> pos = domain.lin2mat(building.getValue());
-// 			std::cout << building.getFullName() << " (" << pos.first << "," << pos.second << ")" << std::endl;
-// 		}
-// 	}
+	for (const auto& building : vec) {
+		if (building.isSelected()) {
+			pair<int, int> pos = domain.lin2mat(building.getValue());
+			std::cout << building.getFullName() << " (" << pos.first << "," << pos.second << ")" << std::endl;
+		}
+	}
 	return cost;
 }
 

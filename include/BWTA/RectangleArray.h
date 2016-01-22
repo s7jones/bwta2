@@ -186,7 +186,7 @@ namespace BWTA
   {
     if (x<0 || y<0 || x>=this->width || y>=this->height)
     {
-      return (Type)NULL;
+      return (Type)nullptr;
     }
     return this->getColumn(x)[y];
   }

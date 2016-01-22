@@ -70,6 +70,9 @@
     <ClInclude Include="..\..\GHOST\include\misc\races.hpp">
       <Filter>GHOST</Filter>
     </ClInclude>
+    <ClInclude Include="Pathfinding.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\OfflineExtractor\MapFileParser.cpp">
@@ -103,6 +106,9 @@
     </ClCompile>
     <ClCompile Include="..\..\GHOST\src\variables\variable.cpp">
       <Filter>GHOST</Filter>
+    </ClCompile>
+    <ClCompile Include="Pathfinding.cpp">
+      <Filter>Tests</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
