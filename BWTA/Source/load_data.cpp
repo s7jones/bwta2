@@ -41,12 +41,17 @@ namespace BWTA
 
 		// load static buildings
 		MapData::staticNeutralBuildings.clear();
-		BWAPI::UnitType unitType;
 		for (auto unit : BWAPI::Broodwar->getStaticNeutralUnits()) {
-			// check if it is a resource container
-			unitType = unit->getType();
+			// checks if it is a resource container
+			auto unitType = unit->getType();
 			if (unitType == BWAPI::UnitTypes::Resource_Vespene_Geyser || unitType.isMineralField()) continue;
-			UnitTypePosition unitTypePosition = std::make_pair(unitType, unit->getPosition());
+
+            // Ignores also the various creatures that move around
+            if (unitType.canMove()) {
+                continue;
+            }
+
+		    auto unitTypePosition = std::make_pair(unitType, unit->getPosition());
 			MapData::staticNeutralBuildings.push_back(unitTypePosition);
 		}
 
