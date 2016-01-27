@@ -46,8 +46,8 @@ namespace BWTA
 			auto unitType = unit->getType();
 			if (unitType == BWAPI::UnitTypes::Resource_Vespene_Geyser || unitType.isMineralField()) continue;
 
-            // Ignores also the various creatures that move around
-            if (unitType.canMove()) {
+            // Ignores also the various creature types that can move around or are destructible
+            if (unitType.canMove() || !unitType.isInvincible()) {
                 continue;
             }
 
