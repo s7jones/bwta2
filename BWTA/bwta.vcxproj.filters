@@ -172,5 +172,8 @@
     <ClInclude Include="Source\Painter.h">
       <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Timer.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

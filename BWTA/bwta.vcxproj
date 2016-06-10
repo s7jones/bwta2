@@ -318,6 +318,7 @@
     <ClInclude Include="Source\Painter.h" />
     <ClInclude Include="Source\RegionImpl.h" />
     <ClInclude Include="Source\terrain_analysis.h" />
+    <ClInclude Include="Source\Timer.h" />
     <ClInclude Include="Source\VertexData.h" />
     <ClInclude Include="..\include\BWTA\BaseLocation.h" />
     <ClInclude Include="..\include\BWTA.h" />
