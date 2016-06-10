@@ -278,7 +278,6 @@
     <ClCompile Include="Source\BWTA_Result.cpp" />
     <ClCompile Include="Source\calculate_connectivity.cpp" />
     <ClCompile Include="Source\ChokepointImpl.cpp" />
-    <ClCompile Include="Source\ConnectedComponent.cpp" />
     <ClCompile Include="Source\extract_polygons.cpp" />
     <ClCompile Include="Source\find_base_locations.cpp" />
     <ClCompile Include="Source\get_voronoi_edges.cpp" />

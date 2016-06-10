@@ -38,9 +38,6 @@
     <ClCompile Include="Source\ChokepointImpl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\ConnectedComponent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\extract_polygons.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
