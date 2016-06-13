@@ -56,10 +56,10 @@ namespace BWTA
       nearest=BWAPI::Position(0,position.y);
     if (position.y < position.getDistance(nearest))
       nearest=BWAPI::Position(position.x,0);
-    if (MapData::mapWidth*32-position.x < position.getDistance(nearest))
-      nearest=BWAPI::Position(MapData::mapWidth*32,position.y);
-    if (MapData::mapHeight*32-position.y < position.getDistance(nearest))
-      nearest=BWAPI::Position(position.x,MapData::mapHeight*32);
+    if (MapData::mapWidthPixelRes-position.x < position.getDistance(nearest))
+      nearest=BWAPI::Position(MapData::mapWidthPixelRes,position.y);
+    if (MapData::mapHeightPixelRes-position.y < position.getDistance(nearest))
+      nearest=BWAPI::Position(position.x,MapData::mapHeightPixelRes);
     return nearest;
   }
   BaseLocation* getStartLocation(BWAPI::Player player)
@@ -212,7 +212,7 @@ namespace BWTA
   }
   void getGroundDistanceMap(BWAPI::TilePosition start, RectangleArray<double>& distanceMap)
   {
-    distanceMap.resize(MapData::mapWidth,MapData::mapHeight);
+    distanceMap.resize(MapData::mapWidthTileRes,MapData::mapHeightTileRes);
     Heap< BWAPI::TilePosition , int > heap(true);
     for(unsigned int x=0;x<distanceMap.getWidth();x++) {
       for(unsigned int y=0;y<distanceMap.getHeight();y++) {
@@ -253,15 +253,13 @@ namespace BWTA
   }
   void getGroundWalkDistanceMap(int walkx, int walky, RectangleArray<double>& distanceMap)
   {
-    distanceMap.resize(MapData::mapWidth*4,MapData::mapHeight*4);
+    distanceMap.resize(MapData::mapWidthWalkRes,MapData::mapHeightWalkRes);
     Heap< BWAPI::TilePosition , int > heap(true);
-    for(unsigned int x=0;x<distanceMap.getWidth();x++)
-    {
-      for(unsigned int y=0;y<distanceMap.getHeight();y++)
-      {
-        distanceMap[x][y]=-1;
-      }
-    }
+	for (unsigned int x = 0; x < distanceMap.getWidth(); x++) {
+		for (unsigned int y = 0; y < distanceMap.getHeight(); y++)  {
+			distanceMap[x][y] = -1;
+		}
+	}
     BWAPI::TilePosition start(walkx,walky);
     heap.push(std::make_pair(start,0));
     int sx=(int)start.x;

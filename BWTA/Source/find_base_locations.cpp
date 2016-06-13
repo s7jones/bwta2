@@ -236,7 +236,7 @@ namespace BWTA
 	//attach resource pointers to base locations based on proximity (walk distance)
 	void attachResourcePointersToBaseLocations(std::set< BWTA::BaseLocation* > &baseLocations)
 	{
-		RectangleArray<int> distanceMap(MapData::mapWidth * 4, MapData::mapHeight * 4);
+		RectangleArray<int> distanceMap(MapData::mapWidthWalkRes, MapData::mapHeightWalkRes);
 		for (std::set<BWTA::BaseLocation*>::iterator i = baseLocations.begin(); i != baseLocations.end(); i++) {
 			BWAPI::Position p((*i)->getTilePosition().x * 4, (*i)->getTilePosition().y * 4);
 			calculate_walk_distances_area(p, 16, 12, 10 * 4 * 10, distanceMap);

@@ -23,9 +23,15 @@ namespace BWTA
 		extern BWAPI::TilePosition::list startLocations;
 		extern std::string hash;
 		extern std::string mapFileName;
-		extern int mapWidth;
-		extern int mapHeight;
-		extern int maxDistanceTransform;
+
+		extern uint16_t mapWidthPixelRes;
+		extern uint16_t mapWidthWalkRes;
+		extern uint16_t mapWidthTileRes;
+		extern uint16_t mapHeightPixelRes;
+		extern uint16_t mapHeightWalkRes;
+		extern uint16_t mapHeightTileRes;
+
+		extern uint16_t maxDistanceTransform;
 		// data for HPA*
 		extern ChokepointGraph chokeNodes;
 		
@@ -35,7 +41,7 @@ namespace BWTA
 		/** Direct mapping of mini tile flags array */
 		struct MiniTileMaps_type {
 			struct MiniTileFlagArray {
-				u16 miniTile[16];
+				uint16_t miniTile[16];
 			};
 			MiniTileFlagArray tile[0x10000];
 		};

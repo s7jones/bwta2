@@ -12,9 +12,15 @@ namespace BWTA
 		BWAPI::TilePosition::list startLocations;
 		std::string hash;
 		std::string mapFileName;
-		int mapWidth;
-		int mapHeight;
-		int maxDistanceTransform;
+
+		uint16_t mapWidthPixelRes;
+		uint16_t mapWidthWalkRes;
+		uint16_t mapWidthTileRes;
+		uint16_t mapHeightPixelRes;
+		uint16_t mapHeightWalkRes;
+		uint16_t mapHeightTileRes;
+
+		uint16_t maxDistanceTransform;
 		// data for HPA*
 		ChokepointGraph chokeNodes;
 		

@@ -250,7 +250,7 @@ namespace BWTA
 
 	/*
 	This function decode the doodads information from a CHK map, 
-	and store the neutral buildings positions in BWTA::MapData::staticNeutralBuildings
+	and store the neutral buildings positions in MapData::staticNeutralBuildings
 	*/
 	void getDoodads(unsigned char* CHKdata, DWORD size) {
 		DWORD chunkSize = 0;
@@ -280,8 +280,8 @@ namespace BWTA
 				if (unitType.isBuilding()) {
 					//std::cout << "Doodad " << unitType.c_str() << " at " << x << "," << y << std::endl;
 					BWAPI::Position unitPosition(x, y);
-					BWTA::UnitTypePosition unitTypePosition = std::make_pair(unitType, unitPosition);
-					BWTA::MapData::staticNeutralBuildings.push_back(unitTypePosition);
+					UnitTypePosition unitTypePosition = std::make_pair(unitType, unitPosition);
+					MapData::staticNeutralBuildings.push_back(unitTypePosition);
 				}
 			}
 
@@ -333,8 +333,8 @@ namespace BWTA
 	//------------------------------------------------ GET TILE ------------------------------------------------
 	TileID getTile(int x, int y)
 	{
-		if (BWTA::MapData::TileArray)
-			return *(BWTA::MapData::TileArray + x + y * BWTA::MapData::mapWidth);
+		if (MapData::TileArray)
+			return *(MapData::TileArray + x + y * MapData::mapWidthTileRes);
 		return 0;
 	}
 	//------------------------------------------- GET TILE VARIATION -------------------------------------------
@@ -351,27 +351,25 @@ namespace BWTA
 		int my = y % 4;
 		TileID tileID = getTile(tx, ty);
 		TileType* tile = TileSet::getTileType(tileID);
-		if (tile && BWTA::MapData::MiniTileFlags)
-			return BWTA::MapData::MiniTileFlags->tile[tile->miniTile[getTileVariation(tileID)]].miniTile[mx + my * 4];
+		if (tile && MapData::MiniTileFlags)
+			return MapData::MiniTileFlags->tile[tile->miniTile[getTileVariation(tileID)]].miniTile[mx + my * 4];
 		return 0;
 	}
 	//-------------------------------------------- SET BUILDABILITY --------------------------------------------
-	void setOfflineBuildability(BWTA::RectangleArray<bool> &buildability)
+	void setOfflineBuildability(RectangleArray<bool> &buildability)
 	{
-		u16 h = BWTA::MapData::mapHeight;
-		u16 w = BWTA::MapData::mapWidth;
-		for (unsigned int y = 0; y < h; ++y)
-			for (unsigned int x = 0; x < w; ++x) {
+		for (unsigned int y = 0; y < MapData::mapHeightTileRes; ++y)
+			for (unsigned int x = 0; x < MapData::mapWidthTileRes; ++x) {
 			TileID tileID = getTile(x, y);
 			TileType* tile = TileSet::getTileType(tileID);
 			buildability[x][y] = (tile->buildability & (1 << 7)) == 0;
 			}
 	}
 	//-------------------------------------------- SET WALKABILITY ---------------------------------------------
-	void setOfflineWalkability(BWTA::RectangleArray<bool> &walkability)
+	void setOfflineWalkability(RectangleArray<bool> &walkability)
 	{
-		u16 h = BWTA::MapData::mapHeight * 4;
-		u16 w = BWTA::MapData::mapWidth * 4;
+		u16 h = MapData::mapHeightWalkRes;
+		u16 w = MapData::mapWidthWalkRes;
 		for (unsigned int y = 0; y < h; ++y)
 			for (unsigned int x = 0; x < w; ++x)
 				walkability[x][y] = (getMiniTile(x, y) & MiniTileFlags::Walkable) != 0;
@@ -406,15 +404,15 @@ namespace BWTA
 		// Save map name
 		std::string strName = mapFilePath;
 		unsigned found = strName.find_last_of("/\\");
-		BWTA::MapData::mapFileName = strName.substr(found + 1);
-		std::cout << "START PARSING FILE " << BWTA::MapData::mapFileName << std::endl;
+		MapData::mapFileName = strName.substr(found + 1);
+		std::cout << "START PARSING FILE " << MapData::mapFileName << std::endl;
 
 		DWORD dataSize = 0;
-		unsigned char* CHKdata = BWTA::extractCHKfile(mapFilePath, &dataSize);
+		unsigned char* CHKdata = extractCHKfile(mapFilePath, &dataSize);
 		if (CHKdata == NULL) return 0;
 
 		std::cout << "Successfully extracted the CHK file (size " << dataSize << ")" << std::endl;
-		//BWTA::printCHKchunks(CHKdata, dataSize);
+		//printCHKchunks(CHKdata, dataSize);
 
 		// Calculate hash from MPQ (not only the CHK)
 		// ==========================================
@@ -436,58 +434,62 @@ namespace BWTA
 		sha1::toHexString(hash, hexstring);
 
 		// Save and close
-		BWTA::MapData::hash = std::string(hexstring);
+		MapData::hash = std::string(hexstring);
 		SFileCloseFile(hFile);
 
 		// Load map dimensions
 		// ====================
 		unsigned int width = 0, height = 0;
-		BWTA::getDimensions(CHKdata, dataSize, width, height);
+		getDimensions(CHKdata, dataSize, width, height);
 		std::cout << "Map is " << width << "x" << height << "\n";
-		BWTA::MapData::mapWidth = width;
-		BWTA::MapData::mapHeight = height;
+		MapData::mapWidthTileRes = width;
+		MapData::mapWidthWalkRes = MapData::mapWidthTileRes * 4;
+		MapData::mapWidthPixelRes = MapData::mapWidthTileRes * 32;
+		MapData::mapHeightTileRes = height;
+		MapData::mapHeightWalkRes = MapData::mapHeightTileRes * 4;
+		MapData::mapHeightPixelRes = MapData::mapHeightTileRes * 32;
 
 		// Load neutral units (minerals, gas, and starting locations)
-		BWTA::getUnits(CHKdata, dataSize);
+		getUnits(CHKdata, dataSize);
 
 		// Some doodads (buildings) are not walkable
-		BWTA::getDoodads(CHKdata, dataSize);
+		getDoodads(CHKdata, dataSize);
 
 		// Get map tileset ID
-		unsigned int tileset = BWTA::getTileset(CHKdata, dataSize);
+		unsigned int tileset = getTileset(CHKdata, dataSize);
 		if (tileset > 7) {
 			std::cout << "Tileset Unknown (" << tileset << ")\n";
 			return 0;
 		}
-		std::cout << "Map's tilset: " << BWTA::tileSetName[tileset] << "\n";
+		std::cout << "Map's tilset: " << tileSetName[tileset] << "\n";
 
-		// Load TileSet file (tileSetName[tileset].cv5) into BWTA::MapData::TileSet
-		std::string cv5FileName = "tileset/" + BWTA::tileSetName[tileset] + ".cv5";
-		BWTA::MapData::TileSet = (TileType*)BWTA::getFileBuffer(cv5FileName.c_str());
+		// Load TileSet file (tileSetName[tileset].cv5) into MapData::TileSet
+		std::string cv5FileName = "tileset/" + tileSetName[tileset] + ".cv5";
+		MapData::TileSet = (TileType*)getFileBuffer(cv5FileName.c_str());
 
 
-		// Load MiniTileFlags file (tileSetName[tileset].vf4) into BWTA::MapData::MiniTileFlags
-		std::string vf4FileName = "tileset/" + BWTA::tileSetName[tileset] + ".vf4";
-		BWTA::MapData::MiniTileFlags = (BWTA::MapData::MiniTileMaps_type*)BWTA::getFileBuffer(vf4FileName.c_str());
+		// Load MiniTileFlags file (tileSetName[tileset].vf4) into MapData::MiniTileFlags
+		std::string vf4FileName = "tileset/" + tileSetName[tileset] + ".vf4";
+		MapData::MiniTileFlags = (MapData::MiniTileMaps_type*)getFileBuffer(vf4FileName.c_str());
 
 
 		// Load Map Tiles
 		DWORD chunkSize = 0;
-		BWTA::MapData::TileArray = (TileID*)BWTA::getChunkPointer((unsigned char *)"MTXM", CHKdata, dataSize, &chunkSize);
+		MapData::TileArray = (TileID*)getChunkPointer((unsigned char *)"MTXM", CHKdata, dataSize, &chunkSize);
 
 
 		// Set walkability
-		BWTA::MapData::rawWalkability.resize(BWTA::MapData::mapWidth * 4, BWTA::MapData::mapHeight * 4);
-		BWTA::setOfflineWalkability(BWTA::MapData::rawWalkability);
+		MapData::rawWalkability.resize(MapData::mapWidthWalkRes, MapData::mapHeightWalkRes);
+		setOfflineWalkability(MapData::rawWalkability);
 		// Test walkability data
-		BWTA::MapData::rawWalkability.saveToFile("logs/walkable.txt");
+		MapData::rawWalkability.saveToFile("logs/walkable.txt");
 
 
 		// Set buildability
-		BWTA::MapData::buildability.resize(BWTA::MapData::mapWidth, BWTA::MapData::mapHeight);
-		BWTA::setOfflineBuildability(BWTA::MapData::buildability);
+		MapData::buildability.resize(MapData::mapWidthTileRes, MapData::mapHeightTileRes);
+		setOfflineBuildability(MapData::buildability);
 		// Test buildability data
-		BWTA::MapData::buildability.saveToFile("logs/buildable.txt");
+		MapData::buildability.saveToFile("logs/buildable.txt");
 
 
 		delete CHKdata;

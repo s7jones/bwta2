@@ -20,9 +20,54 @@ namespace BWTA
 		return a[i];
 	}
 
+	struct baseDistance_t {
+		int x;
+		int y;
+		BaseLocation* baseLocation;
+		int distance;
+
+		baseDistance_t(int xTmp, int yTmp, BaseLocation* baseRef, int dis = 0)
+			: x(xTmp), y(yTmp), baseLocation(baseRef), distance(dis) {};
+	};
+
+	inline void addToExplore(const int& x, const int& y, const baseDistance_t& current, std::queue<baseDistance_t>& toExplore)
+	{
+		// if change from walkable to not walkable, increase distance cost
+		if (MapData::walkability[current.x][current.y] && !MapData::walkability[x][y]) {
+			toExplore.emplace(x, y, current.baseLocation, current.distance + 100000);
+		} else {
+			toExplore.emplace(x, y, current.baseLocation, current.distance);
+		}
+	}
+
+	struct chokeDistance_t {
+		int x;
+		int y;
+		Chokepoint* chokepoint;
+		int distance;
+
+		chokeDistance_t(int xTmp, int yTmp, Chokepoint* chokeRef, int dis = 0)
+			: x(xTmp), y(yTmp), chokepoint(chokeRef), distance(dis) {};
+	};
+
+	inline void addToExplore(const int& x, const int& y, const chokeDistance_t& current, std::queue<chokeDistance_t>& toExplore)
+	{
+		// if change from walkable to not walkable, increase distance cost
+		if (MapData::walkability[current.x][current.y] && !MapData::walkability[x][y]) {
+			toExplore.emplace(x, y, current.chokepoint, current.distance + 100000);
+		} else {
+			toExplore.emplace(x, y, current.chokepoint, current.distance);
+		}
+	}
+
 	void calculate_connectivity()
 	{
+		Timer timer;
+		timer.start();
+
 		// compute reachable region for each region
+		// ===========================================================================
+
 		std::map<RegionImpl*, RegionImpl*> regionGroup;
 		for (auto regionInterface : BWTA_Result::regions) {
 			RegionImpl* region1 = (RegionImpl*)regionInterface;
@@ -35,7 +80,7 @@ namespace BWTA
 				regionGroup[get_set2(regionGroup, region2)] = get_set2(regionGroup, region1);
 			}
 		}
-		
+
 		for (auto regionInterface : BWTA_Result::regions) {
 			RegionImpl* region1 = (RegionImpl*)regionInterface;
 			region1->reachableRegions.insert(region1);
@@ -58,7 +103,7 @@ namespace BWTA
 				bool inPolygon = false;
 				double minPolygonDist = -1;
 				BWAPI::Position tilePoint = BWAPI::Position(x * TILE_SIZE + 16, y * TILE_SIZE + 16);
-				
+
 				for (auto region : BWTA_Result::regions) {
 					if (region->getPolygon().isInside(tilePoint)) {
 						closestRegion = region;
@@ -86,37 +131,51 @@ namespace BWTA
 			}
 		}
 
-#ifdef OFFLINE
-// 		BWTA_Result::getRegion.saveToFile("logs/getRegion.txt");
-// 		BWTA_Result::getUnwalkablePolygon.saveToFile("logs/getUnwalkablePolygon.txt");
-#endif
+		log(" - Reachable regions and closest regions computed in " << timer.stopAndGetTime() << " seconds");
+		timer.start();
+		
+		// compute closest BaseLocation map
+		// ===========================================================================
 
-		// compute closest base location map
-		// TODO SLOW
-		RectangleArray<double> minDistanceMap(MapData::mapWidth * 4, MapData::mapHeight * 4);
+		// walk resolution map
+		RectangleArray<double> minDistanceMap(MapData::mapWidthWalkRes, MapData::mapHeightWalkRes);
 		minDistanceMap.setTo(-1);
-		RectangleArray<double> distanceMap;
-		for (auto baseLocation : BWTA_Result::baselocations) {
-			getGroundWalkDistanceMap(baseLocation->getTilePosition().x * 4 + 8, 
-				baseLocation->getTilePosition().y * 4 + 6, distanceMap);
-			for (int x = 0; x < MapData::mapWidth * 4; x++) {
-				for (int y = 0; y < MapData::mapHeight * 4; y++) {
-					if (distanceMap[x][y] == -1) continue;
-					if (minDistanceMap[x][y] == -1 || distanceMap[x][y] < minDistanceMap[x][y]) {
-						minDistanceMap[x][y] = distanceMap[x][y];
-						BWTA_Result::getBaseLocationW[x][y] = baseLocation;
-					}
+		std::queue<baseDistance_t> postionsToExplore;
+		for (const auto& baseLocation : BWTA_Result::baselocations) {
+			postionsToExplore.emplace(baseLocation->getTilePosition().x * 4 + 8,
+				baseLocation->getTilePosition().y * 4 + 6, baseLocation);
+		}
+		while (!postionsToExplore.empty()) {
+			// pop first element
+			baseDistance_t check = postionsToExplore.front();
+			postionsToExplore.pop();
+
+			if (minDistanceMap[check.x][check.y] == -1 || minDistanceMap[check.x][check.y] > check.distance) {
+				BWTA_Result::getBaseLocationW[check.x][check.y] = check.baseLocation;
+				minDistanceMap[check.x][check.y] = check.distance;
+				// look if the 8-connectivity are valid positions
+				check.distance += 8; // straight move cost
+				int left = check.x - 1;
+				if (left > 0) addToExplore(left, check.y, check, postionsToExplore);
+				int right = check.x + 1;
+				if (right < MapData::mapWidthWalkRes) addToExplore(right, check.y, check, postionsToExplore);
+				int up = check.y - 1;
+				if (up > 0) addToExplore(check.x, up, check, postionsToExplore);
+				int down = check.y + 1;
+				if (down < MapData::mapHeightWalkRes) addToExplore(check.x, down, check, postionsToExplore);
+				check.distance += 3; // increment on diagonal move cost
+				if (left > 0 && up > 0) addToExplore(left, up, check, postionsToExplore);
+				if (left > 0 && down < MapData::mapHeightWalkRes) addToExplore(left, down, check, postionsToExplore);
+				if (right < MapData::mapWidthWalkRes && up > 0) addToExplore(right, up, check, postionsToExplore);
+				if (right < MapData::mapWidthWalkRes && down < MapData::mapHeightWalkRes) {
+					addToExplore(right, down, check, postionsToExplore);
 				}
 			}
 		}
 
-#ifdef OFFLINE
-// 		minDistanceMap.saveToFile("logs/minDistanceMap.txt");
-// 		BWTA_Result::getBaseLocationW.saveToFile("logs/getBaseLocationW.txt");
-#endif
-
-		for (int x = 0; x < MapData::mapWidth; x++) {
-			for (int y = 0; y < MapData::mapHeight; y++) {
+		// tile resolution map
+		for (int x = 0; x < MapData::mapWidthTileRes; x++) {
+			for (int y = 0; y < MapData::mapHeightTileRes; y++) {
 				Heap<BaseLocation*, int> h;
 				for (int xi = 0; xi < 4; xi++) {
 					for (int yi = 0; yi < 4; yi++) {
@@ -136,32 +195,64 @@ namespace BWTA
 			}
 		}
 
-#ifdef OFFLINE
-// 		BWTA_Result::getBaseLocation.saveToFile("logs/getBaseLocation.txt");
-#endif
+		log(" - closest BaseLocation computed in " << timer.stopAndGetTime() << " seconds");
+		timer.start();
 
-		// compute closest chokepoint map
+		// compute closest Chokepoint map
+		// ===========================================================================
+
 		// TODO SLOW
+// 		RectangleArray<double> minDistanceMap(MapData::mapWidthWalkRes, MapData::mapHeightWalkRes);
+// 		minDistanceMap.setTo(-1);
+// 		RectangleArray<double> distanceMap;
+// 		for (auto chokepoint : BWTA_Result::chokepoints) {
+// 			getGroundWalkDistanceMap(chokepoint->getCenter().x / 8, chokepoint->getCenter().y / 8, distanceMap);
+// 			for (int x = 0; x < MapData::mapWidthWalkRes; x++) {
+// 				for (int y = 0; y < MapData::mapHeightWalkRes; y++) {
+// 					if (distanceMap[x][y] == -1) continue;
+// 					if (minDistanceMap[x][y] == -1 || distanceMap[x][y] < minDistanceMap[x][y]) {
+// 						minDistanceMap[x][y] = distanceMap[x][y];
+// 						BWTA_Result::getChokepointW[x][y] = chokepoint;
+// 					}
+// 				}
+// 			}
+// 		}
+
 		minDistanceMap.setTo(-1);
-		for (auto chokepoint : BWTA_Result::chokepoints) {
-			getGroundWalkDistanceMap(chokepoint->getCenter().x / 8, chokepoint->getCenter().y / 8, distanceMap);
-			for (int x = 0; x < MapData::mapWidth * 4; x++) {
-				for (int y = 0; y < MapData::mapHeight * 4; y++) {
-					if (distanceMap[x][y] == -1) continue;
-					if (minDistanceMap[x][y] == -1 || distanceMap[x][y] < minDistanceMap[x][y]) {
-						minDistanceMap[x][y] = distanceMap[x][y];
-						BWTA_Result::getChokepointW[x][y] = chokepoint;
-					}
+		std::queue<chokeDistance_t> postionsToExplore2;
+		for (const auto& chokepoint : BWTA_Result::chokepoints) {
+			postionsToExplore2.emplace(chokepoint->getCenter().x / 8, chokepoint->getCenter().y / 8, chokepoint);
+		}
+		while (!postionsToExplore2.empty()) {
+			// pop first element
+			chokeDistance_t check = postionsToExplore2.front();
+			postionsToExplore2.pop();
+
+			if (minDistanceMap[check.x][check.y] == -1 || minDistanceMap[check.x][check.y] > check.distance) {
+				BWTA_Result::getChokepointW[check.x][check.y] = check.chokepoint;
+				minDistanceMap[check.x][check.y] = check.distance;
+				// look if the 8-connectivity are valid positions
+				check.distance += 8; // straight move cost
+				int left = check.x - 1;
+				if (left > 0) addToExplore(left, check.y, check, postionsToExplore2);
+				int right = check.x + 1;
+				if (right < MapData::mapWidthWalkRes) addToExplore(right, check.y, check, postionsToExplore2);
+				int up = check.y - 1;
+				if (up > 0) addToExplore(check.x, up, check, postionsToExplore2);
+				int down = check.y + 1;
+				if (down < MapData::mapHeightWalkRes) addToExplore(check.x, down, check, postionsToExplore2);
+				check.distance += 3; // increment on diagonal move cost
+				if (left > 0 && up > 0) addToExplore(left, up, check, postionsToExplore2);
+				if (left > 0 && down < MapData::mapHeightWalkRes) addToExplore(left, down, check, postionsToExplore2);
+				if (right < MapData::mapWidthWalkRes && up > 0) addToExplore(right, up, check, postionsToExplore2);
+				if (right < MapData::mapWidthWalkRes && down < MapData::mapHeightWalkRes) {
+					addToExplore(right, down, check, postionsToExplore2);
 				}
 			}
 		}
 
-#ifdef OFFLINE
-// 		BWTA_Result::getChokepointW.saveToFile("logs/getChokepointW.txt");
-#endif
-
-		for (int x = 0; x < MapData::mapWidth; x++) {
-			for (int y = 0; y < MapData::mapHeight; y++) {
+		for (int x = 0; x < MapData::mapWidthTileRes; x++) {
+			for (int y = 0; y < MapData::mapHeightTileRes; y++) {
 				Heap<Chokepoint*, int> h;
 				for (int xi = 0; xi < 4; xi++) {
 					for (int yi = 0; yi < 4; yi++) {
@@ -181,8 +272,6 @@ namespace BWTA
 			}
 		}
 
-#ifdef OFFLINE
-// 		BWTA_Result::getChokepoint.saveToFile("logs/getChokepoint.txt");
-#endif
+		log(" - closest Chokepoint computed in " << timer.stopAndGetTime() << " seconds");
 	}
 }

@@ -19,7 +19,6 @@
 #include "BWTA_Result.h"
 #include "MapData.h"
 #include "Heap.h"
-#include "Timer.h"
 
 namespace BWTA
 {

@@ -14,27 +14,31 @@ namespace BWTA
 	void loadMapFromBWAPI()
 	{
 		// load map name
-		MapData::hash = BWAPI::Broodwar->mapHash(); // TODO Warning on-line and off-line data are different!!!!
+		MapData::hash = BWAPI::Broodwar->mapHash();
 		MapData::mapFileName = BWAPI::Broodwar->mapFileName();
 		// Clean previous log file
 		std::ofstream logFile(LOG_FILE_PATH);
 		logFile << "Map name: " << MapData::mapFileName << std::endl;
 
 		// load map info
-		MapData::mapWidth = BWAPI::Broodwar->mapWidth();
-		MapData::mapHeight = BWAPI::Broodwar->mapHeight();
-		MapData::buildability.resize(MapData::mapWidth, MapData::mapHeight);
-		for (int x = 0; x < MapData::mapWidth; x++) {
-			for (int y = 0; y < MapData::mapHeight; y++) {
+		MapData::mapWidthTileRes = BWAPI::Broodwar->mapWidth();
+		MapData::mapWidthPixelRes = MapData::mapWidthTileRes * 32;
+		MapData::mapWidthWalkRes = MapData::mapHeightTileRes * 4;
+
+		MapData::mapHeightTileRes = BWAPI::Broodwar->mapHeight();
+		MapData::mapHeightPixelRes = MapData::mapHeightTileRes * 32;
+		MapData::mapHeightWalkRes = MapData::mapHeightTileRes * 4;
+
+		MapData::buildability.resize(MapData::mapWidthTileRes, MapData::mapHeightTileRes);
+		for (int x = 0; x < MapData::mapWidthTileRes; x++) {
+			for (int y = 0; y < MapData::mapHeightTileRes; y++) {
 				MapData::buildability[x][y] = BWAPI::Broodwar->isBuildable(x, y);
 			}
 		}
 
-		int walkTileWidth = MapData::mapWidth * 4;
-		int walkTileHeight = MapData::mapHeight * 4;
-		MapData::rawWalkability.resize(walkTileWidth, walkTileHeight);
-		for (int x = 0; x < walkTileWidth; x++) {
-			for (int y = 0; y < walkTileHeight; y++) {
+		MapData::rawWalkability.resize(MapData::mapWidthWalkRes, MapData::mapHeightWalkRes);
+		for (int x = 0; x < MapData::mapWidthWalkRes; x++) {
+			for (int y = 0; y < MapData::mapHeightWalkRes; y++) {
 				MapData::rawWalkability[x][y] = BWAPI::Broodwar->isWalkable(x, y);
 			}
 		}
@@ -74,17 +78,12 @@ namespace BWTA
 
 	void loadMap()
 	{
-		int b_width = MapData::mapWidth;
-		int b_height = MapData::mapHeight;
-		int width = MapData::mapWidth * 4;
-		int height = MapData::mapHeight * 4;
-
 		// init distance transform map
-		MapData::distanceTransform.resize(width, height);
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
+		MapData::distanceTransform.resize(MapData::mapWidthWalkRes, MapData::mapHeightWalkRes);
+		for (int x = 0; x < MapData::mapWidthWalkRes; x++) {
+			for (int y = 0; y < MapData::mapHeightWalkRes; y++) {
 				if (MapData::rawWalkability[x][y]) {
-					if (x == 0 || x == width - 1 || y == 0 || y == height - 1){
+					if (x == 0 || x == MapData::mapWidthWalkRes - 1 || y == 0 || y == MapData::mapHeightWalkRes - 1){
 						MapData::distanceTransform[x][y] = 1;
 					} else {
 						MapData::distanceTransform[x][y] = -1;
@@ -96,16 +95,16 @@ namespace BWTA
 		}
 
 		// init walkability map and lowResWalkability map
-		MapData::lowResWalkability.resize(b_width, b_height);
+		MapData::lowResWalkability.resize(MapData::mapWidthTileRes, MapData::mapHeightTileRes);
 		MapData::lowResWalkability.setTo(true);
 
-		MapData::walkability.resize(width, height);
+		MapData::walkability.resize(MapData::mapWidthWalkRes, MapData::mapHeightWalkRes);
 		MapData::walkability.setTo(true);
 
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
-				for (int x2 = max(x - 1, 0); x2 <= min(width - 1, x + 1); x2++) {
-					for (int y2 = max(y - 1, 0); y2 <= min(height - 1, y + 1); y2++) {
+		for (int x = 0; x < MapData::mapWidthWalkRes; x++) {
+			for (int y = 0; y < MapData::mapHeightWalkRes; y++) {
+				for (int x2 = max(x - 1, 0); x2 <= min(MapData::mapWidthWalkRes - 1, x + 1); x2++) {
+					for (int y2 = max(y - 1, 0); y2 <= min(MapData::mapHeightWalkRes - 1, y + 1); y2++) {
 						MapData::walkability[x2][y2] &= MapData::rawWalkability[x][y];
 					}
 				}
@@ -126,13 +125,13 @@ namespace BWTA
 			// sanitize
 			if (x1 < 0) x1 = 0;
 			if (y1 < 0) y1 = 0;
-			if (x2 >= width) x2 = width - 1;
-			if (y2 >= height) y2 = height - 1;
+			if (x2 >= MapData::mapWidthWalkRes) x2 = MapData::mapWidthWalkRes - 1;
+			if (y2 >= MapData::mapHeightWalkRes) y2 = MapData::mapHeightWalkRes - 1;
 			// map area
 			for (int x = x1; x <= x2; x++) {
 				for (int y = y1; y <= y2; y++) {
-					for (int x3 = max(x - 1, 0); x3 <= min(width - 1, x + 1); x3++) {
-						for (int y3 = max(y - 1, 0); y3 <= min(height - 1, y + 1); y3++) {
+					for (int x3 = max(x - 1, 0); x3 <= min(MapData::mapWidthWalkRes - 1, x + 1); x3++) {
+						for (int y3 = max(y - 1, 0); y3 <= min(MapData::mapHeightWalkRes - 1, y + 1); y3++) {
 							MapData::walkability[x3][y3] = false;
 						}
 					}
@@ -146,12 +145,12 @@ namespace BWTA
 		BWTA::MapData::lowResWalkability.saveToFile("logs/lowResWalkability.txt");
 #endif
 
-		BWTA_Result::getRegion.resize(b_width, b_height);
-		BWTA_Result::getChokepoint.resize(b_width, b_height);
-		BWTA_Result::getBaseLocation.resize(b_width, b_height);
-		BWTA_Result::getChokepointW.resize(width, height);
-		BWTA_Result::getBaseLocationW.resize(width, height);
-		BWTA_Result::getUnwalkablePolygon.resize(b_width, b_height);
+		BWTA_Result::getRegion.resize(MapData::mapWidthTileRes, MapData::mapHeightTileRes);
+		BWTA_Result::getChokepoint.resize(MapData::mapWidthTileRes, MapData::mapHeightTileRes);
+		BWTA_Result::getBaseLocation.resize(MapData::mapWidthTileRes, MapData::mapHeightTileRes);
+		BWTA_Result::getChokepointW.resize(MapData::mapWidthWalkRes, MapData::mapHeightWalkRes);
+		BWTA_Result::getBaseLocationW.resize(MapData::mapWidthWalkRes, MapData::mapHeightWalkRes);
+		BWTA_Result::getUnwalkablePolygon.resize(MapData::mapWidthTileRes, MapData::mapHeightTileRes);
 		BWTA_Result::getRegion.setTo(NULL);
 		BWTA_Result::getChokepoint.setTo(NULL);
 		BWTA_Result::getBaseLocation.setTo(NULL);

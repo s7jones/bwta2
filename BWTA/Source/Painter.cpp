@@ -6,7 +6,7 @@ namespace BWTA {
 		renderCounter(1)
 	{
 		// PNG
-		image = new QImage(MapData::mapWidth * 4, MapData::mapHeight * 4, QImage::Format_ARGB32_Premultiplied);
+		image = new QImage(MapData::mapWidthWalkRes, MapData::mapHeightWalkRes, QImage::Format_ARGB32_Premultiplied);
 		painter = new QPainter(image);
 		painter->setRenderHint(QPainter::Antialiasing);
 
@@ -16,8 +16,8 @@ namespace BWTA {
 // 		renderCounter++;
 // 		svg = new QSvgGenerator();
 // 		svg->setFileName(filename.c_str());
-// 		svg->setSize(QSize(MapData::mapWidth * 4, MapData::mapHeight * 4));
-// 		svg->setViewBox(QRect(0, 0, MapData::mapWidth * 4, MapData::mapHeight * 4));
+// 		svg->setSize(QSize(MapData::mapWidthWalkRes, MapData::mapHeightWalkRes));
+// 		svg->setViewBox(QRect(0, 0, MapData::mapWidthWalkRes, MapData::mapHeightWalkRes));
 // 		painter = new QPainter();
 // 		painter->begin(svg);
 	}
@@ -53,8 +53,8 @@ namespace BWTA {
 // 		delete svg;
 // 		svg = new QSvgGenerator();
 // 		svg->setFileName(filename.c_str());
-// 		svg->setSize(QSize(MapData::mapWidth * 4, MapData::mapHeight * 4));
-// 		svg->setViewBox(QRect(0, 0, MapData::mapWidth * 4, MapData::mapHeight * 4));
+// 		svg->setSize(QSize(MapData::mapWidthWalkRes, MapData::mapHeightWalkRes));
+// 		svg->setViewBox(QRect(0, 0, MapData::mapWidthWalkRes, MapData::mapHeightWalkRes));
 // 		painter = new QPainter();
 // 		painter->begin(svg);
 	}
@@ -290,6 +290,72 @@ namespace BWTA {
 				painter->setBrush(QBrush(heatColor));
 				painter->drawEllipse(x, y, 1, 1);
 			}
+		}
+	}
+
+	void Painter::drawClosestBaseLocationMap(RectangleArray<BaseLocation*> map, std::set<BaseLocation*> baseLocations)
+	{
+		// assign a color to each BaseLocation
+		std::vector<QColor> baseColors = { QColor(0, 114, 189), QColor(217, 83, 25), QColor(237, 177, 32)
+			, QColor(126, 47, 142), QColor(119, 172, 48), QColor(77, 190, 238), QColor(162, 20, 47) };
+
+		std::map<BaseLocation*, QColor> baseToColor;
+		baseToColor[NULL] = QColor(180, 180, 180);
+		int i = 0;
+		for (const auto& baseLocation : baseLocations) {
+			i = i % baseColors.size();
+			baseToColor[baseLocation] = baseColors.at(i);
+			i++;
+		}
+
+		// draw BaseLocation closest map
+		for (unsigned int x = 0; x < map.getWidth(); ++x) {
+			for (unsigned int y = 0; y < map.getHeight(); ++y) {
+				painter->setPen(QPen(baseToColor[map[x][y]]));
+				painter->setBrush(QBrush(baseToColor[map[x][y]]));
+				painter->drawEllipse(x, y, 1, 1);
+			}
+		}
+
+		// draw BaseLocation origin
+		QColor color(0, 0, 0);
+		painter->setPen(QPen(color));
+		painter->setBrush(QBrush(color));
+		for (const auto& base : baseLocations) {
+			painter->drawEllipse(base->getTilePosition().x * 4 - 6, base->getTilePosition().y * 4 - 6, 12, 12);
+		}
+	}
+
+	void Painter::drawClosestChokepointMap(RectangleArray<Chokepoint*> map, std::set<Chokepoint*> chokepoints)
+	{
+		// assign a color to each Chokepoint
+		std::vector<QColor> baseColors = { QColor(0, 114, 189), QColor(217, 83, 25), QColor(237, 177, 32)
+			, QColor(126, 47, 142), QColor(119, 172, 48), QColor(77, 190, 238), QColor(162, 20, 47) };
+
+		std::map<Chokepoint*, QColor> chokeToColor;
+		chokeToColor[NULL] = QColor(180, 180, 180);
+		int i = 0;
+		for (const auto& chokepoint : chokepoints) {
+			i = i % baseColors.size();
+			chokeToColor[chokepoint] = baseColors.at(i);
+			i++;
+		}
+
+		// draw Chokepoint closest map
+		for (unsigned int x = 0; x < map.getWidth(); ++x) {
+			for (unsigned int y = 0; y < map.getHeight(); ++y) {
+				painter->setPen(QPen(chokeToColor[map[x][y]]));
+				painter->setBrush(QBrush(chokeToColor[map[x][y]]));
+				painter->drawEllipse(x, y, 1, 1);
+			}
+		}
+
+		// draw Chokepoint origin
+		QColor color(0, 0, 0);
+		painter->setPen(QPen(color));
+		painter->setBrush(QBrush(color));
+		for (const auto& chokepoint : chokepoints) {
+			painter->drawEllipse(chokepoint->getCenter().x / 8, chokepoint->getCenter().y / 8, 12, 12);
 		}
 	}
 }

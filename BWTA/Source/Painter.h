@@ -27,6 +27,8 @@ namespace BWTA {
 		void drawNodesAndConnectToNeighbors(std::set<Node*> nodes, QColor nodeColor);
 		void drawFourColorMap(std::set<Node*> regions);
 		void drawHeatMap(RectangleArray<int> map, float maxValue);
+		void drawClosestBaseLocationMap(RectangleArray<BaseLocation*> map, std::set<BaseLocation*> baseLocations);
+		void drawClosestChokepointMap(RectangleArray<Chokepoint*> map, std::set<Chokepoint*> chokepoints);
 
 	private:
 		QPainter* painter;

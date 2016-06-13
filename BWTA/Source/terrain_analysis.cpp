@@ -451,6 +451,13 @@ namespace BWTA
 		seconds = timer.stopAndGetTime();
 		log(" [Calculated base location properties in " << seconds << " seconds]");
 
+#ifdef DEBUG_DRAW
+		painter.drawClosestBaseLocationMap(BWTA_Result::getBaseLocationW, BWTA_Result::baselocations);
+		painter.render("ClosestBaseLocationMap");
+		painter.drawClosestChokepointMap(BWTA_Result::getChokepointW, BWTA_Result::chokepoints);
+		painter.render("ClosestChokepointMap");
+#endif
+
 	}
 
 	void remove_voronoi_diagram_from_arrangement(Arrangement_2* arr_ptr)

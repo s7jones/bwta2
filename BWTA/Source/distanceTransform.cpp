@@ -6,25 +6,22 @@ namespace BWTA
 {
 	void distanceTransform()
 	{
-		int mapW = MapData::mapWidth * 4;
-		int mapH = MapData::mapHeight * 4;
-
 		bool finish = false;
 		int maxDistance = 0;
 		while (!finish) {
 			finish = true;
 
-			for(int x=0; x < mapW; ++x) {
-				for(int y=0; y < mapH; ++y) {
+			for (int x = 0; x < MapData::mapWidthWalkRes; ++x) {
+				for(int y=0; y < MapData::mapHeightWalkRes; ++y) {
 					if (MapData::distanceTransform[x][y] == -1) {
-						if		(x>0	  && y>0	  && MapData::distanceTransform[x-1][y-1] == maxDistance) MapData::distanceTransform[x][y] = maxDistance+1;
-						else if (			 y>0	  && MapData::distanceTransform[x][y-1] == maxDistance) MapData::distanceTransform[x][y] = maxDistance+1;
-						else if (x+1<mapW && y>0	  && MapData::distanceTransform[x+1][y-1] == maxDistance) MapData::distanceTransform[x][y] = maxDistance+1;
-						else if (x>0				  && MapData::distanceTransform[x-1][y] == maxDistance) MapData::distanceTransform[x][y] = maxDistance+1;
-						else if (x>0				  && MapData::distanceTransform[x+1][y] == maxDistance) MapData::distanceTransform[x][y] = maxDistance+1;
-						else if (x>0	  && y+1<mapH && MapData::distanceTransform[x-1][y+1] == maxDistance) MapData::distanceTransform[x][y] = maxDistance+1;
-						else if (			 y+1<mapH && MapData::distanceTransform[x][y+1] == maxDistance) MapData::distanceTransform[x][y] = maxDistance+1;
-						else if (x+1<mapW && y+1<mapH && MapData::distanceTransform[x+1][y+1] == maxDistance) MapData::distanceTransform[x][y] = maxDistance+1;
+						if (x>0 && y>0 && MapData::distanceTransform[x - 1][y - 1] == maxDistance) MapData::distanceTransform[x][y] = maxDistance + 1;
+						else if (y > 0 && MapData::distanceTransform[x][y - 1] == maxDistance) MapData::distanceTransform[x][y] = maxDistance + 1;
+						else if (x + 1 < MapData::mapWidthWalkRes && y > 0 && MapData::distanceTransform[x + 1][y - 1] == maxDistance) MapData::distanceTransform[x][y] = maxDistance + 1;
+						else if (x > 0 && MapData::distanceTransform[x - 1][y] == maxDistance) MapData::distanceTransform[x][y] = maxDistance + 1;
+						else if (x > 0 && MapData::distanceTransform[x + 1][y] == maxDistance) MapData::distanceTransform[x][y] = maxDistance + 1;
+						else if (x > 0 && y + 1 < MapData::mapHeightWalkRes && MapData::distanceTransform[x - 1][y + 1] == maxDistance) MapData::distanceTransform[x][y] = maxDistance + 1;
+						else if (y + 1 < MapData::mapHeightWalkRes && MapData::distanceTransform[x][y + 1] == maxDistance) MapData::distanceTransform[x][y] = maxDistance + 1;
+						else if (x + 1 < MapData::mapWidthWalkRes && y + 1 < MapData::mapHeightWalkRes && MapData::distanceTransform[x + 1][y + 1] == maxDistance) MapData::distanceTransform[x][y] = maxDistance + 1;
 					}
 
 					if (MapData::distanceTransform[x][y] == -1) finish = false;
@@ -67,8 +64,8 @@ namespace BWTA
 	void maxDistanceOfRegion()
 	{
 		int maxDistance;
-		for(int x=0; x < MapData::mapWidth; ++x) {
-			for(int y=0; y < MapData::mapHeight; ++y) {
+		for(int x=0; x < MapData::mapWidthTileRes; ++x) {
+			for(int y=0; y < MapData::mapHeightTileRes; ++y) {
 				Region* region = getRegion(x, y);
 				if (region != NULL) {
 					maxDistance = getMaxTransformDistance(x, y);
