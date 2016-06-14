@@ -20,45 +20,30 @@ namespace BWTA
 		return a[i];
 	}
 
-	struct baseDistance_t {
+	template<typename T>
+	struct objectDistance_t {
 		int x;
 		int y;
-		BaseLocation* baseLocation;
+		T* objectRef;
 		int distance;
 
-		baseDistance_t(int xTmp, int yTmp, BaseLocation* baseRef, int dis = 0)
-			: x(xTmp), y(yTmp), baseLocation(baseRef), distance(dis) {};
+		objectDistance_t(int xTmp, int yTmp, T* ref, int dis = 0)
+			: x(xTmp), y(yTmp), objectRef(ref), distance(dis) {};
 	};
 
-	inline void addToExplore(const int& x, const int& y, const baseDistance_t& current, std::queue<baseDistance_t>& toExplore)
+	template<typename T>
+	inline void addToExplore(const int& x, const int& y, const objectDistance_t<T>& current, std::queue<objectDistance_t<T>>& toExplore)
 	{
 		// if change from walkable to not walkable, increase distance cost
 		if (MapData::walkability[current.x][current.y] && !MapData::walkability[x][y]) {
-			toExplore.emplace(x, y, current.baseLocation, current.distance + 100000);
+			toExplore.emplace(x, y, current.objectRef, current.distance + 100000);
 		} else {
-			toExplore.emplace(x, y, current.baseLocation, current.distance);
+			toExplore.emplace(x, y, current.objectRef, current.distance);
 		}
 	}
 
-	struct chokeDistance_t {
-		int x;
-		int y;
-		Chokepoint* chokepoint;
-		int distance;
-
-		chokeDistance_t(int xTmp, int yTmp, Chokepoint* chokeRef, int dis = 0)
-			: x(xTmp), y(yTmp), chokepoint(chokeRef), distance(dis) {};
-	};
-
-	inline void addToExplore(const int& x, const int& y, const chokeDistance_t& current, std::queue<chokeDistance_t>& toExplore)
-	{
-		// if change from walkable to not walkable, increase distance cost
-		if (MapData::walkability[current.x][current.y] && !MapData::walkability[x][y]) {
-			toExplore.emplace(x, y, current.chokepoint, current.distance + 100000);
-		} else {
-			toExplore.emplace(x, y, current.chokepoint, current.distance);
-		}
-	}
+	using baseDistance_t = objectDistance_t<BaseLocation>;
+	using chokeDistance_t = objectDistance_t<Chokepoint>;
 
 	void calculate_connectivity()
 	{
@@ -67,7 +52,6 @@ namespace BWTA
 
 		// compute reachable region for each region
 		// ===========================================================================
-
 		std::map<RegionImpl*, RegionImpl*> regionGroup;
 		for (auto regionInterface : BWTA_Result::regions) {
 			RegionImpl* region1 = (RegionImpl*)regionInterface;
@@ -94,7 +78,11 @@ namespace BWTA
 			}
 		}
 
+		log(" - Reachable regions computed in " << timer.stopAndGetTime() << " seconds");
+		timer.start();
+
 		// compute closestRegion and closestUnwalkablePolygon maps
+		// ===========================================================================
 		for (int x = 0; x < (int)BWTA_Result::getRegion.getWidth(); x++) {
 			for (int y = 0; y < (int)BWTA_Result::getRegion.getHeight(); y++) {
 				Region* closestRegion = NULL;
@@ -131,7 +119,7 @@ namespace BWTA
 			}
 		}
 
-		log(" - Reachable regions and closest regions computed in " << timer.stopAndGetTime() << " seconds");
+		log(" - Closest Polygon (walkable or not) Map computed in " << timer.stopAndGetTime() << " seconds");
 		timer.start();
 		
 		// compute closest BaseLocation map
@@ -151,7 +139,7 @@ namespace BWTA
 			postionsToExplore.pop();
 
 			if (minDistanceMap[check.x][check.y] == -1 || minDistanceMap[check.x][check.y] > check.distance) {
-				BWTA_Result::getBaseLocationW[check.x][check.y] = check.baseLocation;
+				BWTA_Result::getBaseLocationW[check.x][check.y] = check.objectRef;
 				minDistanceMap[check.x][check.y] = check.distance;
 				// look if the 8-connectivity are valid positions
 				check.distance += 8; // straight move cost
@@ -195,28 +183,11 @@ namespace BWTA
 			}
 		}
 
-		log(" - closest BaseLocation computed in " << timer.stopAndGetTime() << " seconds");
+		log(" - Closest BaseLocation Map computed in " << timer.stopAndGetTime() << " seconds");
 		timer.start();
 
 		// compute closest Chokepoint map
 		// ===========================================================================
-
-		// TODO SLOW
-// 		RectangleArray<double> minDistanceMap(MapData::mapWidthWalkRes, MapData::mapHeightWalkRes);
-// 		minDistanceMap.setTo(-1);
-// 		RectangleArray<double> distanceMap;
-// 		for (auto chokepoint : BWTA_Result::chokepoints) {
-// 			getGroundWalkDistanceMap(chokepoint->getCenter().x / 8, chokepoint->getCenter().y / 8, distanceMap);
-// 			for (int x = 0; x < MapData::mapWidthWalkRes; x++) {
-// 				for (int y = 0; y < MapData::mapHeightWalkRes; y++) {
-// 					if (distanceMap[x][y] == -1) continue;
-// 					if (minDistanceMap[x][y] == -1 || distanceMap[x][y] < minDistanceMap[x][y]) {
-// 						minDistanceMap[x][y] = distanceMap[x][y];
-// 						BWTA_Result::getChokepointW[x][y] = chokepoint;
-// 					}
-// 				}
-// 			}
-// 		}
 
 		minDistanceMap.setTo(-1);
 		std::queue<chokeDistance_t> postionsToExplore2;
@@ -229,7 +200,7 @@ namespace BWTA
 			postionsToExplore2.pop();
 
 			if (minDistanceMap[check.x][check.y] == -1 || minDistanceMap[check.x][check.y] > check.distance) {
-				BWTA_Result::getChokepointW[check.x][check.y] = check.chokepoint;
+				BWTA_Result::getChokepointW[check.x][check.y] = check.objectRef;
 				minDistanceMap[check.x][check.y] = check.distance;
 				// look if the 8-connectivity are valid positions
 				check.distance += 8; // straight move cost
@@ -272,6 +243,6 @@ namespace BWTA
 			}
 		}
 
-		log(" - closest Chokepoint computed in " << timer.stopAndGetTime() << " seconds");
+		log(" - Closest Chokepoint Map computed in " << timer.stopAndGetTime() << " seconds");
 	}
 }

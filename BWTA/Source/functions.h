@@ -121,8 +121,4 @@ namespace BWTA
   std::map<BWAPI::TilePosition,double> AstarSearchDistanceAll(BWAPI::TilePosition start, std::set<BWAPI::TilePosition>& end);
   std::vector<BWAPI::TilePosition> AstarSearchPath(BWAPI::TilePosition start, BWAPI::TilePosition end);
   std::vector<BWAPI::TilePosition> AstarSearchPath(BWAPI::TilePosition start, std::set<BWAPI::TilePosition> end);
-  
-// #ifdef DEBUG_DRAW
-//   QColor hsl2rgb(double h, double sl, double l);
-// #endif
 }
