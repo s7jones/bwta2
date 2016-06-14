@@ -105,8 +105,8 @@ namespace BWTA
 		base_build_map.resize(build_map.getWidth(), build_map.getHeight());
 		for (int x = 0; x < (int)build_map.getWidth(); x++) {
 			for (int y = 0; y < (int)build_map.getHeight(); y++) {
-				int max_x = min(x + 4, (int)build_map.getWidth());
-				int max_y = min(y + 3, (int)build_map.getHeight());
+				int max_x = std::min(x + 4, (int)build_map.getWidth());
+				int max_y = std::min(y + 3, (int)build_map.getHeight());
 				base_build_map[x][y] = true;
 				for (int ix = x; ix < max_x; ix++) {
 					for (int iy = y; iy<max_y; iy++) {
@@ -135,20 +135,20 @@ namespace BWTA
 
 				// Minerals and geysers affect tiles differently
 				if (resourceClusters[i][j].first.isMineralField()) {
-					int min_x = max(x - 6, 0);
-					int max_x = min(x + 4, (int)build_map.getWidth() - 1);
-					int min_y = max(y - 5, 0);
-					int max_y = min(y + 3, (int)build_map.getHeight() - 1);
+					int min_x = std::max(x - 6, 0);
+					int max_x = std::min(x + 4, (int)build_map.getWidth() - 1);
+					int min_y = std::max(y - 5, 0);
+					int max_y = std::min(y + 3, (int)build_map.getHeight() - 1);
 					for (int ix = min_x; ix <= max_x; ix++) {
 						for (int iy = min_y; iy <= max_y; iy++) {
 							base_build_map[ix][iy] = false;
 						}
 					}
 				} else {
-					int min_x = max(x - 6, 0);
-					int max_x = min(x + 6, build_map.getWidth() - 1);
-					int min_y = max(y - 5, 0);
-					int max_y = min(y + 4, build_map.getHeight() - 1);
+					int min_x = std::max(x - 6, 0);
+					int max_x = std::min(x + 6, (int)build_map.getWidth() - 1);
+					int min_y = std::max(y - 5, 0);
+					int max_y = std::min(y + 4, (int)build_map.getHeight() - 1);
 					for (int ix = min_x; ix <= max_x; ix++) {
 						for (int iy = min_y; iy <= max_y; iy++) {
 							base_build_map[ix][iy] = false;
@@ -194,10 +194,10 @@ namespace BWTA
 					(unitPosition.y - resourceClusters[i][j].first.dimensionUp()) / TILE_SIZE);
 				int x = unitTilePosition.x;
 				int y = unitTilePosition.y;
-				int min_x = max(x - max_influence_distance, 0);
-				int max_x = min(x + max_influence_distance, base_build_map.getWidth() - 1);
-				int min_y = max(y - max_influence_distance, 0);
-				int max_y = min(y + max_influence_distance, base_build_map.getHeight() - 1);
+				int min_x = std::max(x - max_influence_distance, 0);
+				int max_x = std::min(x + max_influence_distance, (int)base_build_map.getWidth() - 1);
+				int min_y = std::max(y - max_influence_distance, 0);
+				int max_y = std::min(y + max_influence_distance, (int)base_build_map.getHeight() - 1);
 				for (int ix = min_x; ix <= max_x; ix++) {
 					for (int iy = min_y; iy <= max_y; iy++) {
 						if (base_build_map[ix][iy]) {
@@ -205,7 +205,7 @@ namespace BWTA
 							for (int tx = ix * 4; tx < (ix + 4) * 4; tx++) {
 								for (int ty = iy * 4; ty < (iy + 3) * 4; ty++) {
 									if (distance_map[tx][ty] >= 0) {
-										distance = min(distance, (double)distance_map[tx][ty]);
+										distance = std::min(distance, (double)distance_map[tx][ty]);
 									}
 								}
 							}

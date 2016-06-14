@@ -61,12 +61,9 @@ namespace BWTA
     return x;
   }
 
-  int max(int a, int b) {return (a>b) ? a : b;}
-  int min(int a, int b) {return (a<b) ? a : b;}
-
   double distance_to_border(Polygon& polygon,int width, int height)
   {
-    double distance=min(width/2,height/2);
+	  double distance = std::min(width / 2, height / 2);
     for(size_t i=0;i<polygon.size();i++)
     {
       if (polygon[i].x<distance)
@@ -111,13 +108,13 @@ namespace BWTA
 		  int x = (int)pos.x;
 		  int y = (int)pos.y;
 		  if (distance>max_distance && max_distance>0) break;
-		  int min_x = max(x - 1, 0);
-		  int max_x = min(x + 1, read_map.getWidth() - 1);
-		  int min_y = max(y - 1, 0);
-		  int max_y = min(y + 1, read_map.getHeight() - 1);
+		  int min_x = std::max(x - 1, 0);
+		  int max_x = std::min(x + 1, (int)read_map.getWidth() - 1);
+		  int min_y = std::max(y - 1, 0);
+		  int max_y = std::min(y + 1, (int)read_map.getHeight() - 1);
 		  for (int ix = min_x; ix <= max_x; ix++) {
 			  for (int iy = min_y; iy <= max_y; iy++) {
-				  int f = abs(ix - x) * 10 + abs(iy - y) * 10;
+				  int f = std::abs(ix - x) * 10 + std::abs(iy - y) * 10;
 				  if (f > 10) { f = 14; }
 				  int v = distance + f;
 				  if (distance_map[ix][iy] > v) {
@@ -161,13 +158,13 @@ namespace BWTA
       int x=(int)pos.x;
       int y=(int)pos.y;
       if (distance>max_distance && max_distance>0) break;
-      int min_x=max(x-1,0);
-      int max_x=min(x+1,MapData::mapWidthWalkRes-1);
-      int min_y=max(y-1,0);
-      int max_y=min(y+1,MapData::mapHeightWalkRes-1);
+	  int min_x = std::max(x - 1, 0);
+	  int max_x = std::min(x + 1, MapData::mapWidthWalkRes - 1);
+	  int min_y = std::max(y - 1, 0);
+	  int max_y = std::min(y + 1, MapData::mapHeightWalkRes - 1);
       for(int ix=min_x;ix<=max_x;ix++) {
         for(int iy=min_y;iy<=max_y;iy++) {
-          int f=abs(ix-x)*10+abs(iy-y)*10;
+			int f = std::abs(ix - x) * 10 + std::abs(iy - y) * 10;
           if (f>10) {f=14;}
           int v=distance+f;
           if (distance_map[ix][iy]>v) {
@@ -183,13 +180,6 @@ namespace BWTA
       }
     }
   }
-
-  float max(float a, float b) {return (a>b) ? a : b;}
-  float min(float a, float b) {return (a<b) ? a : b;}
-
-  double max(double a, double b) {return (a>b) ? a : b;}
-  double min(double a, double b) {return (a<b) ? a : b;}
-
 
   bool fileExists(std::string filename)
   {

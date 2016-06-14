@@ -103,8 +103,8 @@ namespace BWTA
 
 		for (int x = 0; x < MapData::mapWidthWalkRes; x++) {
 			for (int y = 0; y < MapData::mapHeightWalkRes; y++) {
-				for (int x2 = max(x - 1, 0); x2 <= min(MapData::mapWidthWalkRes - 1, x + 1); x2++) {
-					for (int y2 = max(y - 1, 0); y2 <= min(MapData::mapHeightWalkRes - 1, y + 1); y2++) {
+				for (int x2 = std::max(x - 1, 0); x2 <= std::min(MapData::mapWidthWalkRes - 1, x + 1); x2++) {
+					for (int y2 = std::max(y - 1, 0); y2 <= std::min(MapData::mapHeightWalkRes - 1, y + 1); y2++) {
 						MapData::walkability[x2][y2] &= MapData::rawWalkability[x][y];
 					}
 				}
@@ -130,8 +130,8 @@ namespace BWTA
 			// map area
 			for (int x = x1; x <= x2; x++) {
 				for (int y = y1; y <= y2; y++) {
-					for (int x3 = max(x - 1, 0); x3 <= min(MapData::mapWidthWalkRes - 1, x + 1); x3++) {
-						for (int y3 = max(y - 1, 0); y3 <= min(MapData::mapHeightWalkRes - 1, y + 1); y3++) {
+					for (int x3 = std::max(x - 1, 0); x3 <= std::min(MapData::mapWidthWalkRes - 1, x + 1); x3++) {
+						for (int y3 = std::max(y - 1, 0); y3 <= std::min(MapData::mapHeightWalkRes - 1, y + 1); y3++) {
 							MapData::walkability[x3][y3] = false;
 						}
 					}

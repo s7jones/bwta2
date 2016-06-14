@@ -195,7 +195,7 @@ namespace BWTA
           double d=sqrt(dx*dx+dy*dy);
           double nx=dy/d;
           double ny=-dx/d;
-          double distance=abs((polygon[k].x-polygon[i].x)*nx+(polygon[k].y-polygon[i].y)*ny);
+		  double distance = std::abs((polygon[k].x - polygon[i].x)*nx + (polygon[k].y - polygon[i].y)*ny);
           if (distance>=error_tol)
           {
             within_tol=false;
@@ -278,10 +278,10 @@ namespace BWTA
       if (write_map[x][y]==NULL)
       {
         write_map[x][y]=component;
-        int min_x=max(x-1,0);
-        int max_x=min(x+1,read_map.getWidth()-1);
-        int min_y=max(y-1,0);
-        int max_y=min(y+1,read_map.getHeight()-1);
+		int min_x = std::max(x - 1, 0);
+		int max_x = std::min(x + 1, (int)read_map.getWidth() - 1);
+		int min_y = std::max(y - 1, 0);
+		int max_y = std::min(y + 1, (int)read_map.getHeight() - 1);
         for(int ix=min_x;ix<=max_x;ix++)
         {
           for(int iy=min_y;iy<=max_y;iy++)

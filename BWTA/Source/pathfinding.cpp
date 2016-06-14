@@ -25,10 +25,10 @@ namespace BWTA
       int gvalue=gmap[p];
       openTiles.pop();
       closedTiles.insert(p);
-      int minx=max(p.x-1,0);
-	  int maxx = min(p.x + 1, MapData::mapWidthTileRes - 1);
-      int miny=max(p.y-1,0);
-	  int maxy = min(p.y + 1, MapData::mapHeightTileRes - 1);
+	  int minx = std::max(p.x - 1, 0);
+	  int maxx = std::min(p.x + 1, MapData::mapWidthTileRes - 1);
+	  int miny = std::max(p.y - 1, 0);
+	  int maxy = std::min(p.y + 1, MapData::mapHeightTileRes - 1);
       for(int x=minx;x<=maxx;x++)
         for(int y=miny;y<=maxy;y++)
         {
@@ -38,8 +38,8 @@ namespace BWTA
           if (closedTiles.find(t)!=closedTiles.end()) continue;
 
           int g=gvalue+10; if (x!=p.x && y!=p.y) g+=4;
-          int dx=abs(x-end.x); int dy=abs(y-end.y);
-          int h=abs(dx-dy)*10+min(dx,dy)*14;
+		  int dx = std::abs(x - end.x); int dy = std::abs(y - end.y);
+		  int h = std::abs(dx - dy) * 10 + std::min(dx, dy) * 14;
           int f=g+h;
           if (gmap.find(t)==gmap.end() || gmap[t]>g)
           {
@@ -66,10 +66,10 @@ namespace BWTA
       int gvalue=gmap[p];
       openTiles.pop();
       closedTiles.insert(p);
-      int minx=max(p.x-1,0);
-      int maxx=min(p.x+1,MapData::mapWidthTileRes-1);
-      int miny=max(p.y-1,0);
-	  int maxy = min(p.y + 1, MapData::mapHeightTileRes - 1);
+	  int minx = std::max(p.x - 1, 0);
+	  int maxx = std::min(p.x + 1, MapData::mapWidthTileRes - 1);
+	  int miny = std::max(p.y - 1, 0);
+	  int maxy = std::min(p.y + 1, MapData::mapHeightTileRes - 1);
       for(int x=minx;x<=maxx;x++)
         for(int y=miny;y<=maxy;y++)
         {
@@ -82,8 +82,8 @@ namespace BWTA
           int h=-1;
           for(std::set<BWAPI::TilePosition>::iterator i=end.begin();i!=end.end();i++)
           {
-            int dx=abs(x-i->x); int dy=abs(y-i->y);
-            int ch=abs(dx-dy)*10+min(dx,dy)*14;
+			  int dx = std::abs(x - i->x); int dy = std::abs(y - i->y);
+			  int ch = std::abs(dx - dy) * 10 + std::min(dx, dy) * 14;
             if (h==-1 || ch<h)
               h=ch;
           }
@@ -119,10 +119,10 @@ namespace BWTA
       int gvalue=gmap[p];
       openTiles.pop();
       closedTiles.insert(p);
-      int minx=max(p.x-1,0);
-      int maxx=min(p.x+1,MapData::mapWidthTileRes-1);
-      int miny=max(p.y-1,0);
-	  int maxy = min(p.y + 1, MapData::mapHeightTileRes - 1);
+	  int minx = std::max(p.x - 1, 0);
+	  int maxx = std::min(p.x + 1, MapData::mapWidthTileRes - 1);
+	  int miny = std::max(p.y - 1, 0);
+	  int maxy = std::min(p.y + 1, MapData::mapHeightTileRes - 1);
       for(int x=minx;x<=maxx;x++)
         for(int y=miny;y<=maxy;y++)
         {
@@ -135,8 +135,8 @@ namespace BWTA
           int h=-1;
           for(std::set<BWAPI::TilePosition>::iterator i=end.begin();i!=end.end();i++)
           {
-            int dx=abs(x-i->x); int dy=abs(y-i->y);
-            int ch=abs(dx-dy)*10+min(dx,dy)*14;
+			  int dx = std::abs(x - i->x); int dy = std::abs(y - i->y);
+			  int ch = std::abs(dx - dy) * 10 + std::min(dx, dy) * 14;
             if (h==-1 || ch<h)
               h=ch;
           }
@@ -181,10 +181,10 @@ namespace BWTA
       int gvalue=gmap[p];
       openTiles.pop();
       closedTiles.insert(p);
-      int minx=max(p.x-1,0);
-      int maxx=min(p.x+1,MapData::mapWidthTileRes-1);
-      int miny=max(p.y-1,0);
-	  int maxy = min(p.y + 1, MapData::mapHeightTileRes - 1);
+	  int minx = std::max(p.x - 1, 0);
+	  int maxx = std::min(p.x + 1, MapData::mapWidthTileRes - 1);
+	  int miny = std::max(p.y - 1, 0);
+	  int maxy = std::min(p.y + 1, MapData::mapHeightTileRes - 1);
       for(int x=minx;x<=maxx;x++)
         for(int y=miny;y<=maxy;y++)
         {
@@ -195,9 +195,9 @@ namespace BWTA
 
           int g=gvalue+10;
           if (x!=p.x && y!=p.y) g+=4;
-          int dx=abs(x-end.x);
-          int dy=abs(y-end.y);
-          int h=abs(dx-dy)*10+min(dx,dy)*14;
+		  int dx = std::abs(x - end.x);
+		  int dy = std::abs(y - end.y);
+		  int h = std::abs(dx - dy) * 10 + std::min(dx, dy) * 14;
           int f=g+h;
           if (gmap.find(t)==gmap.end() || g<gmap.find(t)->second)
           {
@@ -240,10 +240,10 @@ namespace BWTA
       int gvalue=gmap[p];
       openTiles.pop();
       closedTiles.insert(p);
-      int minx=max(p.x-1,0);
-      int maxx=min(p.x+1,MapData::mapWidthTileRes-1);
-      int miny=max(p.y-1,0);
-	  int maxy = min(p.y + 1, MapData::mapHeightTileRes - 1);
+	  int minx = std::max(p.x - 1, 0);
+	  int maxx = std::min(p.x + 1, MapData::mapWidthTileRes - 1);
+	  int miny = std::max(p.y - 1, 0);
+	  int maxy = std::min(p.y + 1, MapData::mapHeightTileRes - 1);
       for(int x=minx;x<=maxx;x++)
         for(int y=miny;y<=maxy;y++)
         {
@@ -256,8 +256,8 @@ namespace BWTA
           int h=-1;
           for(std::set<BWAPI::TilePosition>::iterator i=end.begin();i!=end.end();i++)
           {
-            int dx=abs(x-i->x); int dy=abs(y-i->y);
-            int ch=abs(dx-dy)*10+min(dx,dy)*14;
+			  int dx = std::abs(x - i->x); int dy = std::abs(y - i->y);
+			  int ch = std::abs(dx - dy) * 10 + std::min(dx, dy) * 14;
             if (h==-1 || ch<h)
               h=ch;
           }
@@ -363,9 +363,9 @@ namespace BWTA
 
 				int g = gvalue + child->second;
 				BWAPI::TilePosition tileCenter = BWAPI::TilePosition(t->getCenter());
-				int dx = abs(tileCenter.x - target.x);
-				int dy = abs(tileCenter.y - target.y);
-				int h = abs(dx - dy) * 10 + min(dx, dy) * 14;
+				int dx = std::abs(tileCenter.x - target.x);
+				int dy = std::abs(tileCenter.y - target.y);
+				int h = std::abs(dx - dy) * 10 + std::min(dx, dy) * 14;
 				int f = g + h;
 				if (gmap.find(t) == gmap.end() || g < gmap.find(t)->second) {
 					gmap[t] = g;
@@ -455,9 +455,9 @@ namespace BWTA
 
 				int g = gvalue + child->second;
 				BWAPI::TilePosition tileCenter = BWAPI::TilePosition(t->getCenter());
-				int dx = abs(tileCenter.x - target.x);
-				int dy = abs(tileCenter.y - target.y);
-				int h = abs(dx - dy) * 10 + min(dx, dy) * 14;
+				int dx = std::abs(tileCenter.x - target.x);
+				int dy = std::abs(tileCenter.y - target.y);
+				int h = std::abs(dx - dy) * 10 + std::min(dx, dy) * 14;
 				int f = g + h;
 				if (gmap.find(t) == gmap.end() || g < gmap.find(t)->second) {
 					gmap[t] = g;

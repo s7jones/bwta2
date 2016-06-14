@@ -71,9 +71,7 @@ namespace BWTA
   void loadMapFromBWAPI();
   void loadMap();
   int str2int(std::string str);
-  int max(int a, int b);
-  int min(int a, int b);
-  //void writeFile(const char* filename, const char* text, ...);
+
 #ifdef OFFLINE
   #define BWTA_PATH "logs/"
   const std::string LOG_FILE_PATH = "logs/BWTA.log";
@@ -108,11 +106,6 @@ namespace BWTA
 
   void calculate_connectivity();
 
-  float max(float a, float b);
-  float min(float a, float b);
-
-  double max(double a, double b);
-  double min(double a, double b);
   bool fileExists(std::string filename);
   int fileVersion(std::string filename);
 

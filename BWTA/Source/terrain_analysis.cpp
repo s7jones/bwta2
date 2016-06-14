@@ -147,7 +147,7 @@ namespace BWTA
 		// Discard polygons that are too small
 		int removed = 0;
 		for (size_t p = 0; p < polygons.size();) {
-			if (abs(polygons[p].getArea()) <= 256 &&
+			if (std::abs(polygons[p].getArea()) <= 256 &&
 				distance_to_border(polygons[p], MapData::walkability.getWidth(), MapData::walkability.getHeight()) > 1) {
 				polygons.erase(polygons.begin() + p);
 				removed++;
@@ -726,7 +726,7 @@ namespace BWTA
 		}
 		double lt = 0.85;
 		double st = 0.9;
-		double diff = max(c->radius - larger->radius*lt, c->radius - smaller->radius*st);
+		double diff = std::max(c->radius - larger->radius*lt, c->radius - smaller->radius*st);
 		for (Node* region = smaller;; region = larger)
 		{
 			if (region->neighbors.size() == 2)
@@ -748,7 +748,7 @@ namespace BWTA
 				if (c->radius > otherc->radius || (c->radius == otherc->radius && c->point > otherc->point))
 				{
 					double value = c->radius*dist - region->radius*0.7;
-					diff = max(diff, value);
+					diff = std::max(diff, value);
 				}
 			}
 			if (region == larger)

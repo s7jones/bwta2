@@ -209,8 +209,8 @@ namespace BWTA
 	{
 // 		std::cout << "Sides: " << s1 << " - " << s2 << std::endl;
 		BWAPI::TilePosition center((s1 + s2) / 2);
-		int dx = abs(s2.x - s1.x);
-		int dy = abs(s2.y - s1.y);
+		int dx = std::abs(s2.x - s1.x);
+		int dy = std::abs(s2.y - s1.y);
 		int *edges = new int[4];
 		edges[0] = -1;
 		edges[1] = -1;

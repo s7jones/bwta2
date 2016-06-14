@@ -229,13 +229,13 @@ namespace BWTA
       heap.pop();
       int x=(int)pos.x;
       int y=(int)pos.y;
-      int min_x=max(x-1,0);
-      int max_x=min(x+1,distanceMap.getWidth()-1);
-      int min_y=max(y-1,0);
-      int max_y=min(y+1,distanceMap.getHeight()-1);
+	  int min_x = std::max(x - 1, 0);
+	  int max_x = std::min(x + 1, (int)distanceMap.getWidth() - 1);
+	  int min_y = std::max(y - 1, 0);
+	  int max_y = std::min(y + 1, (int)distanceMap.getHeight() - 1);
       for(int ix=min_x;ix<=max_x;ix++) {
         for(int iy=min_y;iy<=max_y;iy++) {
-          int f=abs(ix-x)*32+abs(iy-y)*32;
+			int f = std::abs(ix - x) * 32 + std::abs(iy - y) * 32;
           if (f>32) {f=45;}
           int v=distance+f;
           if (distanceMap[ix][iy]>v) {

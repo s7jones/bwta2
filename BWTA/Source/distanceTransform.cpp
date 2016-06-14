@@ -36,25 +36,25 @@ namespace BWTA
 	int getMaxTransformDistance(int x, int y)
 	{
 		int maxDistance = 0;
-		maxDistance = max(maxDistance, MapData::distanceTransform[x*4][y*4]);
-		maxDistance = max(maxDistance, MapData::distanceTransform[(x*4)+1][y*4]);
-		maxDistance = max(maxDistance, MapData::distanceTransform[(x*4)+2][y*4]);
-		maxDistance = max(maxDistance, MapData::distanceTransform[(x*4)+3][y*4]);
+		maxDistance = std::max(maxDistance, MapData::distanceTransform[x*4][y*4]);
+		maxDistance = std::max(maxDistance, MapData::distanceTransform[(x * 4) + 1][y * 4]);
+		maxDistance = std::max(maxDistance, MapData::distanceTransform[(x * 4) + 2][y * 4]);
+		maxDistance = std::max(maxDistance, MapData::distanceTransform[(x * 4) + 3][y * 4]);
 
-		maxDistance = max(maxDistance, MapData::distanceTransform[x*4][(y*4)+1]);
-		maxDistance = max(maxDistance, MapData::distanceTransform[(x*4)+1][(y*4)+1]);
-		maxDistance = max(maxDistance, MapData::distanceTransform[(x*4)+2][(y*4)+1]);
-		maxDistance = max(maxDistance, MapData::distanceTransform[(x*4)+3][(y*4)+1]);
+		maxDistance = std::max(maxDistance, MapData::distanceTransform[x * 4][(y * 4) + 1]);
+		maxDistance = std::max(maxDistance, MapData::distanceTransform[(x * 4) + 1][(y * 4) + 1]);
+		maxDistance = std::max(maxDistance, MapData::distanceTransform[(x * 4) + 2][(y * 4) + 1]);
+		maxDistance = std::max(maxDistance, MapData::distanceTransform[(x * 4) + 3][(y * 4) + 1]);
 
-		maxDistance = max(maxDistance, MapData::distanceTransform[x*4][(y*4)+2]);
-		maxDistance = max(maxDistance, MapData::distanceTransform[(x*4)+1][(y*4)+2]);
-		maxDistance = max(maxDistance, MapData::distanceTransform[(x*4)+2][(y*4)+2]);
-		maxDistance = max(maxDistance, MapData::distanceTransform[(x*4)+3][(y*4)+2]);
+		maxDistance = std::max(maxDistance, MapData::distanceTransform[x * 4][(y * 4) + 2]);
+		maxDistance = std::max(maxDistance, MapData::distanceTransform[(x * 4) + 1][(y * 4) + 2]);
+		maxDistance = std::max(maxDistance, MapData::distanceTransform[(x * 4) + 2][(y * 4) + 2]);
+		maxDistance = std::max(maxDistance, MapData::distanceTransform[(x * 4) + 3][(y * 4) + 2]);
 
-		maxDistance = max(maxDistance, MapData::distanceTransform[x*4][(y*4)+3]);
-		maxDistance = max(maxDistance, MapData::distanceTransform[(x*4)+1][(y*4)+3]);
-		maxDistance = max(maxDistance, MapData::distanceTransform[(x*4)+2][(y*4)+3]);
-		maxDistance = max(maxDistance, MapData::distanceTransform[(x*4)+3][(y*4)+3]);
+		maxDistance = std::max(maxDistance, MapData::distanceTransform[x * 4][(y * 4) + 3]);
+		maxDistance = std::max(maxDistance, MapData::distanceTransform[(x * 4) + 1][(y * 4) + 3]);
+		maxDistance = std::max(maxDistance, MapData::distanceTransform[(x * 4) + 2][(y * 4) + 3]);
+		maxDistance = std::max(maxDistance, MapData::distanceTransform[(x * 4) + 3][(y * 4) + 3]);
 		return maxDistance;
 	}
 
@@ -69,7 +69,7 @@ namespace BWTA
 				Region* region = getRegion(x, y);
 				if (region != NULL) {
 					maxDistance = getMaxTransformDistance(x, y);
-					((BWTA::RegionImpl*)(region))->_maxDistance = max(((BWTA::RegionImpl*)(region))->_maxDistance, maxDistance);
+					((BWTA::RegionImpl*)(region))->_maxDistance = std::max(((BWTA::RegionImpl*)(region))->_maxDistance, maxDistance);
 				}
 			}
 		}
