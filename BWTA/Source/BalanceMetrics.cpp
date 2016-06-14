@@ -26,8 +26,8 @@ namespace BWTA
 		std::vector<BWTA::BaseLocation*> startLocations(startLocationsTmp.size());
 		std::copy(startLocationsTmp.begin(), startLocationsTmp.end(), startLocations.begin());
 
-		for (std::vector<BWTA::BaseLocation*>::const_iterator it = startLocations.begin(); it != startLocations.end(); ++it) {
-			BWTA::Region* region = (*it)->getRegion();
+		for (const auto& startLocation : startLocations) {
+			const BWTA::Region* region = startLocation->getRegion();
 			//meanOpenness += regionMaxDistance[region];
 			meanOpenness += region->getMaxDistance();
 			meanArea += region->getPolygon().getArea();
@@ -39,8 +39,8 @@ namespace BWTA
 		//log("Mean Openness: " << meanOpenness);
 		//log("Mean Area: " << meanArea);
 
-		for (std::vector<BWTA::BaseLocation*>::const_iterator it = startLocations.begin(); it != startLocations.end(); ++it) {
-			BWTA::Region* region = (*it)->getRegion();
+		for (const auto& startLocation : startLocations) {
+			const BWTA::Region* region = startLocation->getRegion();
 			//standardDeviationOpenness += pow(regionMaxDistance[region]-meanOpenness,2); 
 			standardDeviationOpenness += pow(region->getMaxDistance()-meanOpenness,2); 
 			standardDeviationArea += pow(region->getPolygon().getArea()-meanArea,2); 

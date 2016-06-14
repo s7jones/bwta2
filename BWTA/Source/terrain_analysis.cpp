@@ -110,7 +110,6 @@ namespace BWTA
 
 		// time performance
 		Timer timer;
-		double seconds;
 
 		timer.start();
 
@@ -118,8 +117,7 @@ namespace BWTA
 		findMineralClusters(MapData::walkability, MapData::resourcesWalkPositions, clusters);
 		log("  Found " << clusters.size() << " mineral clusters.");
 
-		seconds = timer.stopAndGetTime();
-		log(" [Clustering done in " << seconds << " seconds]");
+		log(" [Clustering done in " << timer.stopAndGetTime() << " seconds]");
 		timer.start();
 
 		RectangleArray<bool> base_build_map;
@@ -157,8 +155,7 @@ namespace BWTA
 		}
 		log("  Removed " << removed << " small polygons.");
 
-		seconds = timer.stopAndGetTime();
-		log(" [Detected polygons in " << seconds << " seconds]");
+		log(" [Detected polygons in " << timer.stopAndGetTime() << " seconds]");
 		timer.start();
 
 		// Save the remaining polygons in BWTA_Result::unwalkablePolygons
@@ -291,8 +288,7 @@ namespace BWTA
 			}
 		}
 
-		seconds = timer.stopAndGetTime();
-		log(" [Computed Voronoi diagram in " << seconds << " seconds]");
+		log(" [Computed Voronoi diagram in " << timer.stopAndGetTime() << " seconds]");
 		timer.start();
 
 #ifdef DEBUG_DRAW
@@ -304,8 +300,7 @@ namespace BWTA
 
 		simplify_voronoi_diagram(&arr, &distance);
 
-		seconds = timer.stopAndGetTime();
-		log(" [Pruned Voronoi diagram in " << seconds << " seconds]");
+		log(" [Pruned Voronoi diagram in " << timer.stopAndGetTime() << " seconds]");
 		timer.start();
 
 #ifdef DEBUG_DRAW
@@ -317,8 +312,7 @@ namespace BWTA
 
 		identify_region_nodes(&arr, &g);
 
-		seconds = timer.stopAndGetTime();
-		log(" [Identified region nodes in " << seconds << " seconds]");
+		log(" [Identified region nodes in " << timer.stopAndGetTime() << " seconds]");
 		timer.start();
 
 #ifdef DEBUG_DRAW
@@ -331,8 +325,7 @@ namespace BWTA
 
 		identify_chokepoint_nodes(&g, &distance, &nearest);
 
-		seconds = timer.stopAndGetTime();
-		log(" [Identified choke points nodes in " << seconds << " seconds]");
+		log(" [Identified choke points nodes in " << timer.stopAndGetTime() << " seconds]");
 		timer.start();
 
 #ifdef DEBUG_DRAW
@@ -350,8 +343,7 @@ namespace BWTA
 		remove_voronoi_diagram_from_arrangement(&arr);
 		log("  Removed voronoi edges.");
 
-		seconds = timer.stopAndGetTime();
-		log(" [Merged adjacent regions in " << seconds << " seconds]");
+		log(" [Merged adjacent regions in " << timer.stopAndGetTime() << " seconds]");
 		timer.start();
 
 #ifdef DEBUG_DRAW
@@ -365,8 +357,7 @@ namespace BWTA
 
 		wall_off_chokepoints(&g, &arr);
 
-		seconds = timer.stopAndGetTime();
-		log(" [Wall of chokepoints in " << seconds << " seconds]");
+		log(" [Wall of chokepoints in " << timer.stopAndGetTime() << " seconds]");
 		timer.start();
 
 #ifdef DEBUG_DRAW
@@ -404,9 +395,8 @@ namespace BWTA
 #endif
 		}
 
-		seconds = timer.stopAndGetTime();
 		// Computed the polygon from the face of a 2D arrangement
-		log(" [Creating BWTA regions in " << seconds << " seconds]");
+		log(" [Creating BWTA regions in " << timer.stopAndGetTime() << " seconds]");
 		timer.start();
 
 #ifdef DEBUG_DRAW
@@ -441,15 +431,21 @@ namespace BWTA
 			((RegionImpl*)region)->_chokepoints = chokepoints;
 		}
 
-		seconds = timer.stopAndGetTime();
-		log(" [Linked choke points wiht regions in " << seconds << " seconds]");
+		log(" [Linked choke points wiht regions in " << timer.stopAndGetTime() << " seconds]");
 		timer.start();
 
 		calculate_connectivity();
-		calculate_base_location_properties(get_component, components, BWTA_Result::baselocations);
+		calculateBaseLocationProperties(BWTA_Result::baselocations);
 
-		seconds = timer.stopAndGetTime();
-		log(" [Calculated base location properties in " << seconds << " seconds]");
+		log("Debug BaseLocationProperties");
+		for (const auto& base : BWTA_Result::baselocations) {
+			BaseLocationImpl* baseI = (BaseLocationImpl*)base;
+			log("Base Position" << baseI->getTilePosition() << ",isIsland:" << baseI->isIsland()
+				<< ",isStartLocation:" << baseI->isStartLocation()
+				<< ",regionCenter" << baseI->getRegion()->getCenter());
+		}
+
+		log(" [Calculated base location properties in " << timer.stopAndGetTime() << " seconds]");
 
 #ifdef DEBUG_DRAW
 		painter.drawClosestBaseLocationMap(BWTA_Result::getBaseLocationW, BWTA_Result::baselocations);

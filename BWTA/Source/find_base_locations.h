@@ -19,9 +19,6 @@ namespace BWTA
 	  const std::vector< std::vector< UnitTypeWalkPosition > > &resourceClusters,
 	  std::set< BWTA::BaseLocation* > &base_locations);
 
-  void attachResourcePointersToBaseLocations(std::set< BWTA::BaseLocation* > &baseLocations);
-
-  void calculate_base_location_properties(const RectangleArray<ConnectedComponent*> &get_component
-                                         ,const std::list<ConnectedComponent> &components
-                                         ,std::set< BWTA::BaseLocation* > &base_locations);
+  void attachResourcePointersToBaseLocations(std::set<BaseLocation*> &baseLocations);
+  void calculateBaseLocationProperties(std::set<BaseLocation*> &base_locations);
 }

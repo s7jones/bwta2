@@ -260,57 +260,47 @@ namespace BWTA
 		}
 	}
 
-	void calculate_base_location_properties(const RectangleArray<ConnectedComponent*> &get_component
-		, const std::list<ConnectedComponent> &components
-		, std::set< BWTA::BaseLocation* > &base_locations)
+	void calculateBaseLocationProperties(std::set<BaseLocation*> &base_locations)
 	{
-		RectangleArray<double> distance_map;
-		for (std::set<BWTA::BaseLocation*>::iterator i = base_locations.begin(); i != base_locations.end(); i++) {
-			BWAPI::Position p((*i)->getTilePosition().x * 32 + 64, (*i)->getTilePosition().y * 32 + 48);
-			BWAPI::TilePosition tp((*i)->getTilePosition().x + 1, (*i)->getTilePosition().y + 1);
-			BWTA::getGroundDistanceMap(tp, distance_map);
-			BWTA::BaseLocationImpl* ii = (BWTA::BaseLocationImpl*)(*i);
-			
-			//assume the base location is an island unless we can walk from this base location to another base location
-			ii->island = true;
-			for (std::set<BWTA::BaseLocation*>::iterator j = base_locations.begin(); j != base_locations.end(); j++) {
-				if (*j == *i) {
-					ii->ground_distances[*j] = 0;
-					ii->air_distances[*j] = 0;
+		RectangleArray<double> distanceMap;
+		for (auto& base : BWTA_Result::baselocations) {
+			BWAPI::TilePosition baseTile(base->getTilePosition());
+			getGroundDistanceMap(baseTile, distanceMap);
+			BaseLocationImpl* baseI = (BaseLocationImpl*)base;
+
+			// assume the base location is an island unless we can walk from this base location to another base location
+			for (const auto& base2 : BWTA_Result::baselocations) {
+				if (base == base2) {
+					baseI->groundDistances[base2] = 0;
+					baseI->airDistances[base2] = 0;
 				} else {
-					BWAPI::Position p2((*j)->getTilePosition().x * 32 + 64, (*j)->getTilePosition().y * 32 + 48);
-					BWAPI::TilePosition tp2((*j)->getTilePosition().x + 1, (*j)->getTilePosition().y + 1);
-					if (BWTA::isConnected(tp, tp2)) {
-						ii->island = false;
+					BWAPI::TilePosition base2Tile(base2->getTilePosition());
+					if (baseI->_isIsland && isConnected(baseTile, base2Tile)) {
+						baseI->_isIsland = false;
 					}
-					ii->ground_distances[*j] = distance_map[tp2.x][tp2.y];
-					ii->air_distances[*j] = p.getDistance(p2);
+					baseI->groundDistances[base2] = distanceMap[base2Tile.x][base2Tile.y];
+					baseI->airDistances[base2] = baseTile.getDistance(base2Tile);
 				}
 			}
 
 			// look if this base location is a start location
-			ii->start = false;
-			double distance;
-			double maxDistance = TILE_SIZE * 10;
-			for (auto startLocation : MapData::startLocations) {
-				BWAPI::Position pos(startLocation.x * TILE_SIZE + 64, startLocation.y * TILE_SIZE + 48);
-				distance = pos.getApproxDistance((*i)->getPosition());
-				if (distance < maxDistance) {
-					ii->start = true;
-					BWTA::BWTA_Result::startlocations.insert(*i);
+			for (const auto& startLocation : MapData::startLocations) {
+				int distance = startLocation.getApproxDistance(base->getTilePosition());
+				if (distance < 10) {
+					baseI->_isStartLocation = true;
+					BWTA_Result::startlocations.insert(base);
 					break;
 				}
 			}
 
-			//find what region this base location is in and tell that region about the base location
-			for (std::set<BWTA::Region*>::iterator r = BWTA::BWTA_Result::regions.begin(); r != BWTA::BWTA_Result::regions.end(); r++) {
-				if ((*r)->getPolygon().isInside(ii->getPosition())) {
-					ii->region = *r;
-					((BWTA::RegionImpl*)(*r))->baseLocations.insert(*i);
+			// find what region this base location is in and tell that region about the base location
+			for (auto& region : BWTA_Result::regions) {
+				if (region->getPolygon().isInside(base->getPosition())) {
+					baseI->region = region;
+					((RegionImpl*)region)->baseLocations.insert(base);
 					break;
 				}
 			}
-
 		}
 	}
 }

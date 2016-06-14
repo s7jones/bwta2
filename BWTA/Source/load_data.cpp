@@ -249,12 +249,12 @@ namespace BWTA
       {
         double g_dist, a_dist;
         file_in >> g_dist >> a_dist;
-        ((BaseLocationImpl*)baselocations[i])->ground_distances[baselocations[j]]=g_dist;
-        ((BaseLocationImpl*)baselocations[i])->air_distances[baselocations[j]]=a_dist;
+        ((BaseLocationImpl*)baselocations[i])->groundDistances[baselocations[j]]=g_dist;
+        ((BaseLocationImpl*)baselocations[i])->airDistances[baselocations[j]]=a_dist;
       }
-      file_in >> ((BaseLocationImpl*)baselocations[i])->island;
-      file_in >> ((BaseLocationImpl*)baselocations[i])->start;
-      if (((BaseLocationImpl*)baselocations[i])->start)
+      file_in >> ((BaseLocationImpl*)baselocations[i])->_isIsland;
+      file_in >> ((BaseLocationImpl*)baselocations[i])->_isStartLocation;
+      if (((BaseLocationImpl*)baselocations[i])->_isStartLocation)
         BWTA::BWTA_Result::startlocations.insert(baselocations[i]);
     }
     for(int i=0;i<chokepoint_amount;i++)

@@ -1,43 +1,45 @@
 #pragma once
+
 #include <BWTA/BaseLocation.h>
+
 namespace BWTA
 {
-  class BaseLocationImpl : public BaseLocation
-  {
-  public:
-    BaseLocationImpl();
-    BaseLocationImpl(const BWAPI::TilePosition &tp);
+	class BaseLocationImpl : public BaseLocation
+	{
+	public:
+		BaseLocationImpl() {};
+		BaseLocationImpl(const BWAPI::TilePosition &tp);
 
-    virtual BWAPI::Position getPosition() const;
-    virtual BWAPI::TilePosition getTilePosition() const;
+		const BWAPI::Position getPosition() const override { return position; };
+		const BWAPI::TilePosition getTilePosition() const override { return tilePosition; };
 
-    virtual Region* getRegion() const;
+		Region* getRegion() const override { return region; };
 
-    virtual int minerals() const;
-    virtual int gas() const;
+		const int minerals() const override;
+		const int gas() const override;
 
-    virtual const BWAPI::Unitset &getMinerals();
-    virtual const BWAPI::Unitset &getStaticMinerals() const;
-    virtual const BWAPI::Unitset &getGeysers() const;
+		const BWAPI::Unitset &getMinerals() override;
+		const BWAPI::Unitset &getStaticMinerals() const override { return staticMinerals; };
+		const BWAPI::Unitset &getGeysers() const override { return geysers; };
 
-    virtual double getGroundDistance(BaseLocation* other) const;
-    virtual double getAirDistance(BaseLocation* other) const;
+		const double getGroundDistance(BaseLocation* other) const override;
+		const double getAirDistance(BaseLocation* other) const override;
 
-    virtual bool isIsland() const;
-    virtual bool isMineralOnly() const;
-    virtual bool isStartLocation() const;
+		const bool isIsland() const override { return _isIsland; };
+		const bool isMineralOnly() const override { return geysers.empty(); };
+		const bool isStartLocation() const override { return _isStartLocation; };
 
-    //-----------------------------------------------------------
+		//-----------------------------------------------------------
 
-    Region* region;
-    bool island;
-    bool start;
-    BWAPI::Unitset geysers;
-	BWAPI::Unitset staticMinerals;
-	BWAPI::Unitset currentMinerals;
-    std::map<BaseLocation*, double > ground_distances;
-    std::map<BaseLocation*, double > air_distances;
-    BWAPI::TilePosition tilePosition;
-    BWAPI::Position position;
-  };
+		Region* region;
+		bool _isIsland;
+		bool _isStartLocation;
+		BWAPI::TilePosition tilePosition;
+		BWAPI::Position position;
+		BWAPI::Unitset geysers;
+		BWAPI::Unitset staticMinerals;
+		BWAPI::Unitset currentMinerals;
+		std::map<BaseLocation*, double> groundDistances;
+		std::map<BaseLocation*, double> airDistances;
+	};
 }
