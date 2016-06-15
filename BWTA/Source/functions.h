@@ -96,6 +96,11 @@ namespace BWTA
 	  int max_distance,
 	  RectangleArray<int> &distance_map);
 
+  void calculateTileDistances(const RectangleArray<bool>& walkable,
+	  const BWAPI::TilePosition &start,
+	  const double& maxDistance,
+	  RectangleArray<double>& distanceMap);
+
   void calculate_walk_distances_area(const BWAPI::Position &start
                                     ,int width
                                     ,int height

@@ -41,9 +41,6 @@
     <ClCompile Include="Source\extract_polygons.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\find_base_locations.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\get_voronoi_edges.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -89,6 +86,9 @@
     <ClCompile Include="Source\Painter.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
+    <ClCompile Include="Source\BaseLocationGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\BaseLocationImpl.h">
@@ -107,9 +107,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\extract_polygons.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\find_base_locations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\functions.h">
@@ -174,6 +171,9 @@
     </ClInclude>
     <ClInclude Include="Source\Timer.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BaseLocationGenerator.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -31,5 +31,7 @@ namespace BWTA
 		MiniTileMaps_type *MiniTileFlags = NULL;
 		std::vector<UnitTypePosition> staticNeutralBuildings;
 		std::vector<UnitTypeWalkPosition> resourcesWalkPositions;
+
+		std::vector<unitTypeTilePos_t> resources;
 	}
 }

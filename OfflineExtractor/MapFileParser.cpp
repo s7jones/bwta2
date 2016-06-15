@@ -236,8 +236,10 @@ namespace BWTA
 // 				std::cout << "Unit(" << unitClass << ") type=" << unitType.c_str() << " at " << x << "," << y << " player " << player << "\n";
 // 				std::cout << unitType.c_str() << " Tile " << unitTilePosition.x << "," << unitTilePosition.y << std::endl;
 
+				// TODO filter out all mineral patches under 200
 				if (unitType.isMineralField() || unitType == BWAPI::UnitTypes::Resource_Vespene_Geyser) {
 					MapData::resourcesWalkPositions.push_back(std::make_pair(unitType, unitWalkPosition));
+					MapData::resources.emplace_back(unitType, unitTilePosition);
 				}
 				if (unitType == BWAPI::UnitTypes::Special_Start_Location) {
 // 					std::cout << unitType.c_str() << " Tile " << unitTilePosition.x << "," << unitTilePosition.y << std::endl;

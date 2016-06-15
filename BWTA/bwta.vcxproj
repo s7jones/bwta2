@@ -279,7 +279,7 @@
     <ClCompile Include="Source\calculate_connectivity.cpp" />
     <ClCompile Include="Source\ChokepointImpl.cpp" />
     <ClCompile Include="Source\extract_polygons.cpp" />
-    <ClCompile Include="Source\find_base_locations.cpp" />
+    <ClCompile Include="Source\BaseLocationGenerator.cpp" />
     <ClCompile Include="Source\get_voronoi_edges.cpp" />
     <ClCompile Include="Source\Graph.cpp" />
     <ClCompile Include="Source\load_data.cpp" />
@@ -309,7 +309,7 @@
     <ClInclude Include="Source\Color.h" />
     <ClInclude Include="Source\ConnectedComponent.h" />
     <ClInclude Include="Source\extract_polygons.h" />
-    <ClInclude Include="Source\find_base_locations.h" />
+    <ClInclude Include="Source\BaseLocationGenerator.h" />
     <ClInclude Include="Source\functions.h" />
     <ClInclude Include="Source\Globals.h" />
     <ClInclude Include="Source\Graph.h" />

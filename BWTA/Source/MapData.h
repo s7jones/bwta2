@@ -13,6 +13,13 @@ namespace BWTA
 	typedef std::pair<BWAPI::UnitType, BWAPI::WalkPosition> UnitTypeWalkPosition;
 	typedef std::pair<BWAPI::UnitType, BWAPI::TilePosition> UnitTypeTilePosition;
 
+	struct unitTypeTilePos_t {
+		BWAPI::UnitType type;
+		BWAPI::TilePosition pos;
+
+		unitTypeTilePos_t(BWAPI::UnitType t, BWAPI::TilePosition p): type(t), pos(p) {};
+	};
+
 	namespace MapData
 	{
 		extern RectangleArray<bool> walkability;
@@ -48,6 +55,8 @@ namespace BWTA
 		extern MiniTileMaps_type *MiniTileFlags;
 		extern std::vector<UnitTypePosition> staticNeutralBuildings;
 		extern std::vector<UnitTypeWalkPosition> resourcesWalkPositions;
+
+		extern std::vector<unitTypeTilePos_t> resources;
 	}
 }
 

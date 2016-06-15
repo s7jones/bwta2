@@ -14,7 +14,7 @@
 #include "RegionImpl.h"
 #include "ChokepointImpl.h"
 #include "BaseLocationImpl.h"
-#include "find_base_locations.h"
+#include "BaseLocationGenerator.h"
 #include "extract_polygons.h"
 #include "BWTA_Result.h"
 #include "MapData.h"

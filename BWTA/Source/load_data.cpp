@@ -3,7 +3,7 @@
 #include "BaseLocationImpl.h"
 #include "ChokepointImpl.h"
 #include "RegionImpl.h"
-#include "find_base_locations.h"
+#include "BaseLocationGenerator.h"
 #include "MapData.h"
 #include "terrain_analysis.h"
 
@@ -61,16 +61,19 @@ namespace BWTA
 
 		// load resources (minerals, gas) and start locations
 		MapData::resourcesWalkPositions.clear();
+		MapData::resources.clear();
 		for (auto mineral : BWAPI::Broodwar->getStaticMinerals()) {
 			if (mineral->getInitialResources() > 200) { //filter out all mineral patches under 200
 				BWAPI::WalkPosition unitWalkPosition(mineral->getPosition());
 				MapData::resourcesWalkPositions.push_back(std::make_pair(mineral->getType(), unitWalkPosition));
+				MapData::resources.emplace_back(mineral->getType(), mineral->getTilePosition());
 			}
 		}
 
 		for (auto geyser : BWAPI::Broodwar->getStaticGeysers()) {
 			BWAPI::WalkPosition unitWalkPosition(geyser->getPosition());
 			MapData::resourcesWalkPositions.push_back(std::make_pair(geyser->getType(), unitWalkPosition));
+			MapData::resources.emplace_back(geyser->getType(), geyser->getTilePosition());
 		}
 
 		MapData::startLocations = BWAPI::Broodwar->getStartLocations();

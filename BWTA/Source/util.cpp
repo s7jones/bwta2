@@ -131,6 +131,45 @@ namespace BWTA
 	  }
   }
 
+  void calculateTileDistances(const RectangleArray<bool>& walkable,
+	  const BWAPI::TilePosition &start,
+	  const double& maxDistance,
+	  RectangleArray<double>& distanceMap)
+  {
+	  Heap<BWAPI::TilePosition, double> heap(true);
+	  distanceMap.setTo(-1);
+	  heap.push(std::make_pair(start, 0));
+	  distanceMap[start.x][start.y] = 0;
+	  while (!heap.empty()) {
+		  BWAPI::TilePosition pos = heap.top().first;
+		  double distance = heap.top().second;
+		  heap.pop();
+		  int x = pos.x;
+		  int y = pos.y;
+		  if (distance > maxDistance && maxDistance > 0) break;
+		  int min_x = std::max(x - 1, 0);
+		  int max_x = std::min(x + 1, (int)walkable.getWidth() - 1);
+		  int min_y = std::max(y - 1, 0);
+		  int max_y = std::min(y + 1, (int)walkable.getHeight() - 1);
+		  for (int ix = min_x; ix <= max_x; ix++) {
+			  for (int iy = min_y; iy <= max_y; iy++) {
+				  double f = std::abs(ix - x) + std::abs(iy - y);
+				  if (f > 1) f = 1.4;
+				  double v = distance + f;
+				  if (distanceMap[ix][iy] > v) {
+					  heap.push(std::make_pair(BWAPI::TilePosition(x, y), v));
+					  distanceMap[ix][iy] = v;
+				  } else {
+					  if (distanceMap[ix][iy] == -1 && walkable[ix][iy]) {
+						  distanceMap[ix][iy] = v;
+						  heap.push(std::make_pair(BWAPI::TilePosition(ix, iy), v));
+					  }
+				  }
+			  }
+		  }
+	  }
+  }
+
   void calculate_walk_distances_area(const BWAPI::Position &start
                                     ,int width
                                     ,int height
