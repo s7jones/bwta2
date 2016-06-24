@@ -61,17 +61,17 @@ namespace BWTA
 				// look if the 8-connectivity are valid positions
 				check.distance += 8; // straight move cost
 				int left = check.x - 1;
-				if (left > 0) addToExplore(left, check.y, check, postionsToExplore);
+				if (left >= 0) addToExplore(left, check.y, check, postionsToExplore);
 				int right = check.x + 1;
 				if (right < MapData::mapWidthWalkRes) addToExplore(right, check.y, check, postionsToExplore);
 				int up = check.y - 1;
-				if (up > 0) addToExplore(check.x, up, check, postionsToExplore);
+				if (up >= 0) addToExplore(check.x, up, check, postionsToExplore);
 				int down = check.y + 1;
 				if (down < MapData::mapHeightWalkRes) addToExplore(check.x, down, check, postionsToExplore);
 				check.distance += 3; // increment on diagonal move cost
-				if (left > 0 && up > 0) addToExplore(left, up, check, postionsToExplore);
-				if (left > 0 && down < MapData::mapHeightWalkRes) addToExplore(left, down, check, postionsToExplore);
-				if (right < MapData::mapWidthWalkRes && up > 0) addToExplore(right, up, check, postionsToExplore);
+				if (left >= 0 && up >= 0) addToExplore(left, up, check, postionsToExplore);
+				if (left >= 0 && down < MapData::mapHeightWalkRes) addToExplore(left, down, check, postionsToExplore);
+				if (right < MapData::mapWidthWalkRes && up >= 0) addToExplore(right, up, check, postionsToExplore);
 				if (right < MapData::mapWidthWalkRes && down < MapData::mapHeightWalkRes) {
 					addToExplore(right, down, check, postionsToExplore);
 				}
@@ -137,7 +137,7 @@ namespace BWTA
 			}
 		}
 
-		log(" - Reachable regions computed in " << timer.stopAndGetTime() << " seconds");
+		LOG(" - Reachable regions computed in " << timer.stopAndGetTime() << " seconds");
 		timer.start();
 
 		// compute region and closestUnwalkablePolygon maps
@@ -179,7 +179,7 @@ namespace BWTA
 			}
 		}
 
-		log(" - RegionMap and Closest UnwalkablePolygonMap computed in " << timer.stopAndGetTime() << " seconds");
+		LOG(" - RegionMap and Closest UnwalkablePolygonMap computed in " << timer.stopAndGetTime() << " seconds");
 		timer.start();
 		
 		// compute closest BaseLocation map
@@ -193,7 +193,7 @@ namespace BWTA
 		computeClosestObjectMap(seedPositions, BWTA_Result::getBaseLocationW);
 		walkResMapToTileResMap(BWTA_Result::getBaseLocationW, BWTA_Result::getBaseLocation);
 
-		log(" - Closest BaseLocation Map computed in " << timer.stopAndGetTime() << " seconds");
+		LOG(" - Closest BaseLocation Map computed in " << timer.stopAndGetTime() << " seconds");
 		timer.start();
 
 		// compute closest Chokepoint map
@@ -206,6 +206,6 @@ namespace BWTA
 		computeClosestObjectMap(seedPositions2, BWTA_Result::getChokepointW);
 		walkResMapToTileResMap(BWTA_Result::getChokepointW, BWTA_Result::getChokepoint);
 
-		log(" - Closest Chokepoint Map computed in " << timer.stopAndGetTime() << " seconds");
+		LOG(" - Closest Chokepoint Map computed in " << timer.stopAndGetTime() << " seconds");
 	}
 }

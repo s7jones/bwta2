@@ -8,7 +8,7 @@ namespace BWTA
 		// TODO check if distance transform is procesed
 		// TODO check if buildChokeNodes was called (MapData::chokeNodes was populated)
 		
-		log("Starting map balance analysis");
+		LOG("Starting map balance analysis");
 		// **************************************************
 		// METRIC 1
 		// --------------------------------------------------
@@ -50,10 +50,10 @@ namespace BWTA
 		standardDeviationArea = sqrt(standardDeviationArea/startLocations.size());
 // 		log("Standard Deviation Openness: " << standardDeviationOpenness);
 // 		log("Standard Deviation Area: " << standardDeviationArea);
-		log(standardDeviationArea);
-		log(meanArea);
-		log(standardDeviationOpenness);
-		log(meanOpenness);
+		LOG(standardDeviationArea);
+		LOG(meanArea);
+		LOG(standardDeviationOpenness);
+		LOG(meanOpenness);
 
 		// **************************************************
 		// METRIC 2
@@ -106,10 +106,10 @@ namespace BWTA
 // 		log("Standard Deviation A*: " << standardDeviationAstar);
 // 		log("Standard Deviation Euclidean: " << standardDeviationEuclidean);
 // 		log("Total Standard Deviation: " << standardDeviationAstar+standardDeviationEuclidean);
-		log(standardDeviationAstar);
-		log(meanAstar);
-		log(standardDeviationEuclidean);
-		log(meanEuclidean);
+		LOG(standardDeviationAstar);
+		LOG(meanAstar);
+		LOG(standardDeviationEuclidean);
+		LOG(meanEuclidean);
 
 		// **************************************************
 		// METRIC 3
@@ -162,8 +162,8 @@ namespace BWTA
 // 		log("Standard Deviation Exp1: " << standardDeviationExp1);
 // 		log("Standard Deviation Exp2: " << standardDeviationExp2);
 // 		log("Total Standard Deviation: " << standardDeviationExp1+standardDeviationExp2);
-		log(standardDeviationExp1+standardDeviationExp2);
-		log(meanExp1+meanExp2);
+		LOG(standardDeviationExp1+standardDeviationExp2);
+		LOG(meanExp1+meanExp2);
 
 		// **************************************************
 		// METRIC 4
@@ -219,8 +219,8 @@ namespace BWTA
 		}
 		standardDeviation2 = sqrt(standardDeviation2/startSize);
 		//log("Standard Deviation of Standad Deviation: " << standardDeviation2);
-		log(standardDeviation2);
-		log(mean2);
+		LOG(standardDeviation2);
+		LOG(mean2);
 
 
 		// **************************************************
@@ -288,8 +288,8 @@ namespace BWTA
 		standardDeviationChokeDist2 = sqrt(standardDeviationChokeDist2/samples);
 // 		log("Standard Deviation of Standad Deviation (width): " << standardDeviationChokeWidth2);
 // 		log("Standard Deviation of Standad Deviation (dist): " << standardDeviationChokeDist2);
-		log(standardDeviationChokeDist2);
-		log(standardDeviationChokeWidth2);
+		LOG(standardDeviationChokeDist2);
+		LOG(standardDeviationChokeWidth2);
 
 		// **************************************************
 		// METRIC 6

@@ -72,18 +72,6 @@ namespace BWTA
   void loadMap();
   int str2int(std::string str);
 
-#ifdef OFFLINE
-  #define BWTA_PATH "logs/"
-  const std::string LOG_FILE_PATH = "logs/BWTA.log";
-  #define log(message) { std::cout << message << std::endl; }
-#else
-  #define BWTA_PATH "bwapi-data/BWTA2/"
-  const std::string LOG_FILE_PATH = "bwapi-data/logs/BWTA.log";
-  #define log(message) { \
-	  std::ofstream logFile(LOG_FILE_PATH , std::ios_base::out | std::ios_base::app ); \
-	  logFile << message << std::endl; }
-#endif
-
   template< class T>
   double get_distance(CGAL::Point_2<T> a, CGAL::Point_2<T> b)
   {

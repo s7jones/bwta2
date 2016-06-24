@@ -65,7 +65,7 @@ namespace BWTA
 				}
 			}
 		}
-		log(" - Found " << clusters.size() << " resource clusters in " << timer.stopAndGetTime() << " seconds");
+		LOG(" - Found " << clusters.size() << " resource clusters in " << timer.stopAndGetTime() << " seconds");
 		timer.start();
 
 		// 2) compute a buildable map where a resource depot can be build (4x3 tiles)
@@ -102,7 +102,7 @@ namespace BWTA
 				baseBuildMap.setRectangleTo(x1, y1, x2, y2, false);
 			}
 		}
-		log(" - baseBuildMap computed in " << timer.stopAndGetTime() << " seconds");
+		LOG(" - baseBuildMap computed in " << timer.stopAndGetTime() << " seconds");
 		timer.start();
 
 		// 3) with the clusters and baseBuildMap, we will try to find a base location for each cluster
@@ -153,7 +153,7 @@ namespace BWTA
 				baseLocations.insert(new BaseLocationImpl(bestTile));
 			}
 		}
-		log(" - Best baseLocations computed in " << timer.stopAndGetTime() << " seconds");
+		LOG(" - Best baseLocations computed in " << timer.stopAndGetTime() << " seconds");
 	}
 
 

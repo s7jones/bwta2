@@ -19,6 +19,8 @@
 #include "BWTA_Result.h"
 #include "MapData.h"
 #include "Heap.h"
+#include "PolygonGenerator.h"
+#include "RegionGenerator.h"
 
 namespace BWTA
 {

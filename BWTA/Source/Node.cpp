@@ -33,15 +33,15 @@ namespace BWTA
     }
     else if (CGAL::assign(h,spl.locate(Point_2(point.x(),point.y()))))
     {
-      log("error: expected face, not halfedge!");
+      LOG("error: expected face, not halfedge!");
     }
     else if (CGAL::assign(v,spl.locate(Point_2(point.x(),point.y()))))
     {
-      log("error: expected face, not vertex!");
+      LOG("error: expected face, not vertex!");
     }
     else
     {
-      log("error: expected face, didn't find anything!");
+      LOG("error: expected face, didn't find anything!");
     }
     return poly;
   }

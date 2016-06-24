@@ -21,6 +21,9 @@
     <Filter Include="Pathfinding">
       <UniqueIdentifier>{a342873c-5ba3-4b2f-924b-f0e66e0c3f90}</UniqueIdentifier>
     </Filter>
+    <Filter Include="TerrainAnalyzer">
+      <UniqueIdentifier>{a33752a1-051b-45f4-95f7-2fa22ab04960}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\BaseLocationImpl.cpp">
@@ -87,7 +90,13 @@
       <Filter>Utils</Filter>
     </ClCompile>
     <ClCompile Include="Source\BaseLocationGenerator.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>TerrainAnalyzer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PolygonGenerator.cpp">
+      <Filter>TerrainAnalyzer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\RegionGenerator.cpp">
+      <Filter>TerrainAnalyzer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -173,7 +182,13 @@
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="Source\BaseLocationGenerator.h">
-      <Filter>Header Files</Filter>
+      <Filter>TerrainAnalyzer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\PolygonGenerator.h">
+      <Filter>TerrainAnalyzer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\RegionGenerator.h">
+      <Filter>TerrainAnalyzer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

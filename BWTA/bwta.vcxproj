@@ -116,7 +116,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ForcedIncludeFiles>stdafx.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <BufferSecurityCheck>true</BufferSecurityCheck>
-      <AdditionalOptions>-Zm141</AdditionalOptions>
+      <AdditionalOptions>-Zm217</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
@@ -150,7 +150,7 @@
       <DebugInformationFormat>
       </DebugInformationFormat>
       <ForcedIncludeFiles>stdafx.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <AdditionalOptions>-Zm141 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-Zm217</AdditionalOptions>
     </ClCompile>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -186,7 +186,7 @@
       <DebugInformationFormat>
       </DebugInformationFormat>
       <ForcedIncludeFiles>stdafx.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <AdditionalOptions>-Zm141 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-Zm217</AdditionalOptions>
     </ClCompile>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -220,7 +220,7 @@
       <DebugInformationFormat>
       </DebugInformationFormat>
       <ForcedIncludeFiles>stdafx.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <AdditionalOptions>-Zm141 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-Zm217</AdditionalOptions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>libboost_thread-vc120-mt-1_56.lib;libboost_system-vc120-mt-1_56.lib;libCGAL-vc120-mt-4.4.lib;libgmp-10.lib;libmpfr-4.lib;BWAPI.lib;StormLibRAD.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -254,7 +254,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ForcedIncludeFiles>stdafx.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <BufferSecurityCheck>true</BufferSecurityCheck>
-      <AdditionalOptions>-Zm141 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-Zm217</AdditionalOptions>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
     </ClCompile>
@@ -287,6 +287,8 @@
     <ClCompile Include="Source\Node.cpp" />
     <ClCompile Include="Source\Painter.cpp" />
     <ClCompile Include="Source\Polygon.cpp" />
+    <ClCompile Include="Source\PolygonGenerator.cpp" />
+    <ClCompile Include="Source\RegionGenerator.cpp" />
     <ClCompile Include="Source\RegionImpl.cpp" />
     <ClCompile Include="Source\terrain_analysis.cpp" />
     <ClCompile Include="Source\util.cpp" />
@@ -316,6 +318,8 @@
     <ClInclude Include="Source\MapData.h" />
     <ClInclude Include="Source\Node.h" />
     <ClInclude Include="Source\Painter.h" />
+    <ClInclude Include="Source\PolygonGenerator.h" />
+    <ClInclude Include="Source\RegionGenerator.h" />
     <ClInclude Include="Source\RegionImpl.h" />
     <ClInclude Include="Source\terrain_analysis.h" />
     <ClInclude Include="Source\Timer.h" />

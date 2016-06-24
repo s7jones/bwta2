@@ -6,7 +6,7 @@ namespace BWTA {
 		renderCounter(1)
 	{
 		// PNG
-		image = new QImage(MapData::mapWidthWalkRes, MapData::mapHeightWalkRes, QImage::Format_ARGB32_Premultiplied);
+		image = new QImage(MapData::mapWidthWalkRes+50, MapData::mapHeightWalkRes+50, QImage::Format_ARGB32_Premultiplied);
 		painter = new QPainter(image);
 		painter->setRenderHint(QPainter::Antialiasing);
 
@@ -129,6 +129,20 @@ namespace BWTA {
 			for (auto& hole : polygon->holes) {
 				drawPolygon(hole, QColor(255, 100, 255));
 			}
+		}
+	}
+
+	void Painter::drawPolygons(const std::vector<BoostPolygon>& polygons) {
+		for (auto& polygon : polygons) {
+			QVector<QPointF> qp;
+
+			for (const auto& point : polygon.outer()) {
+				qp.push_back(QPointF(point.x(), point.y()));
+			}
+
+			painter->setPen(QPen(Qt::black));
+			painter->setBrush(QBrush(QColor(180, 180, 180)));
+			painter->drawPolygon(QPolygonF(qp));
 		}
 	}
 
@@ -356,6 +370,33 @@ namespace BWTA {
 		painter->setBrush(QBrush(color));
 		for (const auto& chokepoint : chokepoints) {
 			painter->drawEllipse(chokepoint->getCenter().x / 8, chokepoint->getCenter().y / 8, 12, 12);
+		}
+	}
+
+	void Painter::drawEdges(std::vector<boost::polygon::voronoi_edge<double>> edges)
+	{
+		for (auto it = edges.begin(); it != edges.end(); ++it) {
+			if (!it->is_primary()) {
+				continue;
+			}
+			if (it->color() == 1) {
+				QPen qp(QColor(255, 0, 0));
+				qp.setWidth(2);
+				painter->setPen(qp);
+			} else {
+				QPen qp(QColor(0, 0, 255));
+				qp.setWidth(2);
+				painter->setPen(qp);
+			}
+			if (!it->is_finite()) {
+// 				clip_infinite_edge(*it, &samples);
+			} else {
+				painter->drawLine(it->vertex0()->x(), it->vertex0()->y(), 
+					it->vertex1()->x(), it->vertex1()->y());
+// 				if (it->is_curved()) {
+// 					sample_curved_edge(*it, &samples);
+// 				}
+			}
 		}
 	}
 }

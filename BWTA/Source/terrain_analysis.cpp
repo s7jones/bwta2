@@ -1,6 +1,5 @@
 #include "terrain_analysis.h"
 
-using namespace std;
 namespace BWTA
 {
 	bool createDir(std::string& path)
@@ -11,7 +10,6 @@ namespace BWTA
 		}
 		return false;
 	}
-
 
 	class My_observer : public CGAL::Arr_observer < Arrangement_2 >
 	{
@@ -48,9 +46,7 @@ namespace BWTA
 	{
 		cleanMemory();
 
-		// timer variables
 		Timer timer;
-		double seconds;
 
 #ifndef OFFLINE
 		loadMapFromBWAPI();
@@ -60,7 +56,7 @@ namespace BWTA
 		loadMap();
 
 		// Verify if "bwta2" directory exists, and create it if it doesn't.
-		auto bwtaPath = std::string(BWTA_PATH);
+		std::string bwtaPath(BWTA_PATH);
 		if (!boost::filesystem::exists(bwtaPath)) {
 			createDir(bwtaPath);
 		}
@@ -68,38 +64,25 @@ namespace BWTA
 		std::string filename = bwtaPath + MapData::hash + ".bwta";
 
 		if (fileExists(filename) && fileVersion(filename) == BWTA_FILE_VERSION) {
-			log("Recognized map, loading map data...");
-			timer.start();
+			LOG("Recognized map, loading map data...");
 
+			timer.start();
 			load_data(filename);
-
-			seconds = timer.stopAndGetTime();
-			log("Loaded map data in " << seconds << " seconds");
+			LOG("Loaded map data in " << timer.stopAndGetTime() << " seconds");
 		} else {
-			log("Analyzing new map...");
+			LOG("Analyzing new map...");
+
 			timer.start();
-
 			analyze_map();
-
-			seconds = timer.stopAndGetTime();
-			log("Map analyzed in " << seconds << " seconds");
+			LOG("Map analyzed in " << timer.stopAndGetTime() << " seconds");
 
 			save_data(filename);
-			log("Saved map data.");
+			LOG("Saved map data.");
 		}
 
 #ifndef OFFLINE
 		attachResourcePointersToBaseLocations(BWTA_Result::baselocations);
 #endif
-		// debug base locations distances
-// 		log("Base distances");
-// 		for (auto baseLocation1 : BWTA_Result::baselocations) {
-// 			std::string distances;
-// 			for (auto baseLocation2 : BWTA_Result::baselocations) {
-// 				distances += " " + std::to_string((int)baseLocation1->getGroundDistance(baseLocation2));
-// 			}
-// 			log("(" << baseLocation1->getPosition().x << "," << baseLocation1->getPosition().y << ")" << distances);
-// 		}
 	}
 
 	void analyze_map()
@@ -112,7 +95,7 @@ namespace BWTA
 
 		detectBaseLocations(BWTA_Result::baselocations);
 
-		log(" [Calculated base locations in " << timer.stopAndGetTime() << " seconds]");
+		LOG(" [Calculated base locations in " << timer.stopAndGetTime() << " seconds]");
 // 		for (auto i : BWTA_Result::baselocations) {
 // 			log("BaseLocation at Position " << i->getPosition() << " Tile " << i->getTilePosition());
 // 		}
@@ -120,39 +103,66 @@ namespace BWTA
 
 		// Give find_connected_components the walkability data so it can compute the list of connected components,
 		// and determine which component each tile belongs to
-		RectangleArray<ConnectedComponent*> get_component;
-		std::list<ConnectedComponent> components;
-		find_connected_components(MapData::walkability, get_component, components);
-		log(" - Calculated connected components");
+// 		RectangleArray<ConnectedComponent*> get_component;
+// 		std::list<ConnectedComponent> components;
+// 		find_connected_components(MapData::walkability, get_component, components);
+// 		LOG(" - Calculated connected components");
+// 
+// 		// Give extract_polygons the walkability data and connected components so it can compute the polygonal obstacles
+// 		std::vector<Polygon> polygons;
+// 		extract_polygons(MapData::walkability, components, polygons);
+// 		LOG(" - Extracted " << polygons.size() << " polygons.");
+// 
+// 		// Discard polygons that are too small
+// 		int removed = 0;
+// 		for (size_t p = 0; p < polygons.size();) {
+// 			if (std::abs(polygons[p].getArea()) <= 256 &&
+// 				distance_to_border(polygons[p], MapData::walkability.getWidth(), MapData::walkability.getHeight()) > 1) {
+// 				polygons.erase(polygons.begin() + p);
+// 				removed++;
+// 			} else {
+// 				p++;
+// 			}
+// 		}
+// 		LOG(" - Removed " << removed << " small polygons.");
+// 
+// 		// Save the remaining polygons in BWTA_Result::unwalkablePolygons
+// 		for (const auto& polygon : polygons) BWTA_Result::unwalkablePolygons.insert(new Polygon(polygon));
+// 
+// 		LOG(" [Detected polygons in " << timer.stopAndGetTime() << " seconds]");
+// #ifdef DEBUG_DRAW
+// 		painter.drawPolygons(polygons);
+// 		painter.render();
+// #endif
+// 		timer.start();
 
-		// Give extract_polygons the walkability data and connected components so it can compute the polygonal obstacles
 		std::vector<Polygon> polygons;
-		extract_polygons(MapData::walkability, components, polygons);
-		log(" - Extracted " << polygons.size() << " polygons.");
+		generatePolygons(polygons);
 
-		// Discard polygons that are too small
-		int removed = 0;
-		for (size_t p = 0; p < polygons.size();) {
-			if (std::abs(polygons[p].getArea()) <= 256 &&
-				distance_to_border(polygons[p], MapData::walkability.getWidth(), MapData::walkability.getHeight()) > 1) {
-				polygons.erase(polygons.begin() + p);
-				removed++;
-			} else {
-				p++;
-			}
-		}
-		log(" - Removed " << removed << " small polygons.");
-
-		// Save the remaining polygons in BWTA_Result::unwalkablePolygons
-		for (const auto& polygon : polygons) BWTA_Result::unwalkablePolygons.insert(new Polygon(polygon));
-
-		log(" [Detected polygons in " << timer.stopAndGetTime() << " seconds]");
+		LOG(" [Detected BOOST polygons in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
-		log(" - Drawing results of step 1 (polygons extracted)");
 		painter.drawPolygons(polygons);
-		painter.render();
+		painter.render("1-BoostPolygons");
 #endif
 		timer.start();
+
+		BoostVoronoi voronoi;
+		generateVoronoid(polygons, voronoi);
+
+		LOG(" [Computed BOOST Voronoi in " << timer.stopAndGetTime() << " seconds]");
+#ifdef DEBUG_DRAW
+		LOG(" - Drawing BOOST Voronoi");
+		painter.drawPolygons(polygons);
+		painter.drawEdges(voronoi.edges());
+		painter.render("2-BoostVoronoi");
+#endif
+		timer.start();
+
+		
+// 		exit(-1);
+		
+
+
 
 		// All line segments we create we will store in the segments vector and also insert into the 2d segmented Delaunay graph object sdg
 		// Create the segments vector and 2d segmented Delaunay graph
@@ -167,7 +177,7 @@ namespace BWTA
 
 		// Add line segments of the 4 edges of the map
 		segments.push_back(SDG2::Site_2::construct_site_2(topLeft, bottomLeft));
-		segments.push_back(SDG2::Site_2::construct_site_2(bottomLeft, bottomRight)); // this should be unnecessary since bottom tiles are always unwalkable
+// 		segments.push_back(SDG2::Site_2::construct_site_2(bottomLeft, bottomRight)); // this should be unnecessary since bottom tiles are always unwalkable
 		segments.push_back(SDG2::Site_2::construct_site_2(bottomRight, topRight));
 		segments.push_back(SDG2::Site_2::construct_site_2(topRight, topLeft));
 
@@ -196,13 +206,13 @@ namespace BWTA
 
 		// Check to see if the 2d segment Delaunay graph is valid
 		assert(sdg.is_valid(true, 1));
-		log(" - Created 2D Segment Delaunay Graph.");
+		LOG(" - Created 2D Segment Delaunay Graph.");
 
-		vector< Segment > voronoi_diagram_edges;
+		std::vector< Segment > voronoi_diagram_edges;
 		std::map<Point, std::set< Point >, ptcmp > nearest;
 		std::map<Point, double, ptcmp> distance;
 		get_voronoi_edges(sdg, voronoi_diagram_edges, nearest, distance, polygons);
-		log(" - Got voronoi edges.");
+		LOG(" - Got voronoi edges.");
 
 		Arrangement_2 arr;
 		My_observer obs(arr);
@@ -220,7 +230,7 @@ namespace BWTA
 				}
 			}
 		}
-		log(" - Inserted polygons into arrangement.");
+		LOG(" - Inserted polygons into arrangement.");
 
 		//color all initial segments and vertices from the polygons BLACK
 		for (auto eit = arr.edges_begin(); eit != arr.edges_end(); ++eit) eit->data() = BLACK;
@@ -258,7 +268,7 @@ namespace BWTA
 				}
 			}
 		}
-		log(" - Added voronoi edges.");
+		LOG(" - Added voronoi edges.");
 		// Color all the new edges BLUE
 		for (Arrangement_2::Edge_iterator eit = arr.edges_begin(); eit != arr.edges_end(); ++eit) {
 			if (eit->data() != BLACK) {
@@ -273,78 +283,78 @@ namespace BWTA
 			}
 		}
 
-		log(" [Computed Voronoi diagram in " << timer.stopAndGetTime() << " seconds]");
+		LOG(" [Computed Voronoi diagram in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
-		log(" - Drawing results of step 2");
+		LOG(" - Drawing Voronoi");
 		painter.drawPolygons(polygons);
 		painter.drawArrangement(&arr);
-		painter.render();
+		painter.render("2-Voronoi");
 #endif
 		timer.start();
 
 		simplify_voronoi_diagram(&arr, &distance);
 
-		log(" [Pruned Voronoi diagram in " << timer.stopAndGetTime() << " seconds]");
+		LOG(" [Pruned Voronoi diagram in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
-		log(" - Drawing results of step 3");
+		LOG(" - Drawing Voronoi Pruned");
 		painter.drawPolygons(polygons);
 		painter.drawArrangement(&arr);
-		painter.render();
+		painter.render("3-VoronoiPruned");
 #endif
 		timer.start();
 
 		identify_region_nodes(&arr, &g);
 
-		log(" [Identified region nodes in " << timer.stopAndGetTime() << " seconds]");
+		LOG(" [Identified region nodes in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
-		log(" - Drawing results of step 4");
+		LOG(" - Drawing region nodes");
 		painter.drawPolygons(polygons);
 		painter.drawArrangement(&arr);
 		painter.drawNodes(g.getRegions(), Qt::blue);
-		painter.render();
+		painter.render("4-RegionNodes");
 #endif
 		timer.start();
 
 		identify_chokepoint_nodes(&g, &distance, &nearest);
 
-		log(" [Identified choke points nodes in " << timer.stopAndGetTime() << " seconds]");
+		LOG(" [Identified choke points nodes in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
-		log(" - Drawing results of step 5");
+		LOG(" - Drawing chokepoints nodes");
 		painter.drawPolygons(polygons);
 		painter.drawArrangement(&arr);
 		painter.drawNodes(g.getRegions(), Qt::blue);
 		painter.drawNodes(g.getChokepoints(), Qt::red);
-		painter.render();
+		painter.render("5-ChokepointsNodes");
 #endif
 		timer.start();
 
 		merge_adjacent_regions(&g);
-		log(" - Merged regions.");
+		LOG(" - Merged regions.");
 
 		remove_voronoi_diagram_from_arrangement(&arr);
-		log(" - Removed voronoi edges.");
+		LOG(" - Removed voronoi edges.");
 
-		log(" [Merged adjacent regions in " << timer.stopAndGetTime() << " seconds]");
+		LOG(" [Merged adjacent regions in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
-		log(" - Drawing results of step 6");
+		LOG(" - Drawing results of step 6");
 		painter.drawPolygons(polygons);
 		painter.drawArrangement(&arr);
 		painter.drawNodesAndConnectToNeighbors(g.getRegions(), Qt::blue);
 		painter.drawNodes(g.getChokepoints(), Qt::red);
-		painter.render();
+		painter.render("6-NodesPruned");
 #endif
 		timer.start();
 
 		wall_off_chokepoints(&g, &arr);
 
-		log(" [Wall of chokepoints in " << timer.stopAndGetTime() << " seconds]");
+		LOG(" [Wall of chokepoints in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
-		log(" - Drawing results of step 7");
+		LOG(" - Drawing results of step 7");
 		painter.drawPolygons(polygons);
 		painter.drawArrangement(&arr);
 		painter.drawNodesAndConnectToNeighbors(g.getRegions(), Qt::blue);
 		painter.drawNodes(g.getChokepoints(), Qt::red);
-		painter.render();
+		painter.render("7-WallOffChokepoints");
 #endif
 		timer.start();
 
@@ -367,7 +377,7 @@ namespace BWTA
 		}
 
 		if (!polygonsNotSimple.empty()) {
-			log("  ERROR!!! Found " << polygonsNotSimple.size() << " polygons not simple");
+			LOG("  ERROR!!! Found " << polygonsNotSimple.size() << " polygons not simple");
 #ifdef DEBUG_DRAW
 			painter.drawPolygons(polygonsNotSimple);
 			painter.render("Error-PolygonsNotSimple");
@@ -375,17 +385,19 @@ namespace BWTA
 		}
 
 		// Computed the polygon from the face of a 2D arrangement
-		log(" [Creating BWTA regions in " << timer.stopAndGetTime() << " seconds]");
+		LOG(" [Creating BWTA regions in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
-		log("Drawing results of step 8");
+		LOG("Drawing results of step 8");
 		painter.drawPolygons(polygons);
 		painter.drawFourColorMap(g.getRegions());
 		painter.drawArrangement(&arr);
-		painter.render();
+		painter.render("8-Regions");
 #endif
 		timer.start();
 
-		log(" - Finding chokepoints and linking them to regions.");
+// 		exit(-1);
+
+		LOG(" - Finding chokepoints and linking them to regions.");
 		std::map<Node*, Chokepoint*> node2chokepoint;
 		for (std::set<Node*>::iterator c = g.chokepoints_begin(); c != g.chokepoints_end(); c++) {
 			std::set<Node*>::iterator i = (*c)->neighbors.begin();
@@ -398,7 +410,7 @@ namespace BWTA
 			BWTA_Result::chokepoints.insert(new_chokepoint);
 			node2chokepoint.insert(std::make_pair(*c, new_chokepoint));
 		}
-		log(" - Linking regions to chokepoints.");
+		LOG(" - Linking regions to chokepoints.");
 		for (std::set<Node*>::iterator r = g.regions_begin(); r != g.regions_end(); r++) {
 			Region* region = node2region[*r];
 			std::set<Chokepoint*> chokepoints;
@@ -409,7 +421,7 @@ namespace BWTA
 			((RegionImpl*)region)->_chokepoints = chokepoints;
 		}
 
-		log(" [Linked choke points wiht regions in " << timer.stopAndGetTime() << " seconds]");
+		LOG(" [Linked choke points wiht regions in " << timer.stopAndGetTime() << " seconds]");
 		timer.start();
 
 		calculate_connectivity();
@@ -423,7 +435,7 @@ namespace BWTA
 // 				<< ",regionCenter" << baseI->getRegion()->getCenter());
 // 		}
 
-		log(" [Calculated base location properties in " << timer.stopAndGetTime() << " seconds]");
+		LOG(" [Calculated base location properties in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
 		painter.drawClosestBaseLocationMap(BWTA_Result::getBaseLocationW, BWTA_Result::baselocations);
 		painter.render("ClosestBaseLocationMap");
@@ -494,6 +506,22 @@ namespace BWTA
 			for (std::set<Arrangement_2::Vertex_handle, vhradiuscmp>::iterator vh = vertices.begin(); vh != vertices.end(); vh++)
 			{
 				if ((*vh)->data().c == BLUE) {
+
+// 					Point v0((*vh)->point());
+// 					if (v0.x() <= 0 || v0.x() >= MapData::mapWidthWalkRes - 1
+// 						|| v0.y() <= 0 || v0.y() >= MapData::mapHeightWalkRes - 1)
+// 					{
+// 						if ((*vh)->degree() == 0) {
+// 							arr_ptr->remove_isolated_vertex(*vh);
+// 						} else {
+// 							Arrangement_2::Halfedge_handle h((*vh)->incident_halfedges());
+// 							arr_ptr->remove_edge(h, false, true);
+// 							redo = true;
+// 							break;
+// 						}
+// 					}
+
+
 					double dist_node = (*vh)->data().radius;
 					if ((*vh)->degree() == 0) {
 						if (dist_node < 10) {
@@ -596,7 +624,7 @@ namespace BWTA
 				while (first || node->data().is_region == false) {
 					count++;
 					if (count > 1000) {
-						log("Error: Could not find other end of chokepoint path.");
+						LOG("Error: Could not find other end of chokepoint path.");
 						break;
 					}
 					//log("On next vertex of current chokepoint path");

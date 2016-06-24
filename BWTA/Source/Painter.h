@@ -23,12 +23,14 @@ namespace BWTA {
 		void drawPolygon(PolygonD& polygon, QColor color);
 		void drawPolygons(std::vector<Polygon>& polygons);
 		void drawPolygons(std::set<Polygon*>& polygons);
+		void drawPolygons(const std::vector<BoostPolygon>& polygons);
 		void drawNodes(std::set<Node*> nodes, QColor color);
 		void drawNodesAndConnectToNeighbors(std::set<Node*> nodes, QColor nodeColor);
 		void drawFourColorMap(std::set<Node*> regions);
 		void drawHeatMap(RectangleArray<int> map, float maxValue);
 		void drawClosestBaseLocationMap(RectangleArray<BaseLocation*> map, std::set<BaseLocation*> baseLocations);
 		void drawClosestChokepointMap(RectangleArray<Chokepoint*> map, std::set<Chokepoint*> chokepoints);
+		void drawEdges(std::vector<boost::polygon::voronoi_edge<double>> edges);
 
 	private:
 		QPainter* painter;

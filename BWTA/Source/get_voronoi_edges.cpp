@@ -1,6 +1,7 @@
 #include "functions.h"
 #include "Color.h"
 #include "VertexData.h"
+#include "MapData.h"
 
 namespace BWTA
 {
@@ -30,9 +31,22 @@ namespace BWTA
 			e.first->vertex( e.second ),
 			sdg.tds().mirror_vertex(e.first, e.second) };
 
+
+
 		// only consider segments and parabola_segments (discard lines and rays)
         if (CGAL::assign(s,o))  {
 			//log("Segment: " << s);
+
+			// only consider vertex inside map
+// 			if (s.vertex(0).x() <= 0 || s.vertex(0).x() >= MapData::mapWidthWalkRes - 1
+// 				|| s.vertex(0).y() <= 0 || s.vertex(0).y() >= MapData::mapHeightWalkRes - 1
+// 				|| s.vertex(1).x() <= 0 || s.vertex(1).x() >= MapData::mapWidthWalkRes - 1
+// 				|| s.vertex(1).y() <= 0 || s.vertex(1).y() >= MapData::mapHeightWalkRes - 1)
+// 			{
+// 				LOG("Point removed");
+// 				continue;
+// 			}
+
 			if (s.vertex(0).x()!=s.vertex(1).x() || s.vertex(0).y()!=s.vertex(1).y()) {
 				if (is_real(s.vertex(0).x())!=0 && is_real(s.vertex(0).y())!=0
 					&& is_real(s.vertex(1).x())!=0 && is_real(s.vertex(1).y())!=0) 
@@ -113,13 +127,20 @@ namespace BWTA
         else if (CGAL::assign(ps,o))
         {
 			//log("Parabola_segment: " << ps);
+			
 			std::vector<Point> points;
-// 			std::vector<Point> pointsD;
-// 			ps.generate_points(pointsD);
 			ps.generate_points(points);
-// 			for(unsigned int i=0;i<pointsD.size();i++)  {
-// 				points.push_back(Point(pointsD[i].x(),pointsD[i].y()));
+
+			// only consider vertex inside map
+// 			if (points.front().x() <= 0 || points.front().x() >= MapData::mapWidthWalkRes - 1
+// 				|| points.front().y() <= 0 || points.front().y() >= MapData::mapHeightWalkRes - 1
+// 				|| points.back().x() <= 0 || points.back().x() >= MapData::mapWidthWalkRes - 1
+// 				|| points.back().y() <= 0 || points.back().y() >= MapData::mapHeightWalkRes - 1)
+// 			{
+// 				LOG("Parabola segment removed");
+// 				continue;
 // 			}
+
 			for(unsigned int i=0;i<points.size();i++) {
 				Vertex_handle n=pointset.nearest_neighbor(CGAL::Point_2< Kernel >(points[i].x(),points[i].y()));
 				if (n != NULL && get_distance(Point(n->point().x(),n->point().y()),points[i]) < 0.1) {
