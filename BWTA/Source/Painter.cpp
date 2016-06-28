@@ -6,7 +6,7 @@ namespace BWTA {
 		renderCounter(1)
 	{
 		// PNG
-		image = new QImage(MapData::mapWidthWalkRes+50, MapData::mapHeightWalkRes+50, QImage::Format_ARGB32_Premultiplied);
+		image = new QImage(MapData::mapWidthWalkRes, MapData::mapHeightWalkRes, QImage::Format_ARGB32_Premultiplied);
 		painter = new QPainter(image);
 		painter->setRenderHint(QPainter::Antialiasing);
 
@@ -397,6 +397,59 @@ namespace BWTA {
 // 					sample_curved_edge(*it, &samples);
 // 				}
 			}
+		}
+	}
+
+	void Painter::drawGraph(const RegionGraph& graph)
+	{
+		QPen qp(QColor(0, 0, 255));
+		qp.setWidth(2);
+		painter->setPen(qp);
+
+		// container to mark visited nodes
+		std::vector<bool> visited;
+		visited.resize(graph.nodes.size());
+
+		std::queue<nodeID> nodeToPrint;
+		// find first node with children
+		for (size_t id = 0; id < graph.adjacencyList.size(); ++id) {
+			if (!graph.adjacencyList.at(id).empty()) {
+				nodeToPrint.push(id);
+				visited.at(id) = true;
+			}
+		}
+		
+
+		while (!nodeToPrint.empty()) {
+			// pop first element
+			nodeID v0 = nodeToPrint.front();
+			nodeToPrint.pop();
+
+			// draw point if it is an leaf node
+// 			if (graph.adjacencyList.at(v0).size() == 1) {
+// 				painter->drawEllipse(graph.nodes.at(v0).x - 6, graph.nodes.at(v0).y - 6, 12, 12);
+// 				nodeID v1 = *graph.adjacencyList.at(v0).begin();
+// 				LOG("Leaf dist: " << graph.minDistToObstacle.at(v0) << " - parent: " << graph.minDistToObstacle.at(v1));
+// 			}
+
+			// draw all edges of node
+			for (const auto& v1 : graph.adjacencyList.at(v0)) {
+				painter->drawLine(graph.nodes.at(v0).x, graph.nodes.at(v0).y,
+					graph.nodes.at(v1).x, graph.nodes.at(v1).y);
+
+				if (!visited.at(v1)) {
+					nodeToPrint.push(v1);
+					visited.at(v1) = true;
+				}
+			}
+		}
+	}
+
+	void Painter::drawNodes(const RegionGraph& graph, const std::vector<nodeID>& nodes, QColor color) {
+		painter->setPen(QPen(color));
+		painter->setBrush(QBrush(color));
+		for (const auto& v0 : nodes) {
+			painter->drawEllipse(graph.nodes.at(v0).x - 3, graph.nodes.at(v0).y - 3, 6, 6);
 		}
 	}
 }

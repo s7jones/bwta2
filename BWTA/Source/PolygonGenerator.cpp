@@ -69,13 +69,11 @@ namespace BWTA
 	}
 
 	// given a bitmap (a walkability map in our context) it returns the external contour of obstacles
-	void connectedComponentLabeling(std::vector<Contour>& contours, const RectangleArray<bool>& bitMap)
+	void connectedComponentLabeling(std::vector<Contour>& contours, const RectangleArray<bool>& bitMap, RectangleArray<int>& labelMap)
 	{
 		int cy, cx, tracingDirection, connectedComponentsCount = 0, labelId = 0;
 		int width = bitMap.getWidth();
 		int height = bitMap.getHeight();
-		RectangleArray<int> labelMap(bitMap.getWidth(), bitMap.getHeight());
-		labelMap.setTo(0);
 
 		for (cy = 0; cy < height; ++cy) {
 			for (cx = 0, labelId = 0; cx < width; ++cx) {
@@ -127,13 +125,13 @@ namespace BWTA
 	}
 
 
-	void generatePolygons(std::vector<Polygon>& polygons)
+	void generatePolygons(std::vector<Polygon>& polygons, RectangleArray<int>& labelMap)
 	{
 		Timer timer;
 		timer.start();
 
 		std::vector<Contour> contours;
-		connectedComponentLabeling(contours, MapData::walkability);
+		connectedComponentLabeling(contours, MapData::walkability, labelMap);
 
 		LOG(" - Component-Labeling Map and Contours extracted in " << timer.stopAndGetTime() << " seconds");
 		timer.start();

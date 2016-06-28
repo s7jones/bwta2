@@ -10,6 +10,7 @@
 #include "MapData.h"
 #include "functions.h"
 #include "Node.h"
+#include "RegionGenerator.h"
 
 namespace BWTA {
 	class Painter {
@@ -31,6 +32,8 @@ namespace BWTA {
 		void drawClosestBaseLocationMap(RectangleArray<BaseLocation*> map, std::set<BaseLocation*> baseLocations);
 		void drawClosestChokepointMap(RectangleArray<Chokepoint*> map, std::set<Chokepoint*> chokepoints);
 		void drawEdges(std::vector<boost::polygon::voronoi_edge<double>> edges);
+		void drawGraph(const RegionGraph& graph);
+		void drawNodes(const RegionGraph& graph, const std::vector<nodeID>& nodes, QColor color);
 
 	private:
 		QPainter* painter;

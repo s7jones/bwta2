@@ -137,7 +137,9 @@ namespace BWTA
 // 		timer.start();
 
 		std::vector<Polygon> polygons;
-		generatePolygons(polygons);
+		RectangleArray<int> labelMap(MapData::walkability.getWidth(), MapData::walkability.getHeight());
+		labelMap.setTo(0);
+		generatePolygons(polygons, labelMap);
 
 		LOG(" [Detected BOOST polygons in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
@@ -146,20 +148,46 @@ namespace BWTA
 #endif
 		timer.start();
 
-		BoostVoronoi voronoi;
-		generateVoronoid(polygons, voronoi);
+		RegionGraph graph;
+		generateVoronoid(polygons, labelMap, graph);
 
 		LOG(" [Computed BOOST Voronoi in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
-		LOG(" - Drawing BOOST Voronoi");
 		painter.drawPolygons(polygons);
-		painter.drawEdges(voronoi.edges());
+		painter.drawGraph(graph);
 		painter.render("2-BoostVoronoi");
 #endif
 		timer.start();
 
-		
-// 		exit(-1);
+		pruneGraph(graph);
+
+		LOG(" [Pruned Voronoi in " << timer.stopAndGetTime() << " seconds]");
+#ifdef DEBUG_DRAW
+		painter.drawPolygons(polygons);
+		painter.drawGraph(graph);
+		painter.render("3-VoronoiPruned");
+#endif
+		timer.start();
+
+		markRegionNodes(graph);
+
+		LOG(" [Identified region nodes in " << timer.stopAndGetTime() << " seconds]");
+#ifdef DEBUG_DRAW
+		painter.drawPolygons(polygons);
+		painter.drawGraph(graph);
+		painter.drawNodes(graph, graph.regionNodes, Qt::blue);
+		painter.render("4-RegionNodes");
+
+		painter.drawPolygons(polygons);
+		painter.drawGraph(graph);
+		painter.drawNodes(graph, graph.regionNodes, Qt::blue);
+		painter.drawNodes(graph, graph.chokeNodes, Qt::red);
+		painter.render("5-ChokepointsNodes");
+#endif
+		timer.start();
+
+
+		exit(-1);
 		
 
 
