@@ -445,7 +445,7 @@ namespace BWTA {
 		}
 	}
 
-	void Painter::drawNodes(const RegionGraph& graph, const std::vector<nodeID>& nodes, QColor color) {
+	void Painter::drawNodes(const RegionGraph& graph, const std::set<nodeID>& nodes, QColor color) {
 		painter->setPen(QPen(color));
 		painter->setBrush(QBrush(color));
 		for (const auto& v0 : nodes) {

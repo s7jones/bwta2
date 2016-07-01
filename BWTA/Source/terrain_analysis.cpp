@@ -149,7 +149,8 @@ namespace BWTA
 		timer.start();
 
 		RegionGraph graph;
-		generateVoronoid(polygons, labelMap, graph);
+		bgi::rtree<BoostPointI, bgi::quadratic<16> > rtree;
+		generateVoronoid(polygons, labelMap, graph, rtree);
 
 		LOG(" [Computed BOOST Voronoi in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
@@ -171,7 +172,7 @@ namespace BWTA
 
 		markRegionNodes(graph);
 
-		LOG(" [Identified region nodes in " << timer.stopAndGetTime() << " seconds]");
+		LOG(" [Identified region/chokepoints nodes in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
 		painter.drawPolygons(polygons);
 		painter.drawGraph(graph);
@@ -186,6 +187,20 @@ namespace BWTA
 #endif
 		timer.start();
 
+		RegionGraph graphSimplified;
+		simplifyRegionGraph(graph, graphSimplified);
+
+		LOG(" [Simplified region graph in " << timer.stopAndGetTime() << " seconds]");
+#ifdef DEBUG_DRAW
+		painter.drawPolygons(polygons);
+		painter.drawGraph(graphSimplified);
+		painter.drawNodes(graphSimplified, graphSimplified.regionNodes, Qt::blue);
+		painter.drawNodes(graphSimplified, graphSimplified.chokeNodes, Qt::red);
+		painter.render("6-NodesPruned");
+#endif
+		timer.start();
+
+// 		generateRegions(polygons, labelMap, graph, rtree);
 
 		exit(-1);
 		

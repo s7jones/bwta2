@@ -62,6 +62,7 @@ using TileID = uint16_t;
 
 // geometry typedefs
 typedef boost::geometry::model::d2::point_xy<double> BoostPoint;
+using BoostPointI = std::pair<BoostPoint, std::size_t>;
 typedef boost::geometry::model::polygon<BoostPoint> BoostPolygon;
 typedef std::vector<BoostPoint> Contour;
 // Voronoi typedefs
@@ -69,6 +70,9 @@ typedef boost::polygon::voronoi_diagram<double> BoostVoronoi;
 typedef boost::int32_t int32;
 typedef boost::polygon::point_data<int32> VoronoiPoint;
 typedef boost::polygon::segment_data<int32> VoronoiSegment;
+
+namespace bg = boost::geometry;
+namespace bgi = boost::geometry::index;
 
 
 #ifdef OFFLINE

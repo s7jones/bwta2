@@ -36,10 +36,10 @@ namespace BWTA
 	}
 
 
-	void generateVoronoid(const std::vector<Polygon>& polygons, const RectangleArray<int>& labelMap, RegionGraph& graph)
+	void generateVoronoid(const std::vector<Polygon>& polygons, const RectangleArray<int>& labelMap, 
+		RegionGraph& graph, bgi::rtree<BoostPointI, bgi::quadratic<16> >& rtree)
 	{
 		std::vector<VoronoiSegment> segments;
-		using BoostPointI = std::pair<BoostPoint, std::size_t>;
 		std::vector<BoostPointI> rtreePoints;
 		size_t idPoint = 0;
 
@@ -107,9 +107,8 @@ namespace BWTA
 		}
 
 		// create an R-tree to query nearest points/obstacle
-		namespace bg = boost::geometry;
-		namespace bgi = boost::geometry::index;
-		bgi::rtree<BoostPointI, bgi::quadratic<16> > rtree(rtreePoints);
+		bgi::rtree<BoostPointI, bgi::quadratic<16> > rtreeConstruct(rtreePoints);
+		rtree = rtreeConstruct;
 		graph.minDistToObstacle.resize(graph.nodes.size());
 		for (size_t i = 0; i < graph.nodes.size(); ++i) {
 			std::vector<BoostPointI> returnedValues;
@@ -127,8 +126,26 @@ namespace BWTA
 		if (vIt == voronoiVertexToNode.end()) {
 			voronoiVertexToNode[vertex] = vID = nodes.size();
 			nodes.push_back(pos);
+			nodeType.push_back(NONE);
 		} else {
 			vID = vIt->second;
+		}
+
+		return vID;
+	}
+
+	nodeID RegionGraph::addNode(const BWAPI::WalkPosition& pos, const double& minDist)
+	{
+		// add new point if not present in the graph
+		auto it = std::find(nodes.begin(), nodes.end(), pos);
+		nodeID vID;
+		if (it == nodes.end()) {
+			vID = nodes.size();
+			nodes.push_back(pos);
+			nodeType.push_back(NONE);
+			minDistToObstacle.push_back(minDist);
+		} else {
+			vID = it - nodes.begin();
 		}
 
 		return vID;
@@ -178,12 +195,11 @@ namespace BWTA
 
 	void markRegionNodes(RegionGraph& graph)
 	{
-		const double MIN_RADII_DIFF = 1.0;
+		const double MIN_RADII_DIFF = 2.5;
 		struct parentNode_t {
 			nodeID id;
 			bool isMaximal;
 			parentNode_t() : id(0), isMaximal(false) {}
-// 			parentNode_t(nodeID _id, bool isMax) : id(_id), isMaximal(isMax) {}
 		};
 		// container to mark visited nodes, and parent list
 		std::vector<bool> visited;
@@ -194,62 +210,68 @@ namespace BWTA
 		std::stack<nodeID> nodeToVisit;
 		parentNode_t parentNode;
 		// find a leaf node to start
-// 		for (size_t id = 0; id < graph.adjacencyList.size(); ++id) {
-// 			if (graph.adjacencyList.at(id).size() == 1) {
-		size_t id = 326;
+		for (size_t id = 0; id < graph.adjacencyList.size(); ++id) {
+			if (graph.adjacencyList.at(id).size() == 1) {
 				// mark node as graph
 				visited.at(id) = true;
-				graph.regionNodes.push_back(id);
+				graph.regionNodes.insert(id);
+				graph.nodeType.at(id) = RegionGraph::REGION;
 				parentNode.id = id; parentNode.isMaximal = true;
 				parentNodes.at(id) = parentNode;
-				LOG("Found leaf " << id << " at " << graph.nodes.at(id) << " with radii " << graph.minDistToObstacle.at(id));
+// 				LOG("Found leaf " << id << " at " << graph.nodes.at(id) << " with radii " << graph.minDistToObstacle.at(id));
 				// add children to explore
-// 				std::stringstream childList;
 				for (const auto& v1 : graph.adjacencyList.at(id)) {
 					nodeToVisit.push(v1);
 					visited.at(v1) = true;
 					parentNodes.at(v1) = parentNode;
-// 					childList << v1 << ",";
 				}
-// 				LOG(" - " << id << " Childs: " << childList.str());
-// 				break;
-// 			}
-// 		}
+				break;
+			}
+		}
 
 		while (!nodeToVisit.empty()) {
 			// pop first element
 			nodeID v0 = nodeToVisit.top();
 			nodeToVisit.pop();
-// 			LOG("Visiting " << v0);
-
+			// get parent
+			parentNode = parentNodes.at(v0);
 
 			if (graph.adjacencyList.at(v0).size() != 2) {
-				graph.regionNodes.push_back(v0);
+// 				if (parentNode.isMaximal && graph.minDistToObstacle.at(v0) > graph.minDistToObstacle.at(parentNode.id)) {
+// 					graph.regionNodes.erase(parentNode.id);
+// 					graph.nodeType.at(parentNode.id) = RegionGraph::NONE;
+// 				}
+				graph.regionNodes.insert(v0);
+				graph.nodeType.at(v0) = RegionGraph::REGION;
 				parentNode.id = v0; parentNode.isMaximal = true;
-				LOG("Found leaf/connection " << v0 << " at " << graph.nodes.at(v0) << " with radii " << graph.minDistToObstacle.at(v0));
-// 				break;
+// 				LOG("Found leaf/connection " << v0 << " at " << graph.nodes.at(v0) << " with radii " << graph.minDistToObstacle.at(v0));
 			} else {
-
-				// get parent
-				parentNode = parentNodes.at(v0);
-
-				if (parentNode.isMaximal) {
-					// look if the node is a local minimal (chokepoint node)
-					bool localMinimal = true;
-					for (const auto& v1 : graph.adjacencyList.at(v0)) {
-						if (graph.minDistToObstacle.at(v0) > graph.minDistToObstacle.at(v1)) {
-							localMinimal = false;
-							break;
-						}
+				// look if the node is a local minimal (chokepoint node)
+				bool localMinimal = true;
+				for (const auto& v1 : graph.adjacencyList.at(v0)) {
+					if (graph.minDistToObstacle.at(v0) > graph.minDistToObstacle.at(v1)) {
+						localMinimal = false;
+						break;
 					}
-					if (localMinimal) {
-						if (std::abs(graph.minDistToObstacle.at(v0) - graph.minDistToObstacle.at(parentNode.id)) > MIN_RADII_DIFF) {
-							LOG("Found minimal " << v0 << " at " << graph.nodes.at(v0) << " with radii " << graph.minDistToObstacle.at(v0) << " and parent " << parentNode.id);
-// 							LOG(graph.minDistToObstacle.at(v0) << " - " << graph.minDistToObstacle.at(parentNode.id) << " = " << std::abs(graph.minDistToObstacle.at(v0) - graph.minDistToObstacle.at(parentNode.id)));
-							graph.chokeNodes.push_back(v0);
+				}
+				if (localMinimal) {
+					if (!parentNode.isMaximal) {
+						// we have two consecutive minimals, keep the min
+						if (graph.minDistToObstacle.at(v0) < graph.minDistToObstacle.at(parentNode.id)) {
+// 							LOG("Found  better minimal " << v0 << " at " << graph.nodes.at(v0) << " with radii " << graph.minDistToObstacle.at(v0) << " and parent " << parentNode.id);
+							graph.chokeNodes.insert(v0);
+							graph.nodeType.at(v0) = RegionGraph::CHOKEPOINT;
+							graph.chokeNodes.erase(parentNode.id);
+							graph.nodeType.at(parentNode.id) = RegionGraph::NONE;
 							parentNode.id = v0; parentNode.isMaximal = false;
-// 							LOG(" - Parent changed to " << v0);
-// 							if (!parentNode.isMaximal) LOG("Found two consecutive minimals");
+						}
+					} else {
+						if (std::abs(graph.minDistToObstacle.at(v0) - graph.minDistToObstacle.at(parentNode.id)) > MIN_RADII_DIFF) {
+// 							LOG("Found minimal " << v0 << " at " << graph.nodes.at(v0) << " with radii " << graph.minDistToObstacle.at(v0)
+// 								<< " and parent " << parentNode.id << ":" << graph.minDistToObstacle.at(parentNode.id));
+							graph.chokeNodes.insert(v0);
+							graph.nodeType.at(v0) = RegionGraph::CHOKEPOINT;
+							parentNode.id = v0; parentNode.isMaximal = false;
 						}
 					}
 				} else {
@@ -262,32 +284,172 @@ namespace BWTA
 						}
 					}
 					if (localMaximal) {
-						if (std::abs(graph.minDistToObstacle.at(v0) - graph.minDistToObstacle.at(parentNode.id)) > MIN_RADII_DIFF) {
-							LOG("Found maximal " << v0 << " at " << graph.nodes.at(v0) << " with radii " << graph.minDistToObstacle.at(v0) << " and parent " << parentNode.id);
-// 							LOG(graph.minDistToObstacle.at(v0) << " - " << graph.minDistToObstacle.at(parentNode.id) << " = " << std::abs(graph.minDistToObstacle.at(v0) - graph.minDistToObstacle.at(parentNode.id)));
-							graph.regionNodes.push_back(v0);
-							parentNode.id = v0; parentNode.isMaximal = true;
-							parentNodes.at(v0) = parentNode;
-// 							LOG(" - Parent changed to " << v0);
-// 							if (parentNode.isMaximal) LOG("Found two consecutive maximals");
+						if (parentNode.isMaximal) {
+							// we have two consecutive maximals, keep the max
+							if (graph.minDistToObstacle.at(v0) > graph.minDistToObstacle.at(parentNode.id)) {
+// 								LOG("Found better maximal " << v0 << " at " << graph.nodes.at(v0) << " with radii " << graph.minDistToObstacle.at(v0) << " and parent " << parentNode.id);
+								graph.regionNodes.insert(v0);
+								graph.nodeType.at(v0) = RegionGraph::REGION;
+								graph.regionNodes.erase(parentNode.id);
+								graph.nodeType.at(parentNode.id) = RegionGraph::NONE;
+								parentNode.id = v0; parentNode.isMaximal = true;
+// 								parentNodes.at(v0) = parentNode;
+							}
+						} else {
+							if (std::abs(graph.minDistToObstacle.at(v0) - graph.minDistToObstacle.at(parentNode.id)) > MIN_RADII_DIFF) {
+// 								LOG("Found maximal " << v0 << " at " << graph.nodes.at(v0) << " with radii " << graph.minDistToObstacle.at(v0)
+// 									<< " and parent " << parentNode.id << ":" << graph.minDistToObstacle.at(parentNode.id));
+								graph.regionNodes.insert(v0);
+								graph.nodeType.at(v0) = RegionGraph::REGION;
+								parentNode.id = v0; parentNode.isMaximal = true;
+// 								parentNodes.at(v0) = parentNode;
+							}
 						}
 					}
 				}
 			}
 
 			// keep exploring unvisited neighbors
-// 			std::stringstream childList;
 			for (const auto& v1 : graph.adjacencyList.at(v0)) {
 				if (!visited.at(v1)) {
 					nodeToVisit.push(v1);
 					visited.at(v1) = true;
 					parentNodes.at(v1) = parentNode;
-// 					childList << v1 << ",";
-				} else {
-// 					childList << v1 << "*,";
 				}
 			}
-// 			LOG(" - " << v0 << " Childs: " << childList.str());
 		}
 	}
+
+	std::string getString(std::set<nodeID> nodeSet)
+	{
+		std::stringstream stream;
+		for (auto& id : nodeSet) {
+			stream << id << ",";
+		}
+		return stream.str();
+	}
+
+	void simplifyRegionGraph(const RegionGraph& graph, RegionGraph& graphSimplified)
+	{
+// 		struct parentNode_t {
+// 			nodeID oldId;
+// 			nodeID newId;
+// 		};
+		struct nodeInfo_t {
+			nodeID id;
+			nodeID parentId;
+			nodeID parentAbstractId;
+			nodeInfo_t(nodeID _id, nodeID _parentId, nodeID _parentAbstractId) : id(_id), parentId(_parentId), parentAbstractId(_parentAbstractId) {}
+		};
+		// container to mark visited nodes, and parent list
+		std::vector<size_t> visited;
+		visited.resize(graph.nodes.size());
+// 		std::vector<parentNode_t> parentNodes;
+// 		parentNodes.resize(graph.nodes.size());
+
+		std::stack<nodeInfo_t> nodeToVisit;
+// 		parentNode_t parentNode;
+		// start with one region node
+		nodeID id = *graph.regionNodes.begin();
+		visited.at(id) += 1;
+		nodeID id0 = graphSimplified.addNode(graph.nodes.at(id), graph.minDistToObstacle.at(id));
+		graphSimplified.regionNodes.insert(id0);
+		graphSimplified.nodeType.at(id0) = RegionGraph::REGION;
+
+		// add children to explore
+		for (const auto& v1 : graph.adjacencyList.at(id)) {
+			nodeToVisit.emplace(v1, id, id0);
+			visited.at(v1) += 1;
+		}
+
+		while (!nodeToVisit.empty()) {
+			// pop first element
+			nodeInfo_t cNode = nodeToVisit.top();
+			nodeToVisit.pop();
+			// get parent
+// 			parentNode = parentNodes.at(v0);
+			nodeID parentAbstractId = cNode.parentAbstractId;
+
+			if (graph.nodeType.at(cNode.id) == RegionGraph::CHOKEPOINT) {
+// 			if (graph.chokeNodes.find(cNode.id) != graph.chokeNodes.end()) {
+				nodeID v1 = graphSimplified.addNode(graph.nodes.at(cNode.id), graph.minDistToObstacle.at(cNode.id));
+				graphSimplified.addEdge(v1, parentAbstractId);
+				graphSimplified.chokeNodes.insert(v1);
+				graphSimplified.nodeType.at(v1) = RegionGraph::CHOKEPOINT;
+				parentAbstractId = v1;
+// 			} else if (graph.regionNodes.find(cNode.id) != graph.regionNodes.end()) {
+			} else if (graph.nodeType.at(cNode.id) == RegionGraph::REGION) {
+				nodeID v1 = graphSimplified.addNode(graph.nodes.at(cNode.id), graph.minDistToObstacle.at(cNode.id));
+				graphSimplified.addEdge(v1, parentAbstractId);
+				graphSimplified.regionNodes.insert(v1);
+				graphSimplified.nodeType.at(v1) = RegionGraph::REGION;
+				parentAbstractId = v1;
+			}
+
+			// keep exploring unvisited neighbors
+			for (const auto& v1 : graph.adjacencyList.at(cNode.id)) {
+				// to "cut" infinite loops, a node can be explored at most its degree
+				if (v1 != cNode.parentId && visited.at(v1) < graph.adjacencyList.at(v1).size()) {
+					nodeToVisit.emplace(v1, cNode.id, parentAbstractId);
+					visited.at(v1) += 1;
+				}
+			}
+		}
+
+		// Second loop to merge connected regions
+		std::set<nodeID> mergeRegions(graphSimplified.regionNodes);
+
+		while (!mergeRegions.empty()) {
+			// pop first element
+			nodeID v0 = *mergeRegions.begin();
+			mergeRegions.erase(mergeRegions.begin());
+
+			for (auto& it = graphSimplified.adjacencyList.at(v0).begin(); it != graphSimplified.adjacencyList.at(v0).end();) {
+				nodeID v1 = *it;
+				if (graphSimplified.nodeType.at(v0) == RegionGraph::REGION
+					&& graphSimplified.nodeType.at(v1) == RegionGraph::REGION) 
+				{
+// 					LOG(" - Set " << v0 << ":" << getString(graphSimplified.adjacencyList.at(v0)));
+// 					LOG(" - Set " << v1 << ":" << getString(graphSimplified.adjacencyList.at(v1)));
+					if (graphSimplified.minDistToObstacle.at(v0) > graphSimplified.minDistToObstacle.at(v1)) {
+						// keep v0
+						graphSimplified.adjacencyList.at(v0).insert(graphSimplified.adjacencyList.at(v1).begin(), 
+							graphSimplified.adjacencyList.at(v1).end());
+						// for each adjacent, remove v1 add v0 (except v0)
+						for (const auto& v2 : graphSimplified.adjacencyList.at(v1)) {
+							graphSimplified.adjacencyList.at(v2).erase(v1);
+							if (v2 == v0) graphSimplified.adjacencyList.at(v0).erase(v0);
+							else graphSimplified.adjacencyList.at(v2).insert(v0);
+						}
+						graphSimplified.adjacencyList.at(v1).clear();
+// 						LOG(" - Set " << v0 << " merged:" << getString(graphSimplified.adjacencyList.at(v0)));
+						graphSimplified.regionNodes.erase(v1);
+// 						LOG(v1 << " erased, " << v0 << " keeped");
+						// restart iterator
+						it = graphSimplified.adjacencyList.at(v0).begin();
+					} else {
+						// keep v1
+						graphSimplified.adjacencyList.at(v1).insert(graphSimplified.adjacencyList.at(v0).begin(),
+							graphSimplified.adjacencyList.at(v0).end());
+						// for each adjacent, remove v0 add v1 (except v1)
+						for (const auto& v2 : graphSimplified.adjacencyList.at(v0)) {
+							graphSimplified.adjacencyList.at(v2).erase(v0);
+							if (v2 == v1) graphSimplified.adjacencyList.at(v1).erase(v1);
+							else graphSimplified.adjacencyList.at(v2).insert(v1);
+						}
+						graphSimplified.adjacencyList.at(v0).clear();
+// 						LOG(" - Set " << v1 << " merged:" << getString(graphSimplified.adjacencyList.at(v1)));
+						graphSimplified.regionNodes.erase(v0);
+// 						LOG(v0 << " erased, " << v1 << " keeped");
+						// v1 should be re-analyzed
+						mergeRegions.insert(v1);
+						break;
+					}
+				} else {
+					++it;
+				}
+			}
+		}
+	}
+
 }

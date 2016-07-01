@@ -33,7 +33,7 @@ namespace BWTA {
 		void drawClosestChokepointMap(RectangleArray<Chokepoint*> map, std::set<Chokepoint*> chokepoints);
 		void drawEdges(std::vector<boost::polygon::voronoi_edge<double>> edges);
 		void drawGraph(const RegionGraph& graph);
-		void drawNodes(const RegionGraph& graph, const std::vector<nodeID>& nodes, QColor color);
+		void drawNodes(const RegionGraph& graph, const std::set<nodeID>& nodes, QColor color);
 
 	private:
 		QPainter* painter;
