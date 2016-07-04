@@ -34,6 +34,7 @@ namespace BWTA {
 		void drawEdges(std::vector<boost::polygon::voronoi_edge<double>> edges);
 		void drawGraph(const RegionGraph& graph);
 		void drawNodes(const RegionGraph& graph, const std::set<nodeID>& nodes, QColor color);
+		void drawLines(std::map<nodeID, chokeSides_t> chokepointSides, QColor color);
 
 	private:
 		QPainter* painter;

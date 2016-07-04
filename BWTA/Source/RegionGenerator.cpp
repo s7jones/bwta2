@@ -37,10 +37,10 @@ namespace BWTA
 
 
 	void generateVoronoid(const std::vector<Polygon>& polygons, const RectangleArray<int>& labelMap, 
-		RegionGraph& graph, bgi::rtree<BoostPointI, bgi::quadratic<16> >& rtree)
+		RegionGraph& graph, bgi::rtree<BoostSegmentI, bgi::quadratic<16> >& rtree)
 	{
 		std::vector<VoronoiSegment> segments;
-		std::vector<BoostPointI> rtreePoints;
+		std::vector<BoostSegmentI> rtreeSegments;
 		size_t idPoint = 0;
 
 		// containers for border points (we need to fill the borders of the map with segments)
@@ -57,13 +57,13 @@ namespace BWTA
 				else if (polygon[i].x == maxX) rightBorder.insert(polygon[i].y);
 				if (polygon[i].y == 0) topBorder.insert(polygon[i].x);
 
-				int j = (i + 1) % polygon.size(); // because polygons aren't close
+				int j = (i + 1) % polygon.size(); // TODO we don't need this if polygons are close (like Boost polygons)
 
 				segments.push_back(VoronoiSegment(
 					VoronoiPoint(polygon[j].x, polygon[j].y),
 					VoronoiPoint(polygon[i].x, polygon[i].y)));
 
-				rtreePoints.push_back(std::make_pair(BoostPoint(polygon[i].x, polygon[i].y), idPoint++));
+				rtreeSegments.push_back(std::make_pair(BoostSegment(BoostPoint(polygon[j].x, polygon[j].y), BoostPoint(polygon[i].x, polygon[i].y)), idPoint++));
 			}
 			// TODO Add the vertices of each hole in the polygon
 // 			for (const auto& hole : polygon.holes) {
@@ -107,13 +107,14 @@ namespace BWTA
 		}
 
 		// create an R-tree to query nearest points/obstacle
-		bgi::rtree<BoostPointI, bgi::quadratic<16> > rtreeConstruct(rtreePoints);
+		bgi::rtree<BoostSegmentI, bgi::quadratic<16> > rtreeConstruct(rtreeSegments);
 		rtree = rtreeConstruct;
 		graph.minDistToObstacle.resize(graph.nodes.size());
 		for (size_t i = 0; i < graph.nodes.size(); ++i) {
-			std::vector<BoostPointI> returnedValues;
+			std::vector<BoostSegmentI> returnedValues;
 			BoostPoint pt(graph.nodes[i].x, graph.nodes[i].y);
 			rtree.query(bgi::nearest(pt, 1), std::back_inserter(returnedValues));
+			// TODO can be speed up using comaparable_distance
 			graph.minDistToObstacle[i] = bg::distance(returnedValues.front().first, pt);
 		}
 	}
@@ -177,7 +178,7 @@ namespace BWTA
 			nodeID v0 = nodeToPrune.front();
 			nodeToPrune.pop();
 
-			if (graph.adjacencyList.at(v0).empty()) continue; // isolated point???
+			if (graph.adjacencyList.at(v0).empty()) continue; // isolated point
 
 			nodeID v1 = *graph.adjacencyList.at(v0).begin();
 			// remove node if it's too close to an obstacle, or parent is farther to an obstacle
@@ -331,10 +332,6 @@ namespace BWTA
 
 	void simplifyRegionGraph(const RegionGraph& graph, RegionGraph& graphSimplified)
 	{
-// 		struct parentNode_t {
-// 			nodeID oldId;
-// 			nodeID newId;
-// 		};
 		struct nodeInfo_t {
 			nodeID id;
 			nodeID parentId;
@@ -344,11 +341,8 @@ namespace BWTA
 		// container to mark visited nodes, and parent list
 		std::vector<size_t> visited;
 		visited.resize(graph.nodes.size());
-// 		std::vector<parentNode_t> parentNodes;
-// 		parentNodes.resize(graph.nodes.size());
 
 		std::stack<nodeInfo_t> nodeToVisit;
-// 		parentNode_t parentNode;
 		// start with one region node
 		nodeID id = *graph.regionNodes.begin();
 		visited.at(id) += 1;
@@ -367,17 +361,14 @@ namespace BWTA
 			nodeInfo_t cNode = nodeToVisit.top();
 			nodeToVisit.pop();
 			// get parent
-// 			parentNode = parentNodes.at(v0);
 			nodeID parentAbstractId = cNode.parentAbstractId;
 
 			if (graph.nodeType.at(cNode.id) == RegionGraph::CHOKEPOINT) {
-// 			if (graph.chokeNodes.find(cNode.id) != graph.chokeNodes.end()) {
 				nodeID v1 = graphSimplified.addNode(graph.nodes.at(cNode.id), graph.minDistToObstacle.at(cNode.id));
 				graphSimplified.addEdge(v1, parentAbstractId);
 				graphSimplified.chokeNodes.insert(v1);
 				graphSimplified.nodeType.at(v1) = RegionGraph::CHOKEPOINT;
 				parentAbstractId = v1;
-// 			} else if (graph.regionNodes.find(cNode.id) != graph.regionNodes.end()) {
 			} else if (graph.nodeType.at(cNode.id) == RegionGraph::REGION) {
 				nodeID v1 = graphSimplified.addNode(graph.nodes.at(cNode.id), graph.minDistToObstacle.at(cNode.id));
 				graphSimplified.addEdge(v1, parentAbstractId);
@@ -452,4 +443,175 @@ namespace BWTA
 		}
 	}
 
+	BWAPI::WalkPosition getProjectedPoint(BoostPoint p, BoostSegment s)
+	{
+		double dx = s.second.x() - s.first.x();
+		double dy = s.second.y() - s.first.y();
+		if (dx != 0 || dy != 0) {
+			double t = ((p.x() - s.first.x()) * dx + (p.y() - s.first.y()) * dy) / (dx * dx + dy * dy);
+			if (t > 1) {
+				return BWAPI::WalkPosition((int)s.second.x(), (int)s.second.y());
+			} else if (t > 0) {
+				return BWAPI::WalkPosition(int(s.first.x() + dx * t), int(s.first.y() + dy * t));
+			}
+		}
+		return BWAPI::WalkPosition((int)s.first.x(), (int)s.first.y());
+	}
+
+	inline BoostPoint getMidpoint(BoostPoint a, BoostPoint b)
+	{
+		boost::geometry::subtract_point(a, b);
+		boost::geometry::divide_value(a, 2);
+		boost::geometry::add_point(a, b);
+		return a;
+	}
+
+	void getChokepointSides(const RegionGraph& graph, const bgi::rtree<BoostSegmentI, bgi::quadratic<16> >& rtree, std::map<nodeID, chokeSides_t>& chokepointSides)
+	{
+		for (const auto& id : graph.chokeNodes) {
+			BoostPoint pt(graph.nodes[id].x, graph.nodes[id].y);
+			std::vector<BoostSegment> nearestSegments;
+			BoostSegment s1, s2;
+			// iterate over nearest Values
+			for (auto it = rtree.qbegin(bgi::nearest(pt, 100)); it != rtree.qend(); ++it) {
+				if (nearestSegments.empty()) {
+					s1 = (*it).first;
+					nearestSegments.push_back((*it).first);
+					continue;
+				}
+				
+				// if distance to all previous nearest segments is different than 0, we have a second segment candidate
+				bool found = true;
+				for (const auto& seg : nearestSegments) {
+					double dist = boost::geometry::comparable_distance(seg, (*it).first);
+					if (dist == 0) {
+						found = false;
+						break;
+					}
+				}
+				if (found) {
+					// get midpoint of the segment
+					BoostPoint midpoint = getMidpoint(s1.first, (*it).first.first);
+// 					LOG("Midpoint of (" << s1.first.x() << "," << s1.first.y() << ") and (" << (*it).first.first.x() << "," << (*it).first.first.y() << ") is (" << midpoint.x() << "," << midpoint.y() << ")");
+					double distToSide = boost::geometry::comparable_distance(s1, midpoint);
+					double distToMidpoint = boost::geometry::comparable_distance(pt, midpoint);
+// 					LOG("DistChokeToMidpoint: " << distToMidpoint << " ditMidPointToSide: " << distToSide);
+					if (distToMidpoint < distToSide) {
+						s2 = (*it).first;
+						break;
+					}
+				}
+				nearestSegments.push_back((*it).first);
+			}
+
+			BWAPI::WalkPosition side1 = getProjectedPoint(pt, s1);
+			BWAPI::WalkPosition side2 = getProjectedPoint(pt, s2);
+			chokepointSides.emplace(id, chokeSides_t(side1, side2));
+		}
+	}
+
+	void createRegionsFromGraph(const std::vector<BoostPolygon>& polygons, const RectangleArray<int>& labelMap,
+		const RegionGraph& graph, const std::map<nodeID, chokeSides_t>& chokepointSides, 
+		std::set<Region*>& regions, std::set<Chokepoint*>& chokepoints,
+		std::vector<BoostPolygon>& polReg)
+	{
+		// create regions polygons
+		// *********************************************
+
+		// first we start with the "negative" geometry of polygon obstacles
+		// Set vertices of the map
+		BoostPoint topLeft(0, 0);
+		BoostPoint bottomLeft(0, labelMap.getHeight() - 1);
+		BoostPoint bottomRight(labelMap.getWidth() - 1, labelMap.getHeight() - 1);
+		BoostPoint topRight(labelMap.getWidth() - 1, 0);
+		std::vector<BoostPoint> points = { topLeft, topRight, bottomRight, bottomLeft, topLeft };
+		BoostPolygon mapBorder;
+		boost::geometry::assign_points(mapBorder, points);
+		boost::geometry::correct(mapBorder);
+
+		// subtract obstacles
+		typedef boost::geometry::model::multi_polygon<BoostPolygon> BoostMultiPoly;
+		BoostMultiPoly output, obstacles;
+		obstacles.reserve(polygons.size());
+		std::copy(polygons.begin(), polygons.end(), back_inserter(obstacles));
+		boost::geometry::difference(mapBorder, obstacles, output);
+
+		// divide regions
+		typedef boost::geometry::model::linestring<BoostPoint> BoostLine;
+		typedef boost::geometry::model::multi_linestring<BoostLine> BoostMultiLine;
+		BoostMultiLine chokeLines;
+		for (const auto& choke : chokepointSides) {
+			BoostPoint a(choke.second.side1.x, choke.second.side1.y);
+			BoostPoint b(choke.second.side2.x, choke.second.side2.y);
+			std::vector<BoostPoint> line = { a, b };
+			BoostLine chokeLine;
+			boost::geometry::assign_points(chokeLine, line);
+			chokeLines.push_back(chokeLine);
+		}
+
+		// Declare strategies
+		const double buffer_distance = 0.5;
+		boost::geometry::strategy::buffer::distance_symmetric<double> distance_strategy(buffer_distance);
+		boost::geometry::strategy::buffer::join_miter join_strategy;
+		boost::geometry::strategy::buffer::end_round end_strategy;
+		boost::geometry::strategy::buffer::point_square circle_strategy;
+		boost::geometry::strategy::buffer::side_straight side_strategy;
+		// Create the buffer of a linestring
+		BoostMultiPoly cutPolygons;
+		boost::geometry::buffer(chokeLines, cutPolygons,
+			distance_strategy, side_strategy,
+			join_strategy, end_strategy, circle_strategy);
+
+		BoostMultiPoly regionsPoly;
+		boost::geometry::difference(output, cutPolygons, regionsPoly);
+		
+// 		LOG("Output size: " << regionsPoly.size());
+		polReg.reserve(regionsPoly.size());
+		std::copy(regionsPoly.begin(), regionsPoly.end(), back_inserter(polReg));
+
+		// Create regions from graph nodes
+		std::map<nodeID, Region*> node2region;
+		for (const auto& regionNodeId : graph.regionNodes) {
+			Polygon poly;
+			// find polygon
+			BoostPoint regionPoint(graph.nodes[regionNodeId].x, graph.nodes[regionNodeId].y);
+			for (const auto& regionPol : regionsPoly) {
+				if (boost::geometry::within(regionPoint, regionPol)) {
+					// Translate BoostPolygon to BWTA polygon (Polygon) (and WalkPosition to Position)
+					for (const auto& polyPoint : regionPol.outer()) {
+						poly.emplace_back((int)polyPoint.x() * 8, (int)polyPoint.y() * 8);
+					}
+					// Create the BWTA region
+					Region* newRegion = new RegionImpl(poly);
+					regions.insert(newRegion);
+					node2region.emplace(regionNodeId, newRegion);
+					break;
+				}
+			}
+		}
+
+		//LOG(" - Finding chokepoints and linking them to regions.");
+		std::map<nodeID, Chokepoint*> node2chokepoint;
+		for (const auto& chokeNodeId : graph.chokeNodes) {
+			std::set<nodeID>::iterator i = graph.adjacencyList[chokeNodeId].begin();
+			Region* r1 = node2region[*i];
+			i++;
+			Region* r2 = node2region[*i];
+			BWAPI::Position side1(chokepointSides.at(chokeNodeId).side1);
+			BWAPI::Position side2(chokepointSides.at(chokeNodeId).side2);
+			Chokepoint* newChokepoint = new ChokepointImpl(std::make_pair(r1, r2), std::make_pair(side1, side2));
+			chokepoints.insert(newChokepoint);
+			node2chokepoint.insert(std::make_pair(chokeNodeId, newChokepoint));
+		}
+		//LOG(" - Linking regions to chokepoints.");
+		for (const auto& regionNodeId : graph.regionNodes) {
+			Region* region = node2region[regionNodeId];
+			std::set<Chokepoint*> chokepoints;
+			for (const auto& chokeNodeId : graph.adjacencyList[regionNodeId]) {
+				chokepoints.insert(node2chokepoint[chokeNodeId]);
+			}
+			((RegionImpl*)region)->_chokepoints = chokepoints;
+		}
+
+	}
 }

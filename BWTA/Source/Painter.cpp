@@ -445,12 +445,24 @@ namespace BWTA {
 		}
 	}
 
-	void Painter::drawNodes(const RegionGraph& graph, const std::set<nodeID>& nodes, QColor color) {
+	void Painter::drawNodes(const RegionGraph& graph, const std::set<nodeID>& nodes, QColor color) 
+	{
 		painter->setPen(QPen(color));
 		painter->setBrush(QBrush(color));
 		for (const auto& v0 : nodes) {
 			painter->drawEllipse(graph.nodes.at(v0).x - 3, graph.nodes.at(v0).y - 3, 6, 6);
 		}
 	}
+
+	void Painter::drawLines(std::map<nodeID, chokeSides_t> chokepointSides, QColor color)
+	{
+		painter->setPen(QPen(color));
+		painter->setBrush(QBrush(color));
+		for (const auto& chokeSides : chokepointSides) {
+			painter->drawLine(chokeSides.second.side1.x, chokeSides.second.side1.y,
+				chokeSides.second.side2.x, chokeSides.second.side2.y);
+		}
+	}
+
 }
 #endif

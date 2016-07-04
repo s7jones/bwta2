@@ -3,10 +3,18 @@
 #include <BWTA/Polygon.h>
 
 #include "MapData.h"
+#include "RegionImpl.h"
+#include "ChokepointImpl.h"
 
 namespace BWTA
 {
 	typedef size_t nodeID;
+
+	struct chokeSides_t {
+		BWAPI::WalkPosition side1;
+		BWAPI::WalkPosition side2;
+		chokeSides_t(BWAPI::WalkPosition s1, BWAPI::WalkPosition s2) : side1(s1), side2(s2) {};
+	};
 
 	class RegionGraph
 	{
@@ -33,8 +41,13 @@ namespace BWTA
 
 
 	void generateVoronoid(const std::vector<Polygon>& polygons, const RectangleArray<int>& labelMap, 
-		RegionGraph& graph, bgi::rtree<BoostPointI, bgi::quadratic<16> >& rtree);
+		RegionGraph& graph, bgi::rtree<BoostSegmentI, bgi::quadratic<16> >& rtree);
 	void pruneGraph(RegionGraph& graph);
 	void markRegionNodes(RegionGraph& graph);
 	void simplifyRegionGraph(const RegionGraph& graph, RegionGraph& graphSimplified);
+	void getChokepointSides(const RegionGraph& graph, const bgi::rtree<BoostSegmentI, bgi::quadratic<16> >& rtree, std::map<nodeID, chokeSides_t>& chokepointSides);
+	void createRegionsFromGraph(const std::vector<BoostPolygon>& polygons, const RectangleArray<int>& labelMap,
+		const RegionGraph& graph, const std::map<nodeID, chokeSides_t>& chokepointSides,
+		std::set<Region*>& regions, std::set<Chokepoint*>& chokepoints,
+		std::vector<BoostPolygon>& polReg);
 }

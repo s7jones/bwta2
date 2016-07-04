@@ -137,9 +137,18 @@ namespace BWTA
 // 		timer.start();
 
 		std::vector<Polygon> polygons;
+		std::vector<BoostPolygon> boostPolygons;
 		RectangleArray<int> labelMap(MapData::walkability.getWidth(), MapData::walkability.getHeight());
 		labelMap.setTo(0);
-		generatePolygons(polygons, labelMap);
+		generatePolygons(boostPolygons, labelMap);
+
+		// translate Boost polygons to BWTA polygons
+		for (const auto& pol : boostPolygons) {
+			Polygon BwtaPolygon;
+			for (const auto& pos : pol.outer()) BwtaPolygon.emplace_back((int)pos.x(), (int)pos.y());
+			// TODO add holes
+			polygons.push_back(BwtaPolygon);
+		}
 
 		LOG(" [Detected BOOST polygons in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
@@ -149,7 +158,8 @@ namespace BWTA
 		timer.start();
 
 		RegionGraph graph;
-		bgi::rtree<BoostPointI, bgi::quadratic<16> > rtree;
+// 		bgi::rtree<BoostPointI, bgi::quadratic<16> > rtree;
+		bgi::rtree<BoostSegmentI, bgi::quadratic<16> > rtree;
 		generateVoronoid(polygons, labelMap, graph, rtree);
 
 		LOG(" [Computed BOOST Voronoi in " << timer.stopAndGetTime() << " seconds]");
@@ -200,9 +210,32 @@ namespace BWTA
 #endif
 		timer.start();
 
-// 		generateRegions(polygons, labelMap, graph, rtree);
+		std::map<nodeID, chokeSides_t> chokepointSides;
+		getChokepointSides(graphSimplified, rtree, chokepointSides);
 
-		exit(-1);
+		LOG(" [Wall of chokepoints in " << timer.stopAndGetTime() << " seconds]");
+#ifdef DEBUG_DRAW
+		painter.drawPolygons(polygons);
+		painter.drawGraph(graphSimplified);
+		painter.drawNodes(graphSimplified, graphSimplified.regionNodes, Qt::blue);
+		painter.drawLines(chokepointSides, Qt::red);
+		painter.render("7-WallOffChokepoints");
+#endif
+		timer.start();
+
+		std::vector<BoostPolygon> polReg;
+		createRegionsFromGraph(boostPolygons, labelMap, graphSimplified, chokepointSides,
+			BWTA_Result::regions, BWTA_Result::chokepoints,
+			polReg);
+
+		LOG(" [Creating BWTA regions/chokepoints in " << timer.stopAndGetTime() << " seconds]");
+#ifdef DEBUG_DRAW
+		painter.drawPolygons(polReg);
+		painter.render("8-Regions");
+#endif
+		timer.start();
+
+		/*exit(-1);
 		
 
 
@@ -466,7 +499,7 @@ namespace BWTA
 
 		LOG(" [Linked choke points wiht regions in " << timer.stopAndGetTime() << " seconds]");
 		timer.start();
-
+*/
 		calculate_connectivity();
 		calculateBaseLocationProperties();
 

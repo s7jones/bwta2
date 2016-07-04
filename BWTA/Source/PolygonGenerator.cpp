@@ -125,7 +125,7 @@ namespace BWTA
 	}
 
 
-	void generatePolygons(std::vector<Polygon>& polygons, RectangleArray<int>& labelMap)
+	void generatePolygons(std::vector<BoostPolygon>& polygons, RectangleArray<int>& labelMap)
 	{
 		Timer timer;
 		timer.start();
@@ -148,9 +148,10 @@ namespace BWTA
 			// if polygon isn't too small, add it to the result
 			if (boost::geometry::area(simPolygon) > MIN_ARE_POLYGON) {
 				// transform BOOST_Polygon to BWTA_Polygon
-				Polygon BwtaPolygon;
-				for (const auto& pos : simPolygon.outer()) BwtaPolygon.emplace_back((int)pos.x(), (int)pos.y());
-				polygons.push_back(BwtaPolygon);
+				polygons.push_back(simPolygon);
+// 				Polygon BwtaPolygon;
+// 				for (const auto& pos : simPolygon.outer()) BwtaPolygon.emplace_back((int)pos.x(), (int)pos.y());
+// 				polygons.push_back(BwtaPolygon);
 			}
 		}
 
