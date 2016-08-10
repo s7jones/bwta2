@@ -101,44 +101,14 @@ namespace BWTA
 // 		}
 		timer.start();
 
-		// Give find_connected_components the walkability data so it can compute the list of connected components,
-		// and determine which component each tile belongs to
-// 		RectangleArray<ConnectedComponent*> get_component;
-// 		std::list<ConnectedComponent> components;
-// 		find_connected_components(MapData::walkability, get_component, components);
-// 		LOG(" - Calculated connected components");
-// 
-// 		// Give extract_polygons the walkability data and connected components so it can compute the polygonal obstacles
-// 		std::vector<Polygon> polygons;
-// 		extract_polygons(MapData::walkability, components, polygons);
-// 		LOG(" - Extracted " << polygons.size() << " polygons.");
-// 
-// 		// Discard polygons that are too small
-// 		int removed = 0;
-// 		for (size_t p = 0; p < polygons.size();) {
-// 			if (std::abs(polygons[p].getArea()) <= 256 &&
-// 				distance_to_border(polygons[p], MapData::walkability.getWidth(), MapData::walkability.getHeight()) > 1) {
-// 				polygons.erase(polygons.begin() + p);
-// 				removed++;
-// 			} else {
-// 				p++;
-// 			}
-// 		}
-// 		LOG(" - Removed " << removed << " small polygons.");
-// 
-// 		// Save the remaining polygons in BWTA_Result::unwalkablePolygons
-// 		for (const auto& polygon : polygons) BWTA_Result::unwalkablePolygons.insert(new Polygon(polygon));
-// 
-// 		LOG(" [Detected polygons in " << timer.stopAndGetTime() << " seconds]");
-// #ifdef DEBUG_DRAW
-// 		painter.drawPolygons(polygons);
-// 		painter.render();
-// #endif
-// 		timer.start();
+		// *************************************************
+		// OUR METHOD
+		// *************************************************
 
 		std::vector<Polygon> polygons;
 		std::vector<BoostPolygon> boostPolygons;
 		RectangleArray<int> labelMap(MapData::walkability.getWidth(), MapData::walkability.getHeight());
+// 		LOG("Size of labelMap " << MapData::walkability.getWidth() << "x" << MapData::walkability.getHeight());
 		labelMap.setTo(0);
 		generatePolygons(boostPolygons, labelMap);
 
@@ -154,14 +124,17 @@ namespace BWTA
 #ifdef DEBUG_DRAW
 		painter.drawPolygons(polygons);
 		painter.render("1-BoostPolygons");
+// 		for (auto tmpPol : polygons) {
+// 			painter.drawPolygon(tmpPol, QColor(180, 180, 180));
+// 			painter.render();
+// 		}
 #endif
 		timer.start();
 
 		RegionGraph graph;
-// 		bgi::rtree<BoostPointI, bgi::quadratic<16> > rtree;
 		bgi::rtree<BoostSegmentI, bgi::quadratic<16> > rtree;
 		generateVoronoid(polygons, labelMap, graph, rtree);
-
+		
 		LOG(" [Computed BOOST Voronoi in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
 		painter.drawPolygons(polygons);
@@ -235,9 +208,46 @@ namespace BWTA
 #endif
 		timer.start();
 
-		/*exit(-1);
-		
 
+		// *************************************************
+		// BWTA ORIGINAL
+		// *************************************************
+/*
+
+		// Give find_connected_components the walkability data so it can compute the list of connected components,
+		// and determine which component each tile belongs to
+		RectangleArray<ConnectedComponent*> get_component;
+		std::list<ConnectedComponent> components;
+		find_connected_components(MapData::walkability, get_component, components);
+		LOG(" - Calculated connected components");
+
+		// Give extract_polygons the walkability data and connected components so it can compute the polygonal obstacles
+		std::vector<Polygon> polygons;
+		extract_polygons(MapData::walkability, components, polygons);
+		LOG(" - Extracted " << polygons.size() << " polygons.");
+
+		// Discard polygons that are too small
+		int removed = 0;
+		for (size_t p = 0; p < polygons.size();) {
+		if (std::abs(polygons[p].getArea()) <= 256 &&
+		distance_to_border(polygons[p], MapData::walkability.getWidth(), MapData::walkability.getHeight()) > 1) {
+		polygons.erase(polygons.begin() + p);
+		removed++;
+		} else {
+		p++;
+		}
+		}
+		LOG(" - Removed " << removed << " small polygons.");
+
+		// Save the remaining polygons in BWTA_Result::unwalkablePolygons
+		for (const auto& polygon : polygons) BWTA_Result::unwalkablePolygons.insert(new Polygon(polygon));
+
+		LOG(" [Detected polygons in " << timer.stopAndGetTime() << " seconds]");
+#ifdef DEBUG_DRAW
+		painter.drawPolygons(polygons);
+		painter.render();
+#endif
+		timer.start();
 
 
 		// All line segments we create we will store in the segments vector and also insert into the 2d segmented Delaunay graph object sdg
@@ -497,8 +507,11 @@ namespace BWTA
 			((RegionImpl*)region)->_chokepoints = chokepoints;
 		}
 
-		LOG(" [Linked choke points wiht regions in " << timer.stopAndGetTime() << " seconds]");
+		LOG(" [Linked choke points with regions in " << timer.stopAndGetTime() << " seconds]");
 		timer.start();
+
+		// END BWTA ORIGINAL
+		// *************************************************
 */
 		calculate_connectivity();
 		calculateBaseLocationProperties();

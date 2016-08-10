@@ -6,7 +6,8 @@ namespace BWTA
 {
 	static const std::size_t VISITED_COLOR = 1;
 
-	void addVerticalBorder(std::vector<VoronoiSegment>& segments, const std::set<int>& border, int x, int maxY)
+	void addVerticalBorder(std::vector<VoronoiSegment>& segments, std::vector<BoostSegmentI>& rtreeSegments, size_t& idPoint, 
+		const std::set<int>& border, int x, int maxY)
 	{
 // 		for (const auto& val : border) {
 // 			LOG(val);
@@ -14,24 +15,59 @@ namespace BWTA
 
 		auto it = border.begin();
 		if (*it == 0) ++it;
+		else {
+			VoronoiPoint point1(x, 0); 
+			VoronoiPoint point2(x, maxY);
+			if (it != border.end()) {
+				point2.y(*it); ++it;
+			}
+// 			LOG("(" << point1.x() << "," << point1.y() << ") - (" << point2.x() << "," << point2.y() << ")");
+			segments.push_back(VoronoiSegment(point1, point2));
+			rtreeSegments.push_back(std::make_pair(BoostSegment(BoostPoint(point1.x(), point1.y()), BoostPoint(point2.x(), point2.y())), idPoint++));
+
+		}
 		for (it; it != border.end();) {
 			if (*it == maxY) break;
 			VoronoiPoint point1(x, *it); ++it;
-			VoronoiPoint point2(x, *it); ++it;
-			segments.push_back(VoronoiSegment(point1, point2));
+			VoronoiPoint point2(x, maxY);
+			if (it != border.end()) {
+				point2.y(*it); ++it;
+			}
 // 			LOG("(" << point1.x() << "," << point1.y() << ") - (" << point2.x() << "," << point2.y() << ")");
+			segments.push_back(VoronoiSegment(point1, point2));
+			rtreeSegments.push_back(std::make_pair(BoostSegment(BoostPoint(point1.x(), point1.y()), BoostPoint(point2.x(), point2.y())), idPoint++));
 		}
 	}
 
-	void addHorizontalBorder(std::vector<VoronoiSegment>& segments, const std::set<int>& border, int y, int maxX)
+	void addHorizontalBorder(std::vector<VoronoiSegment>& segments, std::vector<BoostSegmentI>& rtreeSegments, size_t& idPoint, 
+		const std::set<int>& border, int y, int maxX)
 	{
+// 		for (const auto& val : border) {
+// 			LOG(val);
+// 		}
+
 		auto it = border.begin();
 		if (*it == 0) ++it;
+		else {
+			VoronoiPoint point1(0, y);
+			VoronoiPoint point2(maxX, y);
+			if (it != border.end()) {
+				point2.x(*it); ++it;
+			}
+// 			LOG("(" << point1.x() << "," << point1.y() << ") - (" << point2.x() << "," << point2.y() << ")");
+			segments.push_back(VoronoiSegment(point1, point2));
+			rtreeSegments.push_back(std::make_pair(BoostSegment(BoostPoint(point1.x(), point1.y()), BoostPoint(point2.x(), point2.y())), idPoint++));
+		}
 		for (it; it != border.end();) {
 			if (*it == maxX) break;
 			VoronoiPoint point1(*it, y); ++it;
-			VoronoiPoint point2(*it, y); ++it;
+			VoronoiPoint point2(maxX, y);
+			if (it != border.end()) {
+				point2.x(*it); ++it;
+			}
+// 			LOG("(" << point1.x() << "," << point1.y() << ") - (" << point2.x() << "," << point2.y() << ")");
 			segments.push_back(VoronoiSegment(point1, point2));
+			rtreeSegments.push_back(std::make_pair(BoostSegment(BoostPoint(point1.x(), point1.y()), BoostPoint(point2.x(), point2.y())), idPoint++));
 		}
 	}
 
@@ -49,16 +85,20 @@ namespace BWTA
 		int maxY = MapData::walkability.getHeight() - 1;
 
 		// Add the line segments of each polygon to VoronoiSegment list and points to R-tree points list
+// 		auto polygon = polygons.at(3);
 		for (const auto& polygon : polygons) {
 			// Add the vertices of the polygon
-			for (size_t i = 0; i < polygon.size(); i++) {
+			size_t lastPoint = polygon.size() - 1;
+			for (size_t i = 0; i < lastPoint; i++) {
 				// save border points
 				if (polygon[i].x == 0) leftBorder.insert(polygon[i].y);
 				else if (polygon[i].x == maxX) rightBorder.insert(polygon[i].y);
 				if (polygon[i].y == 0) topBorder.insert(polygon[i].x);
 
-				int j = (i + 1) % polygon.size(); // TODO we don't need this if polygons are close (like Boost polygons)
+// 				int j = (i + 1) % polygon.size(); // TODO we don't need this if polygons are close (like Boost polygons)
+				int j = i + 1;
 
+// 				LOG("Segment (" << polygon[j].x << "," << polygon[j].y << ") to (" << polygon[i].x << "," << polygon[i].y << ")");
 				segments.push_back(VoronoiSegment(
 					VoronoiPoint(polygon[j].x, polygon[j].y),
 					VoronoiPoint(polygon[i].x, polygon[i].y)));
@@ -77,11 +117,16 @@ namespace BWTA
 		}
 
 		// add remain border segments
-		LOG(" - Generating border");
-		addVerticalBorder(segments, leftBorder, 0, maxY);
-		addVerticalBorder(segments, rightBorder, maxX, maxY);
-		addHorizontalBorder(segments, topBorder, 0, maxX);
-		
+		LOG(" - Generating borders");
+		addVerticalBorder(segments, rtreeSegments, idPoint, leftBorder, 0, maxY);
+		addVerticalBorder(segments, rtreeSegments, idPoint, rightBorder, maxX, maxY);
+		addHorizontalBorder(segments, rtreeSegments, idPoint, topBorder, 0, maxX);
+
+// 		std::vector<VoronoiSegment> borderSegments;
+// 		addVerticalBorder(borderSegments, rtreeSegments, idPoint, leftBorder, 0, maxY);
+// 		addVerticalBorder(borderSegments, rtreeSegments, idPoint, rightBorder, maxX, maxY);
+// 		addHorizontalBorder(borderSegments, rtreeSegments, idPoint, topBorder, 0, maxX);
+
 		BoostVoronoi voronoi;
 		boost::polygon::construct_voronoi(segments.begin(), segments.end(), &voronoi);
 
@@ -89,6 +134,9 @@ namespace BWTA
 		// traverse the Voronoi diagram and generate graph nodes and edges
 		for (const auto& edge : voronoi.edges()) {
 			if (!edge.is_primary() || !edge.is_finite() || edge.color() == VISITED_COLOR) continue;
+
+			// mark half-edge twin as visited
+			edge.twin()->color(VISITED_COLOR);
 
 			const BoostVoronoi::vertex_type* v0 = edge.vertex0();
 			const BoostVoronoi::vertex_type* v1 = edge.vertex1();
@@ -98,12 +146,13 @@ namespace BWTA
 			// skip edge if any of its endpoints is inside an obstacle
 			if (labelMap[p0.x][p0.y] > 0 || labelMap[p1.x][p1.y] > 0) continue;
 
+			// skip if near border
+			if (p0.x < 4 || p0.x >(maxX - 4) || p0.y < 4 || p0.y >(maxY - 4)
+				|| p1.x < 4 || p1.x >(maxX - 4) || p1.y < 4 || p1.y >(maxY - 4)) continue;
+
 			nodeID v0ID = graph.addNode(v0, p0);
 			nodeID v1ID = graph.addNode(v1, p1);
 			graph.addEdge(v0ID, v1ID);
-
-			// mark half-edge twin as visited
-			edge.twin()->color(VISITED_COLOR);
 		}
 
 		// create an R-tree to query nearest points/obstacle
@@ -182,7 +231,7 @@ namespace BWTA
 
 			nodeID v1 = *graph.adjacencyList.at(v0).begin();
 			// remove node if it's too close to an obstacle, or parent is farther to an obstacle
-			if (graph.minDistToObstacle.at(v0) < 5.0 
+			if (graph.minDistToObstacle.at(v0) < 6.0 
 				|| graph.minDistToObstacle.at(v0) - 0.9 <= graph.minDistToObstacle.at(v1)) 
 			{
 				graph.adjacencyList.at(v0).clear();

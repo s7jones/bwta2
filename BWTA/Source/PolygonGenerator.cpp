@@ -1,5 +1,7 @@
 #include "PolygonGenerator.h"
 
+#include <boost/geometry/extensions/algorithms/dissolve.hpp>
+
 namespace BWTA
 {
 	// To vectorize obstacles (unwalkable areas) we use the algorithm described in:
@@ -20,7 +22,7 @@ namespace BWTA
 			x = cx + searchDirection[tracingdirection][1];
 
 			// filter invalid position (out of range)
-			if (x < 0 || x >= width || y < 0 || y >= height) {
+			if (x < 0 || x >= height || y < 0 || y >= width) {
 				tracingdirection = (tracingdirection + 1) % 8;
 				continue;
 			}
@@ -75,8 +77,8 @@ namespace BWTA
 		int width = bitMap.getWidth();
 		int height = bitMap.getHeight();
 
-		for (cy = 0; cy < height; ++cy) {
-			for (cx = 0, labelId = 0; cx < width; ++cx) {
+		for (cy = 0; cy < width; ++cy) {
+			for (cx = 0, labelId = 0; cx < height; ++cx) {
 				if (!bitMap[cy][cx]) {
 					if (labelId != 0) { // use pre-pixel label
 						labelMap[cy][cx] = labelId;
@@ -121,7 +123,15 @@ namespace BWTA
 		}
 		// after anchoring we simplify again the polygon to remove unnecessary points
 		BoostPolygon simPolygon;
-		boost::geometry::simplify(polygon, simPolygon, 0.5);
+		std::vector<BoostPolygon> output;
+// 		LOG("Ready to perform union...");
+		boost::geometry::dissolve(polygon, output);
+// 		boost::geometry::union_(polygon, polygon, output);
+		if (output.size() != 1) {
+			LOG("ERROR: polygon simplification generated " << output.size()  << " polygons");
+		} else {
+			boost::geometry::simplify(output.at(0), polygon, 0.5);
+		}
 	}
 
 
@@ -140,13 +150,20 @@ namespace BWTA
 		for (const auto& contour : contours) {
 			BoostPolygon polygon, simPolygon;
 			boost::geometry::assign_points(polygon, contour);
-			// Uses Douglas-Peucker algorithm to simplify points in the polygon
-			// https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm
-			boost::geometry::simplify(polygon, simPolygon, 1.0);
-			anchorToBorder(simPolygon, MapData::walkability.getWidth(), MapData::walkability.getHeight());
-
 			// if polygon isn't too small, add it to the result
-			if (boost::geometry::area(simPolygon) > MIN_ARE_POLYGON) {
+			if (boost::geometry::area(polygon) > MIN_ARE_POLYGON) {
+				// Uses Douglas-Peucker algorithm to simplify points in the polygon
+				// https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm
+				boost::geometry::simplify(polygon, simPolygon, 1.0);
+				anchorToBorder(simPolygon, MapData::walkability.getWidth(), MapData::walkability.getHeight());
+			
+				if (!boost::geometry::is_simple(simPolygon)) {
+					LOG("Error, polygon not simple!!!!!!!!!!!!!!");
+				}
+				std::string message;
+				if (!boost::geometry::is_valid(simPolygon)) {
+					LOG("Error, polygon not valid!!!!!!!!!!!!!! => " << message);
+				}
 				// transform BOOST_Polygon to BWTA_Polygon
 				polygons.push_back(simPolygon);
 // 				Polygon BwtaPolygon;

@@ -12,7 +12,7 @@ void patfhindingTest();
 int main(int argc, char * argv[])
 {
 	// Off-line map file parsing
-	bool ok = BWTA::parseMapFile("maps\\(2)Destination.scx");
+	bool ok = BWTA::parseMapFile("maps\\(3)Aztec.scx");
 	if (!ok) return 1;
 	// Normal procedure to analyze map
 	BWTA::analyze();
@@ -29,8 +29,9 @@ int main(int argc, char * argv[])
 void patfhindingTest() {
 	BWTA::buildChokeNodes();
 
-	compareDistance(BWAPI::TilePosition(28, 116), BWAPI::TilePosition(69, 122));
-	compareDistance(BWAPI::TilePosition(32, 97), BWAPI::TilePosition(48, 64));
+	compareDistance(BWAPI::TilePosition(9, 84), BWAPI::TilePosition(69, 7));
+	compareDistance(BWAPI::TilePosition(9, 84), BWAPI::TilePosition(118, 101));
+	compareDistance(BWAPI::TilePosition(69, 7), BWAPI::TilePosition(118, 101));
 }
 
 void wallingTest()
