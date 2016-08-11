@@ -109,29 +109,29 @@ namespace BWTA
 
 	// anchor vertices near borders of the map to the border
 	// used to fix errors from simplify polygon
-	void anchorToBorder(BoostPolygon& polygon, int mapWidth, int mapHeight)
+	void anchorToBorder(BoostPolygon& polygon, const int maxX, const int maxY, const int maxMarginX, const int maxMarginY)
 	{
-		const int maxX = mapWidth - 1;
-		const int maxMarginX = maxX - ANCHOR_MARGIN;
-		const int maxY = mapHeight - 1;
-		const int maxMarginY = maxY - ANCHOR_MARGIN;
+		bool modified = false;
 		for (auto& vertex : polygon.outer()) {
-			if (vertex.x() <= ANCHOR_MARGIN) vertex.x(0);
-			if (vertex.y() <= ANCHOR_MARGIN) vertex.y(0);
-			if (vertex.x() >= maxMarginX) vertex.x(maxX);
-			if (vertex.y() >= maxMarginY) vertex.y(maxY);
+			if (vertex.x() <= ANCHOR_MARGIN) { modified = true; vertex.x(0); }
+			if (vertex.y() <= ANCHOR_MARGIN) { modified = true; vertex.y(0); }
+			if (vertex.x() >= maxMarginX) { modified = true; vertex.x(maxX); }
+			if (vertex.y() >= maxMarginY) { modified = true; vertex.y(maxY); }
 		}
 		// after anchoring we simplify again the polygon to remove unnecessary points
-		BoostPolygon simPolygon;
-		std::vector<BoostPolygon> output;
-// 		LOG("Ready to perform union...");
-		boost::geometry::dissolve(polygon, output);
-// 		boost::geometry::union_(polygon, polygon, output);
-		if (output.size() != 1) {
-			LOG("ERROR: polygon simplification generated " << output.size()  << " polygons");
-		} else {
-			boost::geometry::simplify(output.at(0), polygon, 0.5);
+		if (modified) {
+			BoostPolygon simPolygon;
+			boost::geometry::simplify(polygon, simPolygon, 1.0);
+			polygon = simPolygon;
 		}
+		
+// 		std::vector<BoostPolygon> output;
+// 		boost::geometry::dissolve(polygon, output);
+// 		if (output.size() != 1) {
+// 			LOG("ERROR: polygon simplification generated " << output.size()  << " polygons");
+// 		} else {
+// 			boost::geometry::simplify(output.at(0), polygon, 1.0);
+// 		}
 	}
 
 
@@ -146,7 +146,13 @@ namespace BWTA
 		LOG(" - Component-Labeling Map and Contours extracted in " << timer.stopAndGetTime() << " seconds");
 		timer.start();
 
+		const int maxX = MapData::walkability.getWidth() - 1;
+		const int maxY = MapData::walkability.getHeight() - 1;
+		const int maxMarginX = maxX - ANCHOR_MARGIN;
+		const int maxMarginY = maxY - ANCHOR_MARGIN;
+
 // 		boost::geometry::model::multi_polygon<BoostPolygon> polygons;
+// 		const auto& contour = contours.at(1);
 		for (const auto& contour : contours) {
 			BoostPolygon polygon, simPolygon;
 			boost::geometry::assign_points(polygon, contour);
@@ -154,9 +160,37 @@ namespace BWTA
 			if (boost::geometry::area(polygon) > MIN_ARE_POLYGON) {
 				// Uses Douglas-Peucker algorithm to simplify points in the polygon
 				// https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm
-				boost::geometry::simplify(polygon, simPolygon, 1.0);
-				anchorToBorder(simPolygon, MapData::walkability.getWidth(), MapData::walkability.getHeight());
-			
+				boost::geometry::simplify(polygon, simPolygon, 2.0);
+// 				LOG(" - Simplified polygon " << boost::geometry::dsv(simPolygon));
+
+				// If the starting-ending points are co-linear, this is a special case that is not simplified
+				// http://boost-geometry.203548.n3.nabble.com/Simplifying-polygons-with-co-linear-points-td3415757.html
+				// To avoid problems with borders, if the initial point is in the border, we rotate the points
+				// until we find one that it is not in the border (or all points explored)
+				// Notice that we may still have co-linear points, but not in the border.
+				const auto& p0 = simPolygon.outer().at(0);
+				if (p0.x() <= 0 || p0.x() >= maxX || p0.y() <= 0 || p0.y() >= maxY) {
+					// find index of not border point
+					size_t index = 0;
+					for (size_t i = 1; i < simPolygon.outer().size(); ++i) {
+						const auto& p1 = simPolygon.outer().at(i);
+						if (p1.x() > 0 && p1.x() < maxX && p1.y() > 0 && p1.y() < maxY) {
+							// not border point found
+							index = i;
+							break;
+						}
+					}
+					if (index != 0) {
+						auto& outerRing = simPolygon.outer();
+						std::rotate(outerRing.begin(), outerRing.begin() + index, outerRing.end());
+						outerRing.push_back(outerRing.at(0));
+					}
+// 					LOG(" - Rotated polygon " << boost::geometry::dsv(simPolygon));
+				}
+
+				anchorToBorder(simPolygon, maxX, maxY, maxMarginX, maxMarginY);
+// 				LOG(" -   Anchored polygon " << boost::geometry::dsv(simPolygon));
+
 				if (!boost::geometry::is_simple(simPolygon)) {
 					LOG("Error, polygon not simple!!!!!!!!!!!!!!");
 				}

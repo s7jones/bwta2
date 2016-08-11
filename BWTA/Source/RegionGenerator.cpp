@@ -5,6 +5,7 @@
 namespace BWTA
 {
 	static const std::size_t VISITED_COLOR = 1;
+	static const int SKIP_NEAR_BORDER = 3;
 
 	void addVerticalBorder(std::vector<VoronoiSegment>& segments, std::vector<BoostSegmentI>& rtreeSegments, size_t& idPoint, 
 		const std::set<int>& border, int x, int maxY)
@@ -85,7 +86,7 @@ namespace BWTA
 		int maxY = MapData::walkability.getHeight() - 1;
 
 		// Add the line segments of each polygon to VoronoiSegment list and points to R-tree points list
-// 		auto polygon = polygons.at(3);
+// 		auto polygon = polygons.at(1);
 		for (const auto& polygon : polygons) {
 			// Add the vertices of the polygon
 			size_t lastPoint = polygon.size() - 1;
@@ -96,7 +97,7 @@ namespace BWTA
 				if (polygon[i].y == 0) topBorder.insert(polygon[i].x);
 
 // 				int j = (i + 1) % polygon.size(); // TODO we don't need this if polygons are close (like Boost polygons)
-				int j = i + 1;
+				int j = i + 1; // Notice that polygons are closed, i.e. the last vertex is equal to the first
 
 // 				LOG("Segment (" << polygon[j].x << "," << polygon[j].y << ") to (" << polygon[i].x << "," << polygon[i].y << ")");
 				segments.push_back(VoronoiSegment(
@@ -129,7 +130,10 @@ namespace BWTA
 
 		BoostVoronoi voronoi;
 		boost::polygon::construct_voronoi(segments.begin(), segments.end(), &voronoi);
+		LOG(" - Voronoi constructed");
 
+		const int maxXborder = maxX - SKIP_NEAR_BORDER;
+		const int maxYborder = maxY - SKIP_NEAR_BORDER;
 
 		// traverse the Voronoi diagram and generate graph nodes and edges
 		for (const auto& edge : voronoi.edges()) {
@@ -143,12 +147,13 @@ namespace BWTA
 			BWAPI::WalkPosition p0((int)v0->x(), (int)v0->y());
 			BWAPI::WalkPosition p1((int)v1->x(), (int)v1->y());
 
-			// skip edge if any of its endpoints is inside an obstacle
-			if (labelMap[p0.x][p0.y] > 0 || labelMap[p1.x][p1.y] > 0) continue;
+			// skip edge if ...
+			// ... is outside map or near border
+			if (p0.x < SKIP_NEAR_BORDER || p0.x > maxXborder || p0.y < SKIP_NEAR_BORDER || p0.y >maxYborder
+				|| p1.x < SKIP_NEAR_BORDER || p1.x >maxXborder || p1.y < SKIP_NEAR_BORDER || p1.y >maxYborder) continue;
 
-			// skip if near border
-			if (p0.x < 4 || p0.x >(maxX - 4) || p0.y < 4 || p0.y >(maxY - 4)
-				|| p1.x < 4 || p1.x >(maxX - 4) || p1.y < 4 || p1.y >(maxY - 4)) continue;
+			// ... any of its endpoints is inside an obstacle
+			if (labelMap[p0.x][p0.y] > 0 || labelMap[p1.x][p1.y] > 0) continue;
 
 			nodeID v0ID = graph.addNode(v0, p0);
 			nodeID v1ID = graph.addNode(v1, p1);

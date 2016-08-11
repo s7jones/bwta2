@@ -93,14 +93,6 @@ namespace BWTA
 		Timer timer;
 		timer.start();
 
-		detectBaseLocations(BWTA_Result::baselocations);
-
-		LOG(" [Calculated base locations in " << timer.stopAndGetTime() << " seconds]");
-// 		for (auto i : BWTA_Result::baselocations) {
-// 			log("BaseLocation at Position " << i->getPosition() << " Tile " << i->getTilePosition());
-// 		}
-		timer.start();
-
 		// *************************************************
 		// OUR METHOD
 		// *************************************************
@@ -354,7 +346,7 @@ namespace BWTA
 				}
 			}
 		}
-		LOG(" - Added voronoi edges.");
+		LOG(" - Added Voronoi edges.");
 		// Color all the new edges BLUE
 		for (Arrangement_2::Edge_iterator eit = arr.edges_begin(); eit != arr.edges_end(); ++eit) {
 			if (eit->data() != BLACK) {
@@ -418,7 +410,7 @@ namespace BWTA
 		LOG(" - Merged regions.");
 
 		remove_voronoi_diagram_from_arrangement(&arr);
-		LOG(" - Removed voronoi edges.");
+		LOG(" - Removed Voronoi edges.");
 
 		LOG(" [Merged adjacent regions in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
@@ -513,9 +505,23 @@ namespace BWTA
 		// END BWTA ORIGINAL
 		// *************************************************
 */
-		calculate_connectivity();
-		calculateBaseLocationProperties();
 
+		exit(-1);
+
+		detectBaseLocations(BWTA_Result::baselocations);
+// 		for (auto i : BWTA_Result::baselocations) {
+// 			log("BaseLocation at Position " << i->getPosition() << " Tile " << i->getTilePosition());
+// 		}
+
+		LOG(" [Calculated base locations in " << timer.stopAndGetTime() << " seconds]");
+		timer.start();
+
+		calculate_connectivity();
+
+		LOG(" [Calculated connectivity in " << timer.stopAndGetTime() << " seconds]");
+		timer.start();
+
+		calculateBaseLocationProperties();
 // 		log("Debug BaseLocationProperties");
 // 		for (const auto& base : BWTA_Result::baselocations) {
 // 			BaseLocationImpl* baseI = (BaseLocationImpl*)base;
