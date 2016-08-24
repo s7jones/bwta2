@@ -20,9 +20,9 @@ namespace BWTA {
 		void render(const std::string& label = std::string());
 		void drawMapBorder();
 		void drawArrangement(Arrangement_2* arrangement);
-		void drawPolygon(Polygon& polygon, QColor color);
+		void drawPolygon(const Polygon& polygon, QColor color);
 		void drawPolygon(PolygonD& polygon, QColor color);
-		void drawPolygons(std::vector<Polygon>& polygons);
+		void drawPolygons(const std::vector<Polygon>& polygons);
 		void drawPolygons(std::set<Polygon*>& polygons);
 		void drawPolygons(const std::vector<BoostPolygon>& polygons);
 		void drawNodes(std::set<Node*> nodes, QColor color);

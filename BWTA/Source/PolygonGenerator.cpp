@@ -104,7 +104,6 @@ namespace BWTA
 				}
 			}
 		}
-// 		labelMap.saveToFile("logs/areaContours.txt");
 	}
 
 	// anchor vertices near borders of the map to the border
@@ -142,6 +141,7 @@ namespace BWTA
 
 		std::vector<Contour> contours;
 		connectedComponentLabeling(contours, MapData::walkability, labelMap);
+		labelMap.saveToFile("logs/labelMap.txt");
 
 		LOG(" - Component-Labeling Map and Contours extracted in " << timer.stopAndGetTime() << " seconds");
 		timer.start();
@@ -167,7 +167,7 @@ namespace BWTA
 				// http://boost-geometry.203548.n3.nabble.com/Simplifying-polygons-with-co-linear-points-td3415757.html
 				// To avoid problems with borders, if the initial point is in the border, we rotate the points
 				// until we find one that it is not in the border (or all points explored)
-				// Notice that we may still have co-linear points, but not in the border.
+				// Notice that we may still have co-linear points, but hopefully not in the border.
 				const auto& p0 = simPolygon.outer().at(0);
 				if (p0.x() <= 0 || p0.x() >= maxX || p0.y() <= 0 || p0.y() >= maxY) {
 					// find index of not border point
@@ -203,6 +203,11 @@ namespace BWTA
 // 				Polygon BwtaPolygon;
 // 				for (const auto& pos : simPolygon.outer()) BwtaPolygon.emplace_back((int)pos.x(), (int)pos.y());
 // 				polygons.push_back(BwtaPolygon);
+			} else {
+				// region discarded, relabel
+				const auto& p0 = polygon.outer().at(0);
+				int labelID = labelMap[(int)p0.x()][(int)p0.y()];
+				LOG("Discarded obstacle with label : " << labelID << " and area: " << boost::geometry::area(polygon));
 			}
 		}
 

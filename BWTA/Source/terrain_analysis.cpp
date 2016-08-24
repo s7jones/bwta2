@@ -145,7 +145,7 @@ namespace BWTA
 #endif
 		timer.start();
 
-		markRegionNodes(graph);
+		markRegionNodes(graph, polygons);
 
 		LOG(" [Identified region/chokepoints nodes in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW

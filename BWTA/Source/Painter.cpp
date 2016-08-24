@@ -93,7 +93,7 @@ namespace BWTA {
 		}
 	}
 
-	void Painter::drawPolygon(Polygon& polygon, QColor color) {
+	void Painter::drawPolygon(const Polygon& polygon, QColor color) {
 		QVector<QPointF> qp;
 		for (int i = 0; i < (int)polygon.size(); i++) {
 			int j = (i + 1) % polygon.size();
@@ -114,8 +114,8 @@ namespace BWTA {
 		painter->drawPolygon(QPolygonF(qp));
 	}
 
-	void Painter::drawPolygons(std::vector<Polygon>& polygons) {
-		for (auto& polygon : polygons) {
+	void Painter::drawPolygons(const std::vector<Polygon>& polygons) {
+		for (const auto& polygon : polygons) {
 			drawPolygon(polygon, QColor(180, 180, 180));
 			for (auto& hole : polygon.holes) {
 				drawPolygon(hole, QColor(255, 100, 255));

@@ -1,5 +1,6 @@
 #include "RegionGenerator.h"
 
+#include "Painter.h"
 #include <boost/geometry/index/rtree.hpp>
 
 namespace BWTA
@@ -96,7 +97,6 @@ namespace BWTA
 				else if (polygon[i].x == maxX) rightBorder.insert(polygon[i].y);
 				if (polygon[i].y == 0) topBorder.insert(polygon[i].x);
 
-// 				int j = (i + 1) % polygon.size(); // TODO we don't need this if polygons are close (like Boost polygons)
 				int j = i + 1; // Notice that polygons are closed, i.e. the last vertex is equal to the first
 
 // 				LOG("Segment (" << polygon[j].x << "," << polygon[j].y << ") to (" << polygon[i].x << "," << polygon[i].y << ")");
@@ -123,11 +123,6 @@ namespace BWTA
 		addVerticalBorder(segments, rtreeSegments, idPoint, rightBorder, maxX, maxY);
 		addHorizontalBorder(segments, rtreeSegments, idPoint, topBorder, 0, maxX);
 
-// 		std::vector<VoronoiSegment> borderSegments;
-// 		addVerticalBorder(borderSegments, rtreeSegments, idPoint, leftBorder, 0, maxY);
-// 		addVerticalBorder(borderSegments, rtreeSegments, idPoint, rightBorder, maxX, maxY);
-// 		addHorizontalBorder(borderSegments, rtreeSegments, idPoint, topBorder, 0, maxX);
-
 		BoostVoronoi voronoi;
 		boost::polygon::construct_voronoi(segments.begin(), segments.end(), &voronoi);
 		LOG(" - Voronoi constructed");
@@ -149,8 +144,8 @@ namespace BWTA
 
 			// skip edge if ...
 			// ... is outside map or near border
-			if (p0.x < SKIP_NEAR_BORDER || p0.x > maxXborder || p0.y < SKIP_NEAR_BORDER || p0.y >maxYborder
-				|| p1.x < SKIP_NEAR_BORDER || p1.x >maxXborder || p1.y < SKIP_NEAR_BORDER || p1.y >maxYborder) continue;
+// 			if (p0.x < SKIP_NEAR_BORDER || p0.x > maxXborder || p0.y < SKIP_NEAR_BORDER || p0.y >maxYborder
+// 				|| p1.x < SKIP_NEAR_BORDER || p1.x >maxXborder || p1.y < SKIP_NEAR_BORDER || p1.y >maxYborder) continue;
 
 			// ... any of its endpoints is inside an obstacle
 			if (labelMap[p0.x][p0.y] > 0 || labelMap[p1.x][p1.y] > 0) continue;
@@ -175,9 +170,9 @@ namespace BWTA
 
 	nodeID RegionGraph::addNode(const BoostVoronoi::vertex_type* vertex, const BWAPI::WalkPosition& pos)
 	{
+		nodeID vID;
 		// add new point if not present in the graph
 		auto vIt = voronoiVertexToNode.find(vertex);
-		nodeID vID;
 		if (vIt == voronoiVertexToNode.end()) {
 			voronoiVertexToNode[vertex] = vID = nodes.size();
 			nodes.push_back(pos);
@@ -191,9 +186,9 @@ namespace BWTA
 
 	nodeID RegionGraph::addNode(const BWAPI::WalkPosition& pos, const double& minDist)
 	{
+		nodeID vID;
 		// add new point if not present in the graph
 		auto it = std::find(nodes.begin(), nodes.end(), pos);
-		nodeID vID;
 		if (it == nodes.end()) {
 			vID = nodes.size();
 			nodes.push_back(pos);
@@ -248,9 +243,9 @@ namespace BWTA
 		}
 	}
 
-	void markRegionNodes(RegionGraph& graph)
+	void markRegionNodes(RegionGraph& graph, const std::vector<Polygon>& polygons)
 	{
-		const double MIN_RADII_DIFF = 2.5;
+		const double MIN_RADII_DIFF = 4.5;
 		struct parentNode_t {
 			nodeID id;
 			bool isMaximal;
@@ -267,13 +262,13 @@ namespace BWTA
 		// find a leaf node to start
 		for (size_t id = 0; id < graph.adjacencyList.size(); ++id) {
 			if (graph.adjacencyList.at(id).size() == 1) {
-				// mark node as graph
+				// mark node as Region
 				visited.at(id) = true;
 				graph.regionNodes.insert(id);
 				graph.nodeType.at(id) = RegionGraph::REGION;
 				parentNode.id = id; parentNode.isMaximal = true;
 				parentNodes.at(id) = parentNode;
-// 				LOG("Found leaf " << id << " at " << graph.nodes.at(id) << " with radii " << graph.minDistToObstacle.at(id));
+// 				LOG("REGION " << graph.nodes.at(id) << " radius " << graph.minDistToObstacle.at(id));
 				// add children to explore
 				for (const auto& v1 : graph.adjacencyList.at(id)) {
 					nodeToVisit.push(v1);
@@ -284,6 +279,9 @@ namespace BWTA
 			}
 		}
 
+		Painter painter;
+		int nodesDetected = 0;
+		int oldNodesDetected = 0;
 		while (!nodeToVisit.empty()) {
 			// pop first element
 			nodeID v0 = nodeToVisit.top();
@@ -292,72 +290,140 @@ namespace BWTA
 			parentNode = parentNodes.at(v0);
 
 			if (graph.adjacencyList.at(v0).size() != 2) {
-// 				if (parentNode.isMaximal && graph.minDistToObstacle.at(v0) > graph.minDistToObstacle.at(parentNode.id)) {
-// 					graph.regionNodes.erase(parentNode.id);
-// 					graph.nodeType.at(parentNode.id) = RegionGraph::NONE;
-// 				}
+// 				LOG("REGION !=2 " << graph.nodes.at(v0) << " radius: " << graph.minDistToObstacle.at(v0) << " parent: " << graph.minDistToObstacle.at(parentNode.id));
+				// if parent chokepoint too close, delete parent
+				if (graph.nodeType.at(parentNode.id) == RegionGraph::CHOKEPOINT
+					&& graph.nodes.at(v0).getApproxDistance(graph.nodes.at(parentNode.id)) < 10) {
+					graph.chokeNodes.erase(parentNode.id);
+					graph.nodeType.at(parentNode.id) = RegionGraph::NONE;
+				}
+				nodesDetected++;
 				graph.regionNodes.insert(v0);
 				graph.nodeType.at(v0) = RegionGraph::REGION;
 				parentNode.id = v0; parentNode.isMaximal = true;
-// 				LOG("Found leaf/connection " << v0 << " at " << graph.nodes.at(v0) << " with radii " << graph.minDistToObstacle.at(v0));
 			} else {
-				// look if the node is a local minimal (chokepoint node)
-				bool localMinimal = true;
-				for (const auto& v1 : graph.adjacencyList.at(v0)) {
-					if (graph.minDistToObstacle.at(v0) > graph.minDistToObstacle.at(v1)) {
-						localMinimal = false;
-						break;
-					}
-				}
-				if (localMinimal) {
-					if (!parentNode.isMaximal) {
-						// we have two consecutive minimals, keep the min
-						if (graph.minDistToObstacle.at(v0) < graph.minDistToObstacle.at(parentNode.id)) {
-// 							LOG("Found  better minimal " << v0 << " at " << graph.nodes.at(v0) << " with radii " << graph.minDistToObstacle.at(v0) << " and parent " << parentNode.id);
-							graph.chokeNodes.insert(v0);
-							graph.nodeType.at(v0) = RegionGraph::CHOKEPOINT;
-							graph.chokeNodes.erase(parentNode.id);
-							graph.nodeType.at(parentNode.id) = RegionGraph::NONE;
-							parentNode.id = v0; parentNode.isMaximal = false;
-						}
-					} else {
-						if (std::abs(graph.minDistToObstacle.at(v0) - graph.minDistToObstacle.at(parentNode.id)) > MIN_RADII_DIFF) {
-// 							LOG("Found minimal " << v0 << " at " << graph.nodes.at(v0) << " with radii " << graph.minDistToObstacle.at(v0)
-// 								<< " and parent " << parentNode.id << ":" << graph.minDistToObstacle.at(parentNode.id));
-							graph.chokeNodes.insert(v0);
-							graph.nodeType.at(v0) = RegionGraph::CHOKEPOINT;
-							parentNode.id = v0; parentNode.isMaximal = false;
-						}
-					}
-				} else {
-					// look if the node is a local maximal (region node)
-					bool localMaximal = true;
+				// only consider if point is NOT too close to parent
+				if (graph.nodes.at(v0).getApproxDistance(graph.nodes.at(parentNode.id)) > 10) {
+
+					// look if the node is a local minimal (chokepoint node)
+					bool localMinimal = true;
 					for (const auto& v1 : graph.adjacencyList.at(v0)) {
-						if (graph.minDistToObstacle.at(v0) < graph.minDistToObstacle.at(v1)) {
-							localMaximal = false;
+						if (graph.minDistToObstacle.at(v0) > graph.minDistToObstacle.at(v1)) {
+							localMinimal = false;
 							break;
 						}
 					}
-					if (localMaximal) {
-						if (parentNode.isMaximal) {
-							// we have two consecutive maximals, keep the max
-							if (graph.minDistToObstacle.at(v0) > graph.minDistToObstacle.at(parentNode.id)) {
-// 								LOG("Found better maximal " << v0 << " at " << graph.nodes.at(v0) << " with radii " << graph.minDistToObstacle.at(v0) << " and parent " << parentNode.id);
-								graph.regionNodes.insert(v0);
-								graph.nodeType.at(v0) = RegionGraph::REGION;
-								graph.regionNodes.erase(parentNode.id);
+					if (localMinimal) {
+						if (!parentNode.isMaximal) {
+							// we have two consecutive minimals
+							// if parent is CHOKE
+// 							if (graph.nodeType.at(parentNode.id) == RegionGraph::CHOKEPOINT) {
+// 								// if the new chokepoint is smaller, keep the new as CHOKEPOINT
+// 								if (graph.minDistToObstacle.at(v0) < graph.minDistToObstacle.at(parentNode.id)) {
+// 									graph.chokeNodes.erase(parentNode.id);
+// 									graph.nodeType.at(parentNode.id) = RegionGraph::NONE;
+// 
+// 									nodesDetected++;
+// 									graph.chokeNodes.insert(v0);
+// 									graph.nodeType.at(v0) = RegionGraph::CHOKEPOINT;
+// 									parentNode.id = v0; parentNode.isMaximal = false;
+// 								} else { // otherwise, parent becomes GATEA and this GATEB
+// 									graph.chokeNodes.erase(parentNode.id);
+// 									graph.gateNodesA.insert(parentNode.id);
+// 									graph.nodeType.at(parentNode.id) = RegionGraph::CHOKEGATEA;
+// 
+// 									nodesDetected++;
+// 									graph.gateNodesB.insert(v0);
+// 									graph.nodeType.at(v0) = RegionGraph::CHOKEGATEB;
+// 									parentNode.id = v0; parentNode.isMaximal = false;
+// 								}
+// 							}
+// 
+// 							// else if parent is GATEB, remove parent and keep this as GATEB
+// 							else if (graph.nodeType.at(parentNode.id) == RegionGraph::CHOKEGATEB) {
+// 								// TODO if between GATEA and GATEB there is too much difference ...
+// 								// ... we have a cone, keep only the smallest
+// 								graph.gateNodesB.erase(parentNode.id);
+// 								graph.nodeType.at(v0) = RegionGraph::NONE;
+// 
+// 								nodesDetected++;
+// 								graph.gateNodesB.insert(v0);
+// 								graph.nodeType.at(v0) = RegionGraph::CHOKEGATEB;
+// 								parentNode.id = v0; parentNode.isMaximal = false;
+// 							}
+
+							// keep the min
+							if (graph.minDistToObstacle.at(v0) < graph.minDistToObstacle.at(parentNode.id)) {
+// 								LOG("CHOKE (better consecutive) " << graph.nodes.at(v0) << " radius: " << graph.minDistToObstacle.at(v0) << " parent: " << graph.minDistToObstacle.at(parentNode.id));
+								graph.chokeNodes.erase(parentNode.id);
 								graph.nodeType.at(parentNode.id) = RegionGraph::NONE;
-								parentNode.id = v0; parentNode.isMaximal = true;
-// 								parentNodes.at(v0) = parentNode;
+								
+								nodesDetected++;
+								graph.chokeNodes.insert(v0);
+								graph.nodeType.at(v0) = RegionGraph::CHOKEPOINT;
+								parentNode.id = v0; parentNode.isMaximal = false;
 							}
-						} else {
+						} else { // parent is maximal
 							if (std::abs(graph.minDistToObstacle.at(v0) - graph.minDistToObstacle.at(parentNode.id)) > MIN_RADII_DIFF) {
-// 								LOG("Found maximal " << v0 << " at " << graph.nodes.at(v0) << " with radii " << graph.minDistToObstacle.at(v0)
-// 									<< " and parent " << parentNode.id << ":" << graph.minDistToObstacle.at(parentNode.id));
-								graph.regionNodes.insert(v0);
-								graph.nodeType.at(v0) = RegionGraph::REGION;
-								parentNode.id = v0; parentNode.isMaximal = true;
-// 								parentNodes.at(v0) = parentNode;
+// 								LOG("CHOKEPOINT " << graph.nodes.at(v0) << " radius: " << graph.minDistToObstacle.at(v0) << " parent: " << graph.minDistToObstacle.at(parentNode.id)
+// 									<< " diff: " << std::abs(graph.minDistToObstacle.at(v0) - graph.minDistToObstacle.at(parentNode.id)));
+								nodesDetected++;
+								// TODO if parent of parent is gateA this is gateB
+								graph.chokeNodes.insert(v0);
+								graph.nodeType.at(v0) = RegionGraph::CHOKEPOINT;
+								parentNode.id = v0; parentNode.isMaximal = false;
+							} else {
+								// the radius difference is too small, we mark the node as a "choke-gate"
+// 								LOG("CHOKEGATE " << graph.nodes.at(v0) << " radius: " << graph.minDistToObstacle.at(v0) << " parent: " << graph.minDistToObstacle.at(parentNode.id)
+// 									<< " diff: " << std::abs(graph.minDistToObstacle.at(v0) - graph.minDistToObstacle.at(parentNode.id)));
+// 								nodesDetected++;
+// 								graph.gateNodes.insert(v0);
+// 								graph.nodeType.at(v0) = RegionGraph::CHOKEGATE;
+// 								parentNode.id = v0; parentNode.isMaximal = false;
+							}
+						}
+					} else {
+						// look if the node is a local maximal (region node)
+						bool localMaximal = true;
+						for (const auto& v1 : graph.adjacencyList.at(v0)) {
+							if (graph.minDistToObstacle.at(v0) < graph.minDistToObstacle.at(v1)) {
+								localMaximal = false;
+								break;
+							}
+						}
+						if (localMaximal) {
+							if (parentNode.isMaximal) {
+								// we have two consecutive maximals, keep the max
+								if (graph.minDistToObstacle.at(v0) > graph.minDistToObstacle.at(parentNode.id)) {
+// 									LOG("REGION (better consecutive) " << graph.nodes.at(v0) << " radius: " << graph.minDistToObstacle.at(v0) << " parent: " << graph.minDistToObstacle.at(parentNode.id));
+									// only delete parent if size == 2
+									if (graph.adjacencyList.at(parentNode.id).size() == 2) {
+										graph.regionNodes.erase(parentNode.id);
+										graph.nodeType.at(parentNode.id) = RegionGraph::NONE;
+									}
+									nodesDetected++;
+									graph.regionNodes.insert(v0);
+									graph.nodeType.at(v0) = RegionGraph::REGION;
+									parentNode.id = v0; parentNode.isMaximal = true;
+								}
+							} else { // parent is minimal
+								if (std::abs(graph.minDistToObstacle.at(v0) - graph.minDistToObstacle.at(parentNode.id)) > MIN_RADII_DIFF) {
+// 									LOG("REGION " << graph.nodes.at(v0) << " radius: " << graph.minDistToObstacle.at(v0) << " parent: " << graph.minDistToObstacle.at(parentNode.id)
+// 										<< " diff: " << std::abs(graph.minDistToObstacle.at(v0) - graph.minDistToObstacle.at(parentNode.id)));
+									nodesDetected++;
+									graph.regionNodes.insert(v0);
+									graph.nodeType.at(v0) = RegionGraph::REGION;
+									parentNode.id = v0; parentNode.isMaximal = true;
+								} else {
+									// the radius difference is too small, if parent is a "choke-gate" we add it
+// 									if (graph.nodeType.at(parentNode.id) == RegionGraph::CHOKEGATEA) {
+// 										LOG("REGION (parent chokegateA) " << graph.nodes.at(v0) << " radius: " << graph.minDistToObstacle.at(v0) << " parent: " << graph.minDistToObstacle.at(parentNode.id));
+// 										nodesDetected++;
+// 										graph.regionNodes.insert(v0);
+// 										graph.nodeType.at(v0) = RegionGraph::REGION;
+// 										parentNode.id = v0; parentNode.isMaximal = true;
+// 									}
+								}
 							}
 						}
 					}
@@ -372,6 +438,20 @@ namespace BWTA
 					parentNodes.at(v1) = parentNode;
 				}
 			}
+
+// #ifdef DEBUG_DRAW
+// 			// iterative drawing of nodes detected
+// 			if (oldNodesDetected != nodesDetected) {
+// 				painter.drawPolygons(polygons);
+// 				painter.drawGraph(graph);
+// 				painter.drawNodes(graph, graph.regionNodes, Qt::blue);
+// 				painter.drawNodes(graph, graph.chokeNodes, Qt::red);
+// 				painter.drawNodes(graph, graph.gateNodesA, Qt::green);
+// 				painter.drawNodes(graph, graph.gateNodesB, Qt::darkGreen);
+// 				painter.render();
+// 				oldNodesDetected = nodesDetected;
+// 			}
+// #endif
 		}
 	}
 
@@ -386,71 +466,83 @@ namespace BWTA
 
 	void simplifyRegionGraph(const RegionGraph& graph, RegionGraph& graphSimplified)
 	{
-		struct nodeInfo_t {
-			nodeID id;
-			nodeID parentId;
-			nodeID parentAbstractId;
-			nodeInfo_t(nodeID _id, nodeID _parentId, nodeID _parentAbstractId) : id(_id), parentId(_parentId), parentAbstractId(_parentAbstractId) {}
-		};
-		// container to mark visited nodes, and parent list
-		std::vector<size_t> visited;
+		// containers to mark visited nodes, and parent list
+		std::vector<bool> visited;
 		visited.resize(graph.nodes.size());
+		std::vector<nodeID> parentID;
+		parentID.resize(graph.nodes.size());
 
-		std::stack<nodeInfo_t> nodeToVisit;
+		std::stack<nodeID> nodeToVisit;
 		// start with one region node
 		nodeID id = *graph.regionNodes.begin();
-		visited.at(id) += 1;
-		nodeID id0 = graphSimplified.addNode(graph.nodes.at(id), graph.minDistToObstacle.at(id));
-		graphSimplified.regionNodes.insert(id0);
-		graphSimplified.nodeType.at(id0) = RegionGraph::REGION;
+		visited.at(id) = true;
+		nodeID newId = graphSimplified.addNode(graph.nodes.at(id), graph.minDistToObstacle.at(id));
+		graphSimplified.regionNodes.insert(newId);
+		graphSimplified.nodeType.at(newId) = RegionGraph::REGION;
 
 		// add children to explore
 		for (const auto& v1 : graph.adjacencyList.at(id)) {
-			nodeToVisit.emplace(v1, id, id0);
-			visited.at(v1) += 1;
+			nodeToVisit.emplace(v1);
+			visited.at(v1) = true;
+			parentID.at(v1) = newId;
 		}
 
 		while (!nodeToVisit.empty()) {
 			// pop first element
-			nodeInfo_t cNode = nodeToVisit.top();
+			nodeID nodeId = nodeToVisit.top();
 			nodeToVisit.pop();
-			// get parent
-			nodeID parentAbstractId = cNode.parentAbstractId;
+			nodeID parentId = parentID.at(nodeId);
 
-			if (graph.nodeType.at(cNode.id) == RegionGraph::CHOKEPOINT) {
-				nodeID v1 = graphSimplified.addNode(graph.nodes.at(cNode.id), graph.minDistToObstacle.at(cNode.id));
-				graphSimplified.addEdge(v1, parentAbstractId);
-				graphSimplified.chokeNodes.insert(v1);
-				graphSimplified.nodeType.at(v1) = RegionGraph::CHOKEPOINT;
-				parentAbstractId = v1;
-			} else if (graph.nodeType.at(cNode.id) == RegionGraph::REGION) {
-				nodeID v1 = graphSimplified.addNode(graph.nodes.at(cNode.id), graph.minDistToObstacle.at(cNode.id));
-				graphSimplified.addEdge(v1, parentAbstractId);
-				graphSimplified.regionNodes.insert(v1);
-				graphSimplified.nodeType.at(v1) = RegionGraph::REGION;
-				parentAbstractId = v1;
+			if (graph.nodeType.at(nodeId) == RegionGraph::CHOKEPOINT) {
+				nodeID newId = graphSimplified.addNode(graph.nodes.at(nodeId), graph.minDistToObstacle.at(nodeId));
+				if (newId != parentId) { // to avoid self inclusions
+					graphSimplified.chokeNodes.insert(newId);
+					graphSimplified.nodeType.at(newId) = RegionGraph::CHOKEPOINT;
+					graphSimplified.addEdge(newId, parentId);
+					parentId = newId;
+				}
+			} else if (graph.nodeType.at(nodeId) == RegionGraph::REGION) {
+				nodeID newId = graphSimplified.addNode(graph.nodes.at(nodeId), graph.minDistToObstacle.at(nodeId));
+				if (newId != parentId) { // to avoid self inclusions
+					graphSimplified.regionNodes.insert(newId);
+					graphSimplified.nodeType.at(newId) = RegionGraph::REGION;
+					graphSimplified.addEdge(newId, parentId);
+					parentId = newId;
+				}
 			}
 
 			// keep exploring unvisited neighbors
-			for (const auto& v1 : graph.adjacencyList.at(cNode.id)) {
-				// to "cut" infinite loops, a node can be explored at most its degree
-				if (v1 != cNode.parentId && visited.at(v1) < graph.adjacencyList.at(v1).size()) {
-					nodeToVisit.emplace(v1, cNode.id, parentAbstractId);
-					visited.at(v1) += 1;
+			for (const auto& v1 : graph.adjacencyList.at(nodeId)) {
+				if (!visited.at(v1) 
+					|| (graph.nodeType.at(v1) != RegionGraph::NONE && graph.nodeType.at(v1) != graph.nodeType.at(nodeId))){
+					nodeToVisit.emplace(v1);
+					parentID.at(v1) = parentId;
+					visited.at(v1) = true;
+				} else 
+					// if to paths with different parents meet together, add the edge between the parents
+					if (graph.nodeType.at(v1) == RegionGraph::NONE && graph.nodeType.at(nodeId) == RegionGraph::NONE
+					&& parentID.at(v1) != parentID.at(nodeId)) {
+					graphSimplified.addEdge(parentID.at(v1), parentID.at(nodeId));
 				}
 			}
 		}
+
 
 		// Second loop to merge connected regions
 		std::set<nodeID> mergeRegions(graphSimplified.regionNodes);
 
 		while (!mergeRegions.empty()) {
+// 			LOG("Graph size: " << mergeRegions.size());
 			// pop first element
 			nodeID v0 = *mergeRegions.begin();
 			mergeRegions.erase(mergeRegions.begin());
 
 			for (auto& it = graphSimplified.adjacencyList.at(v0).begin(); it != graphSimplified.adjacencyList.at(v0).end();) {
 				nodeID v1 = *it;
+				if (v0 == v1) { // This is a self-loop, remove it
+					it = graphSimplified.adjacencyList.at(v0).erase(it);
+					continue;
+				}
 				if (graphSimplified.nodeType.at(v0) == RegionGraph::REGION
 					&& graphSimplified.nodeType.at(v1) == RegionGraph::REGION) 
 				{
@@ -472,6 +564,12 @@ namespace BWTA
 // 						LOG(v1 << " erased, " << v0 << " keeped");
 						// restart iterator
 						it = graphSimplified.adjacencyList.at(v0).begin();
+// #ifdef DEBUG_DRAW
+// 						painter.drawGraph(graphSimplified);
+// 						painter.drawNodes(graphSimplified, graphSimplified.regionNodes, Qt::blue);
+// 						painter.drawNodes(graphSimplified, graphSimplified.chokeNodes, Qt::red);
+// 						painter.render();
+// #endif
 					} else {
 						// keep v1
 						graphSimplified.adjacencyList.at(v1).insert(graphSimplified.adjacencyList.at(v0).begin(),
@@ -488,6 +586,12 @@ namespace BWTA
 // 						LOG(v0 << " erased, " << v1 << " keeped");
 						// v1 should be re-analyzed
 						mergeRegions.insert(v1);
+// #ifdef DEBUG_DRAW
+// 						painter.drawGraph(graphSimplified);
+// 						painter.drawNodes(graphSimplified, graphSimplified.regionNodes, Qt::blue);
+// 						painter.drawNodes(graphSimplified, graphSimplified.chokeNodes, Qt::red);
+// 						painter.render();
+// #endif
 						break;
 					}
 				} else {
