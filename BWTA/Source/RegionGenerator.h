@@ -47,7 +47,7 @@ namespace BWTA
 	void pruneGraph(RegionGraph& graph);
 	void markRegionNodes(RegionGraph& graph, const std::vector<Polygon>& polygons);
 	void simplifyRegionGraph(const RegionGraph& graph, RegionGraph& graphSimplified);
-	void getChokepointSides(const RegionGraph& graph, const bgi::rtree<BoostSegmentI, bgi::quadratic<16> >& rtree, std::map<nodeID, chokeSides_t>& chokepointSides);
+	void getChokepointSides(const std::vector<Polygon>& polygons, const RegionGraph& graph, const bgi::rtree<BoostSegmentI, bgi::quadratic<16> >& rtree, std::map<nodeID, chokeSides_t>& chokepointSides);
 	void createRegionsFromGraph(const std::vector<BoostPolygon>& polygons, const RectangleArray<int>& labelMap,
 		const RegionGraph& graph, const std::map<nodeID, chokeSides_t>& chokepointSides,
 		std::set<Region*>& regions, std::set<Chokepoint*>& chokepoints,

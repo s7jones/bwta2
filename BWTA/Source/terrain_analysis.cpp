@@ -152,13 +152,8 @@ namespace BWTA
 		painter.drawPolygons(polygons);
 		painter.drawGraph(graph);
 		painter.drawNodes(graph, graph.regionNodes, Qt::blue);
-		painter.render("4-RegionNodes");
-
-		painter.drawPolygons(polygons);
-		painter.drawGraph(graph);
-		painter.drawNodes(graph, graph.regionNodes, Qt::blue);
 		painter.drawNodes(graph, graph.chokeNodes, Qt::red);
-		painter.render("5-ChokepointsNodes");
+		painter.render("5-NodesDetected");
 #endif
 		timer.start();
 
@@ -176,7 +171,7 @@ namespace BWTA
 		timer.start();
 
 		std::map<nodeID, chokeSides_t> chokepointSides;
-		getChokepointSides(graphSimplified, rtree, chokepointSides);
+		getChokepointSides(polygons, graphSimplified, rtree, chokepointSides);
 
 		LOG(" [Wall of chokepoints in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW

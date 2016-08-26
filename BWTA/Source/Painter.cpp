@@ -464,5 +464,14 @@ namespace BWTA {
 		}
 	}
 
+	void Painter::drawLine(const BoostSegment& seg, QColor color) {
+		QPen qp(color);
+		qp.setWidth(2);
+		painter->setPen(qp);
+		painter->setBrush(QBrush(color));
+		painter->drawLine(seg.first.x(), seg.first.y(), seg.second.x(), seg.second.y());
+	}
+
+
 }
 #endif

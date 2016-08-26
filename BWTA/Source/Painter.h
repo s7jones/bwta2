@@ -35,6 +35,7 @@ namespace BWTA {
 		void drawGraph(const RegionGraph& graph);
 		void drawNodes(const RegionGraph& graph, const std::set<nodeID>& nodes, QColor color);
 		void drawLines(std::map<nodeID, chokeSides_t> chokepointSides, QColor color);
+		void drawLine(const BoostSegment& seg, QColor color);
 
 	private:
 		QPainter* painter;
