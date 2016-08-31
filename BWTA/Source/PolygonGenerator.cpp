@@ -4,6 +4,66 @@
 
 namespace BWTA
 {
+	struct holeLabel_t {
+		Contour ring;
+		int labelID;
+		holeLabel_t(Contour _ring, int id) : labelID(id), ring(_ring) {}
+	};
+
+	void scanLineFill(Contour contour, const int& labelID, RectangleArray<int>& labelMap, RectangleArray<bool>& nodeMap) {
+		// Detect nodes for scan-line fill algorithm (avoiding edges)
+		contour.pop_back(); // since first and last point are the same
+		BoostPoint left = contour.back();
+		BoostPoint pos, right;
+		size_t last = contour.size() - 1;
+		for (size_t i = 0; i < last; ++i) {
+			pos = contour.at(i);
+			right = contour.at(i + 1);
+			if ((left.y() <= pos.y() && right.y() <= pos.y()) ||
+				(left.y() > pos.y() && right.y() > pos.y()))
+			{ // we have an edge
+// 				labelMap[(int)pos.x()][(int)pos.y()] = 9;
+			} else { // we have a node
+// 				labelMap[(int)pos.x()][(int)pos.y()] = 8;
+				nodeMap[(int)pos.x()][(int)pos.y()] = true;
+			}
+			left = pos;
+		}
+		// check last element
+		pos = contour.back();
+		right = contour.front();
+		if ((left.y() <= pos.y() && right.y() <= pos.y()) ||
+			(left.y() > pos.y() && right.y() > pos.y()))
+		{ // we have an edge
+// 			labelMap[(int)pos.x()][(int)pos.y()] = 9;
+		} else { // we have a node
+// 			labelMap[(int)pos.x()][(int)pos.y()] = 8;
+			nodeMap[(int)pos.x()][(int)pos.y()] = true;
+		}
+
+		// find bounding box of polygon
+		size_t maxX = 0;
+		size_t minX = labelMap.getWidth();
+		size_t maxY = 0;
+		size_t minY = labelMap.getHeight();
+		for (const auto& pos : contour) {
+			maxX = std::max(maxX, (size_t)pos.x());
+			minX = std::min(minX, (size_t)pos.x());
+			maxY = std::max(maxY, (size_t)pos.y());
+			minY = std::min(minY, (size_t)pos.y());
+		}
+
+		// iterate though the bounding box using a scan-line algorithm to fill the polygon
+		bool toFill;
+		for (size_t posY = minY; posY < maxY; ++posY) {
+			toFill = false;
+			for (size_t posX = minX; posX < maxX; ++posX) {
+				if (toFill) labelMap[posX][posY] = labelID;
+				if (nodeMap[posX][posY]) toFill = !toFill;
+			}
+		}
+	}
+
 	// To vectorize obstacles (unwalkable areas) we use the algorithm described in:
 	// "A Linear-Time Component-Labeling Algorithm Using Contour Tracing Technique" Chang et al.
 	// http://ocrwks11.iis.sinica.edu.tw/~dar/Download/Papers/Component/component_labeling_cviu.pdf
@@ -76,6 +136,7 @@ namespace BWTA
 		int cy, cx, tracingDirection, connectedComponentsCount = 0, labelId = 0;
 		int width = bitMap.getWidth();
 		int height = bitMap.getHeight();
+		std::vector<holeLabel_t> holesToLabel;
 
 		for (cy = 0; cy < width; ++cy) {
 			for (cx = 0, labelId = 0; cx < height; ++cx) {
@@ -97,12 +158,27 @@ namespace BWTA
 					if (labelMap[cy][cx] == 0) {
 						tracingDirection = 1;
 						// internal contour
-						// TODO a polygon can have walkable polygons as "holes", save them
-						contourTracing(cy, cx - 1, labelId, tracingDirection, labelMap, bitMap);
+						Contour hole = contourTracing(cy, cx - 1, labelId, tracingDirection, labelMap, bitMap);
+						BoostPolygon polygon;
+						boost::geometry::assign_points(polygon, hole);
+						// if polygon isn't too small, add it to the result
+						if (boost::geometry::area(polygon) > MIN_ARE_POLYGON) {
+							// TODO a polygon can have walkable polygons as "holes", save them
+							LOG(" - Found big HOLE");
+						} else {
+							// "remove" the hole filling it with the polygon label
+							holesToLabel.emplace_back(hole, labelId);
+						}
 					}
 					labelId = 0;
 				}
 			}
+		}
+
+		RectangleArray<bool> nodeMap(width, height);
+		nodeMap.setTo(false);
+		for (auto& holeToLabel : holesToLabel) {
+			scanLineFill(holeToLabel.ring, holeToLabel.labelID, labelMap, nodeMap);
 		}
 	}
 
@@ -141,7 +217,7 @@ namespace BWTA
 
 		std::vector<Contour> contours;
 		connectedComponentLabeling(contours, MapData::walkability, labelMap);
-		labelMap.saveToFile("logs/labelMap.txt");
+// 		labelMap.saveToFile("logs/labelMap.txt");
 
 		LOG(" - Component-Labeling Map and Contours extracted in " << timer.stopAndGetTime() << " seconds");
 		timer.start();
@@ -150,6 +226,9 @@ namespace BWTA
 		const int maxY = MapData::walkability.getHeight() - 1;
 		const int maxMarginX = maxX - ANCHOR_MARGIN;
 		const int maxMarginY = maxY - ANCHOR_MARGIN;
+
+		RectangleArray<bool> nodeMap(labelMap.getWidth(), labelMap.getHeight());
+		nodeMap.setTo(false);
 
 // 		boost::geometry::model::multi_polygon<BoostPolygon> polygons;
 // 		const auto& contour = contours.at(1);
@@ -205,11 +284,15 @@ namespace BWTA
 // 				polygons.push_back(BwtaPolygon);
 			} else {
 				// region discarded, relabel
-				const auto& p0 = polygon.outer().at(0);
-				int labelID = labelMap[(int)p0.x()][(int)p0.y()];
-				LOG("Discarded obstacle with label : " << labelID << " and area: " << boost::geometry::area(polygon));
+// 				const auto& p0 = polygon.outer().at(0);
+// 				int labelID = labelMap[(int)p0.x()][(int)p0.y()];
+// 				LOG("Discarded obstacle with label : " << labelID << " and area: " << boost::geometry::area(polygon));
+				// TODO, still has some inaccuracies....
+				scanLineFill(contour, 0, labelMap, nodeMap);
 			}
 		}
+
+// 		labelMap.saveToFile("logs/labelMap.txt");
 
 		LOG(" - Vectorized areas in " << timer.stopAndGetTime() << " seconds");
 		
