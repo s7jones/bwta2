@@ -279,9 +279,9 @@ namespace BWTA
 			}
 		}
 
-// #ifdef DEBUG_DRAW
-// 		Painter painter;
-// #endif
+#ifdef DEBUG_DRAW
+		Painter painter;
+#endif
 		int nodesDetected = 0;
 		int oldNodesDetected = 0;
 
@@ -466,6 +466,10 @@ namespace BWTA
 
 	void simplifyRegionGraph(const RegionGraph& graph, RegionGraph& graphSimplified)
 	{
+
+#ifdef DEBUG_DRAW
+		Painter painter;
+#endif
 		// containers to mark visited nodes, and parent list
 		std::vector<bool> visited;
 		visited.resize(graph.nodes.size());
@@ -511,22 +515,40 @@ namespace BWTA
 				}
 			}
 
+// 			std::stringstream toPrint;
+// 			for (const auto& v1 : graph.adjacencyList.at(nodeId)) toPrint << v1 << ",";
+// 			LOG("OUT " << nodeId << " CHILDREN: " << toPrint.str());
+
 			// keep exploring unvisited neighbors
 			for (const auto& v1 : graph.adjacencyList.at(nodeId)) {
-				if (!visited.at(v1) 
-					|| (graph.nodeType.at(v1) != RegionGraph::NONE && graph.nodeType.at(v1) != graph.nodeType.at(nodeId))){
+				if (!visited.at(v1) ){
 					nodeToVisit.emplace(v1);
 					parentID.at(v1) = parentId;
 					visited.at(v1) = true;
-				} else 
+// 					LOG("IN " << v1);
+				} else if (parentID.at(v1) != parentID.at(nodeId)) {
 					// if to paths with different parents meet together, add the edge between the parents
-					if (graph.nodeType.at(v1) == RegionGraph::NONE && graph.nodeType.at(nodeId) == RegionGraph::NONE
-					&& parentID.at(v1) != parentID.at(nodeId)) {
-					graphSimplified.addEdge(parentID.at(v1), parentID.at(nodeId));
+					nodeID n1 = parentID.at(v1);
+					if (graph.nodeType.at(v1) != RegionGraph::NONE) { // get their own ID
+						n1 = graphSimplified.addNode(graph.nodes.at(v1), graph.minDistToObstacle.at(v1));
+					}
+					nodeID n2 = parentID.at(nodeId);
+					if (graph.nodeType.at(nodeId) != RegionGraph::NONE) { // get their own ID
+						n2 = graphSimplified.addNode(graph.nodes.at(nodeId), graph.minDistToObstacle.at(nodeId));
+					}
+					if (n1 != n2) {
+						graphSimplified.addEdge(n1, n2);
+					}
 				}
 			}
 		}
 
+#ifdef DEBUG_DRAW
+		painter.drawGraph(graphSimplified);
+		painter.drawNodes(graphSimplified, graphSimplified.regionNodes, Qt::blue);
+		painter.drawNodes(graphSimplified, graphSimplified.chokeNodes, Qt::red);
+		painter.render("5-NodesSimplified");
+#endif
 
 		// Second loop to merge connected regions
 		std::set<nodeID> mergeRegions(graphSimplified.regionNodes);
