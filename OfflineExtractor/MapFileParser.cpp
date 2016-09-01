@@ -484,7 +484,7 @@ namespace BWTA
 		MapData::rawWalkability.resize(MapData::mapWidthWalkRes, MapData::mapHeightWalkRes);
 		setOfflineWalkability(MapData::rawWalkability);
 		// Test walkability data
-		MapData::rawWalkability.saveToFile("logs/walkable.txt");
+		MapData::rawWalkability.saveToFile("logs/rawWalkability.txt");
 
 
 		// Set buildability

@@ -121,10 +121,11 @@ namespace BWTA
 		for (auto unit : MapData::staticNeutralBuildings) {
 			unitType = unit.first;
 			// get build area (the position is in the middle of the unit)
-			x1 = (unit.second.x / 8) - (unitType.tileWidth() * 2);
-			y1 = (unit.second.y / 8) - (unitType.tileHeight() * 2);
-			x2 = x1 + unitType.tileWidth() * 4;
-			y2 = y1 + unitType.tileHeight() * 4;
+			// we also expand the square by 2 pixels to make sure it touches any map border (like in (2)Heartbreak_Ridge.scx)
+			x1 = (unit.second.x / 8) - (unitType.tileWidth() * 2) - 2;
+			y1 = (unit.second.y / 8) - (unitType.tileHeight() * 2) - 2;
+			x2 = x1 + (unitType.tileWidth() * 4) + 4;
+			y2 = y1 + (unitType.tileHeight() * 4) + 4;
 			// sanitize
 			if (x1 < 0) x1 = 0;
 			if (y1 < 0) y1 = 0;
@@ -145,6 +146,7 @@ namespace BWTA
 		}
 
 #ifdef OFFLINE
+		BWTA::MapData::walkability.saveToFile("logs/walkability.txt");
 		BWTA::MapData::lowResWalkability.saveToFile("logs/lowResWalkability.txt");
 #endif
 
