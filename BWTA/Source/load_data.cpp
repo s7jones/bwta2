@@ -11,6 +11,16 @@ using namespace std;
 using namespace BWAPI;
 namespace BWTA
 {
+
+	struct square_t {
+		size_t minX;
+		size_t maxX;
+		size_t minY;
+		size_t maxY;
+		square_t(size_t _minX, size_t _maxX, size_t _minY, size_t _maxY) :
+			maxX(_maxX), minX(_minX), maxY(_maxY), minY(_minY) {}
+	};
+
 	void loadMapFromBWAPI()
 	{
 		// load map name
@@ -104,13 +114,47 @@ namespace BWTA
 		MapData::walkability.resize(MapData::mapWidthWalkRes, MapData::mapHeightWalkRes);
 		MapData::walkability.setTo(true);
 
-		for (int x = 0; x < MapData::mapWidthWalkRes; x++) {
-			for (int y = 0; y < MapData::mapHeightWalkRes; y++) {
-				for (int x2 = std::max(x - 1, 0); x2 <= std::min(MapData::mapWidthWalkRes - 1, x + 1); x2++) {
-					for (int y2 = std::max(y - 1, 0); y2 <= std::min(MapData::mapHeightWalkRes - 1, y + 1); y2++) {
-						MapData::walkability[x2][y2] &= MapData::rawWalkability[x][y];
-					}
+		size_t maxWidth2 = MapData::mapWidthWalkRes - 2;
+		size_t maxHeight2 = MapData::mapHeightWalkRes - 2;
+		size_t maxWidth1 = MapData::mapWidthWalkRes - 1;
+		size_t maxHeight1 = MapData::mapHeightWalkRes - 1;
+
+		for (size_t x = 0; x < MapData::mapWidthWalkRes; ++x) {
+			for (size_t y = 0; y < MapData::mapHeightWalkRes; ++y) {
+				// the smallest unit size is 16x16 pixels (Zerglings), that is 2x2 walk tiles
+				// to be safe, we check if there is room for a generic small unit (3x3 walk tiles) in the 4 corners
+				std::vector<square_t> boxes;
+				// top left corner
+				if (x >= 2 && y >= 2) boxes.emplace_back(x - 2, x, y - 2, y);
+				// top right corner
+				if (x < maxWidth2 && y >= 2) boxes.emplace_back(x, x + 2, y - 2, y);
+				// bottom left corner
+				if (x >= 2 && y < maxHeight2) boxes.emplace_back(x - 2, x, y, y + 2);
+				// bottom right corner
+				if (x < maxWidth2 && y < maxHeight2) boxes.emplace_back(x, x + 2, y, y + 2);
+				// middle
+				if (x >= 1 && y >= 1 && x < maxWidth1 && y < maxHeight1) {
+					boxes.emplace_back(x - 1, x + 1, y - 1, y + 1);
 				}
+				bool cornerWalkable = true;
+				for (const auto& box : boxes) {
+					cornerWalkable = true;
+					for (size_t x2 = box.minX; x2 <= box.maxX; ++x2) {
+						for (size_t y2 = box.minY; y2 <= box.maxY; ++y2) {
+							cornerWalkable &= MapData::rawWalkability[x2][y2];
+						}
+					}
+					if (cornerWalkable) break;
+				}
+				MapData::walkability[x][y] = cornerWalkable;
+
+// 				for (int x2 = std::max(x - 1, minSize); x2 <= std::min(maxWidth, x + 1); x2++) {
+// 					for (int y2 = std::max(y - 1, minSize); y2 <= std::min(maxHeight, y + 1); y2++) {
+// 						MapData::walkability[x2][y2] &= MapData::rawWalkability[x][y];
+// 					}
+// 				}
+				// the lowResWalkability has built tile resolution
+				// so a built tile is walkable only if all 4x4 tiles are walkable
 				MapData::lowResWalkability[x / 4][y / 4] &= MapData::rawWalkability[x][y];
 			}
 		}
@@ -121,7 +165,7 @@ namespace BWTA
 		for (auto unit : MapData::staticNeutralBuildings) {
 			unitType = unit.first;
 			// get build area (the position is in the middle of the unit)
-			// we also expand the square by 2 pixels to make sure it touches any map border (like in (2)Heartbreak_Ridge.scx)
+			// we also expand the square by 2 walk tiles to make sure it touches any map border (like in (2)Heartbreak_Ridge.scx)
 			x1 = (unit.second.x / 8) - (unitType.tileWidth() * 2) - 2;
 			y1 = (unit.second.y / 8) - (unitType.tileHeight() * 2) - 2;
 			x2 = x1 + (unitType.tileWidth() * 4) + 4;

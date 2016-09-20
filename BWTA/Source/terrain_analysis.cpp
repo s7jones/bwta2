@@ -100,7 +100,6 @@ namespace BWTA
 		std::vector<Polygon> polygons;
 		std::vector<BoostPolygon> boostPolygons;
 		RectangleArray<int> labelMap(MapData::walkability.getWidth(), MapData::walkability.getHeight());
-// 		LOG("Size of labelMap " << MapData::walkability.getWidth() << "x" << MapData::walkability.getHeight());
 		labelMap.setTo(0);
 		generatePolygons(boostPolygons, labelMap);
 
@@ -116,6 +115,7 @@ namespace BWTA
 #ifdef DEBUG_DRAW
 		painter.drawPolygons(polygons);
 		painter.render("1-BoostPolygons");
+		// Prints each polygon to debug 
 // 		for (auto tmpPol : polygons) {
 // 			painter.drawPolygon(tmpPol, QColor(180, 180, 180));
 // 			painter.render();

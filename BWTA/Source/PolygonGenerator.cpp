@@ -231,7 +231,7 @@ namespace BWTA
 		nodeMap.setTo(false);
 
 // 		boost::geometry::model::multi_polygon<BoostPolygon> polygons;
-// 		const auto& contour = contours.at(1);
+// 		const auto& contour = contours.at(29);
 		for (const auto& contour : contours) {
 			BoostPolygon polygon, simPolygon;
 			boost::geometry::assign_points(polygon, contour);
@@ -292,30 +292,9 @@ namespace BWTA
 			}
 		}
 
-// 		labelMap.saveToFile("logs/labelMap.txt");
+		labelMap.saveToFile("logs/labelMap.txt");
 
 		LOG(" - Vectorized areas in " << timer.stopAndGetTime() << " seconds");
-		
-
-		// build tile resolution version
-// 		timer.start();
-// 		std::vector<Contour> contours2;
-// 		connectedComponentLabeling(contours2, MapData::lowResWalkability);
-// 
-// 		LOG(" - Component-Labeling Map and Contours extracted in " << timer.stopAndGetTime() << " seconds");
-// 		timer.start();
-// 
-// 		boost::geometry::model::multi_polygon<BoostPolygon> polygons2;
-// 		for (const auto& contour : contours2) {
-// 			BoostPolygon polygon, scalePolygon, simPolygon;
-// 			boost::geometry::assign_points(polygon, contour);
-// 			boost::geometry::simplify(polygon, simPolygon, 0.5);
-// 			boost::geometry::strategy::transform::scale_transformer<double, 2, 2> scale(4.0);
-// 			boost::geometry::transform(simPolygon, scalePolygon, scale);
-// 			polygons2.push_back(scalePolygon);
-// 		}
-// 
-// 		LOG(" - Vectorized areas in " << timer.stopAndGetTime() << " seconds");
 
 	}
 }

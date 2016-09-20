@@ -87,18 +87,27 @@ namespace BWTA
 		int maxY = MapData::walkability.getHeight() - 1;
 
 		// Add the line segments of each polygon to VoronoiSegment list and points to R-tree points list
-// 		auto polygon = polygons.at(1);
+// 		auto polygon = polygons.at(6);
+		size_t i, j;
 		for (const auto& polygon : polygons) {
 			// Add the vertices of the polygon
 			size_t lastPoint = polygon.size() - 1;
-			for (size_t i = 0; i < lastPoint; i++) {
+			// Notice that polygons are closed, i.e. the last vertex is equal to the first
+			for (i = 0, j = 1; i < lastPoint; ++i, ++j) {
+
 				// save border points
-				if (polygon[i].x == 0) leftBorder.insert(polygon[i].y);
-				else if (polygon[i].x == maxX) rightBorder.insert(polygon[i].y);
-				if (polygon[i].y == 0) topBorder.insert(polygon[i].x);
-
-				int j = i + 1; // Notice that polygons are closed, i.e. the last vertex is equal to the first
-
+				if (polygon[i].x == 0 && polygon[j].x == 0) {
+					leftBorder.insert(polygon[i].y);
+					leftBorder.insert(polygon[j].y);
+				} else if (polygon[i].x == maxX && polygon[j].x == maxX)  {
+					rightBorder.insert(polygon[i].y);
+					rightBorder.insert(polygon[j].y);
+				}
+				if (polygon[i].y == 0 && polygon[j].y == 0) {
+					topBorder.insert(polygon[i].x);
+					topBorder.insert(polygon[j].x);
+				}
+				
 // 				LOG("Segment (" << polygon[j].x << "," << polygon[j].y << ") to (" << polygon[i].x << "," << polygon[i].y << ")");
 				segments.push_back(VoronoiSegment(
 					VoronoiPoint(polygon[j].x, polygon[j].y),
@@ -118,9 +127,11 @@ namespace BWTA
 		}
 
 		// add remain border segments
-		LOG(" - Generating borders");
+// 		LOG(" - Generating LEFT border");
 		addVerticalBorder(segments, rtreeSegments, idPoint, leftBorder, 0, maxY);
+// 		LOG(" - Generating RIGHT border");
 		addVerticalBorder(segments, rtreeSegments, idPoint, rightBorder, maxX, maxY);
+// 		LOG(" - Generating TOP border");
 		addHorizontalBorder(segments, rtreeSegments, idPoint, topBorder, 0, maxX);
 
 		BoostVoronoi voronoi;
@@ -227,7 +238,7 @@ namespace BWTA
 			nodeID v0 = nodeToPrune.front();
 			nodeToPrune.pop();
 
-			if (graph.adjacencyList.at(v0).empty()) continue; // isolated point
+			if (graph.adjacencyList.at(v0).empty())  continue;
 
 			nodeID v1 = *graph.adjacencyList.at(v0).begin();
 			// remove node if it's too close to an obstacle, or parent is farther to an obstacle
@@ -238,6 +249,11 @@ namespace BWTA
 				graph.adjacencyList.at(v1).erase(v0);
 				if (graph.adjacencyList.at(v1).size() == 1) {
 					nodeToPrune.push(v1);
+				}
+				if (graph.adjacencyList.at(v1).empty()) {
+// 					LOG("Found isolated point");
+					graph.regionNodes.insert(v1);
+					graph.nodeType.at(v1) = RegionGraph::REGION;
 				}
 			}
 		}
