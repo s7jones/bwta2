@@ -250,7 +250,8 @@ namespace BWTA
 				if (graph.adjacencyList.at(v1).size() == 1) {
 					nodeToPrune.push(v1);
 				}
-				if (graph.adjacencyList.at(v1).empty()) {
+				// TODO make 6.0 const
+				if (graph.adjacencyList.at(v1).empty() && graph.minDistToObstacle.at(v1) > 6.0) {
 // 					LOG("Found isolated point");
 					graph.regionNodes.insert(v1);
 					graph.nodeType.at(v1) = RegionGraph::REGION;
@@ -492,19 +493,37 @@ namespace BWTA
 		std::vector<nodeID> parentID;
 		parentID.resize(graph.nodes.size());
 
-		std::stack<nodeID> nodeToVisit;
-		// start with one region node
-		nodeID id = *graph.regionNodes.begin();
-		visited.at(id) = true;
-		nodeID newId = graphSimplified.addNode(graph.nodes.at(id), graph.minDistToObstacle.at(id));
-		graphSimplified.regionNodes.insert(newId);
-		graphSimplified.nodeType.at(newId) = RegionGraph::REGION;
+		nodeID leafRegionId = 99;
+		nodeID newleafRegionId;
+		for (const auto& regionId : graph.regionNodes) {
+			if (leafRegionId == 99 && graph.adjacencyList.at(regionId).size() == 1) {
+				// start with one leaf region node
+				leafRegionId = regionId;
+				visited.at(regionId) = true;
+				newleafRegionId = graphSimplified.addNode(graph.nodes.at(regionId), graph.minDistToObstacle.at(regionId));
+				graphSimplified.regionNodes.insert(newleafRegionId);
+				graphSimplified.nodeType.at(newleafRegionId) = RegionGraph::REGION;
+			}
+			if (graph.adjacencyList.at(regionId).empty()) {
+				// add "island" regions nodes
+				nodeID newId = graphSimplified.addNode(graph.nodes.at(regionId), graph.minDistToObstacle.at(regionId));
+				graphSimplified.regionNodes.insert(newId);
+				graphSimplified.nodeType.at(newId) = RegionGraph::REGION;
+			}
+		}
+// 		// start with one region node
+// 		nodeID id = *graph.regionNodes.begin();
+// 		visited.at(id) = true;
+// 		nodeID newId = graphSimplified.addNode(graph.nodes.at(id), graph.minDistToObstacle.at(id));
+// 		graphSimplified.regionNodes.insert(newId);
+// 		graphSimplified.nodeType.at(newId) = RegionGraph::REGION;
 
 		// add children to explore
-		for (const auto& v1 : graph.adjacencyList.at(id)) {
+		std::stack<nodeID> nodeToVisit;
+		for (const auto& v1 : graph.adjacencyList.at(leafRegionId)) {
 			nodeToVisit.emplace(v1);
 			visited.at(v1) = true;
-			parentID.at(v1) = newId;
+			parentID.at(v1) = newleafRegionId;
 		}
 
 		while (!nodeToVisit.empty()) {
