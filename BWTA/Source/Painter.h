@@ -6,6 +6,7 @@
 #include <QtGui/QColor>
 #include <QtGui/QPen>
 #include <QtSvg/QSvgGenerator>
+#include <QtGui/QGuiApplication>
 
 #include "MapData.h"
 #include "functions.h"
@@ -36,6 +37,7 @@ namespace BWTA {
 		void drawNodes(const RegionGraph& graph, const std::set<nodeID>& nodes, QColor color);
 		void drawLines(std::map<nodeID, chokeSides_t> chokepointSides, QColor color);
 		void drawLine(const BoostSegment& seg, QColor color);
+		void drawText(int x, int y, std::string text);
 
 	private:
 		QPainter* painter;

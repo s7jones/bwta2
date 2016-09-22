@@ -148,8 +148,8 @@ namespace BWTA
 				}
 				MapData::walkability[x][y] = cornerWalkable;
 
-// 				for (int x2 = std::max(x - 1, minSize); x2 <= std::min(maxWidth, x + 1); x2++) {
-// 					for (int y2 = std::max(y - 1, minSize); y2 <= std::min(maxHeight, y + 1); y2++) {
+// 				for (int x2 = std::max(x - 1, (size_t)0); x2 <= std::min(maxWidth1, x + 1); x2++) {
+// 					for (int y2 = std::max(y - 1, (size_t)0); y2 <= std::min(maxHeight1, y + 1); y2++) {
 // 						MapData::walkability[x2][y2] &= MapData::rawWalkability[x][y];
 // 					}
 // 				}

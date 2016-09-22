@@ -11,6 +11,7 @@ namespace BWTA
 	};
 
 	void scanLineFill(Contour contour, const int& labelID, RectangleArray<int>& labelMap, RectangleArray<bool>& nodeMap) {
+		if (contour.size() < 2) return;
 		// Detect nodes for scan-line fill algorithm (avoiding edges)
 		contour.pop_back(); // since first and last point are the same
 		BoostPoint left = contour.back();

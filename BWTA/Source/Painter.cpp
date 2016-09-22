@@ -472,6 +472,12 @@ namespace BWTA {
 		painter->drawLine(seg.first.x(), seg.first.y(), seg.second.x(), seg.second.y());
 	}
 
-
+	void Painter::drawText(int x, int y, std::string text) {
+		painter->setFont(QFont("Tahoma", 8));
+// 		painter->drawText(x, y, QString::fromStdString(text));
+		QRect rect = image->rect();
+		rect.setLeft(5);
+		painter->drawText(rect, Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap, QString::fromStdString(text));
+	}
 }
 #endif

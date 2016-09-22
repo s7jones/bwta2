@@ -88,6 +88,9 @@ namespace BWTA
 	void analyze_map()
 	{
 #ifdef DEBUG_DRAW
+		int argc = 1;
+		char* argv = "0";
+		QGuiApplication a(argc, &argv); // needed for print text (init fonts)
 		Painter painter;
 #endif
 		Timer timer;
