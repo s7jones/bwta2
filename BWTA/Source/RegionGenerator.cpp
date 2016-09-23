@@ -699,7 +699,9 @@ namespace BWTA
 			// get nearest value
 			auto it = rtree.qbegin(bgi::nearest(pt, 100));
 			s1 = (*it).first;
-			nearestSegments.push_back((*it).first);
+			BWAPI::WalkPosition side1 = getProjectedPoint(pt, s1);
+			BWAPI::WalkPosition side2;
+// 			nearestSegments.push_back((*it).first);
 			++it;
 
 			// iterate over nearest Values
@@ -718,31 +720,33 @@ namespace BWTA
 // #endif
 
 				// if distance to all previous nearest segments is different than 0, we have a second segment candidate
-				bool found = true;
-				for (const auto& seg : nearestSegments) {
-					double dist = boost::geometry::comparable_distance(seg, (*it).first);
-					if (dist == 0) {
-						found = false;
-						break;
-					}
-				}
-				if (found) {
-					// get midpoint of the segment
-// 					BoostPoint midpoint = getMidpoint(s1.first, (*it).first.first);
-// 					LOG("Midpoint of (" << s1.first.x() << "," << s1.first.y() << ") and (" << (*it).first.first.x() << "," << (*it).first.first.y() << ") is (" << midpoint.x() << "," << midpoint.y() << ")");
-// 					double distToSide = boost::geometry::comparable_distance(s1, midpoint);
-// 					double distToMidpoint = boost::geometry::comparable_distance(pt, midpoint);
-// 					LOG("DistChokeToMidpoint: " << distToMidpoint << " ditMidPointToSide: " << distToSide);
-// 					if (distToMidpoint < distToSide) {
-						s2 = (*it).first;
-						break;
+// 				bool found = true;
+// 				for (const auto& seg : nearestSegments) {
+// 					double dist = boost::geometry::comparable_distance(seg, (*it).first);
+// 					if (dist == 0) {
+// 						found = false;
+// 						break;
 // 					}
+// 				}
+// 				if (found) {
+// 					s2 = (*it).first;
+// 					break;
+// 				}
+
+				side2 = getProjectedPoint(pt, (*it).first);
+				if ((side1.x < pt.x() && side2.x > pt.x()) ||
+					(side1.x > pt.x() && side2.x < pt.x()) ||
+					(side1.y < pt.y() && side2.y > pt.y()) ||
+					(side1.y > pt.y() && side2.y < pt.y())) {
+// 					s2 = (*it).first;
+					break;
 				}
-				nearestSegments.push_back((*it).first);
+
+// 				nearestSegments.push_back((*it).first);
 			}
 
-			BWAPI::WalkPosition side1 = getProjectedPoint(pt, s1);
-			BWAPI::WalkPosition side2 = getProjectedPoint(pt, s2);
+// 			BWAPI::WalkPosition side1 = getProjectedPoint(pt, s1);
+// 			BWAPI::WalkPosition side2 = getProjectedPoint(pt, s2);
 			chokepointSides.emplace(id, chokeSides_t(side1, side2));
 		}
 	}
