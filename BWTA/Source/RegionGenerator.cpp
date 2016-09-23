@@ -234,6 +234,27 @@ namespace BWTA
 		adjacencyList[v1].insert(v0);
 	}
 
+	void RegionGraph::markNodeAsRegion(const nodeID& v0)
+	{
+		regionNodes.insert(v0);
+		nodeType.at(v0) = RegionGraph::REGION;
+	}
+	void RegionGraph::markNodeAsChoke(const nodeID& v0)
+	{
+		chokeNodes.insert(v0);
+		nodeType.at(v0) = RegionGraph::CHOKEPOINT;
+	}
+	void RegionGraph::unmarkRegionNode(const nodeID& v0)
+	{
+		regionNodes.erase(v0);
+		nodeType.at(v0) = RegionGraph::NONE;
+	}
+	void RegionGraph::unmarkChokeNode(const nodeID& v0)
+	{
+		chokeNodes.erase(v0);
+		nodeType.at(v0) = RegionGraph::NONE;
+	}
+
 	void pruneGraph(RegionGraph& graph)
 	{
 		// get the list of all leafs (nodes with only one element in the adjacent list)
@@ -265,14 +286,13 @@ namespace BWTA
 				// TODO make 6.0 const
 				if (graph.adjacencyList.at(v1).empty() && graph.minDistToObstacle.at(v1) > 6.0) {
 // 					LOG("Found isolated point");
-					graph.regionNodes.insert(v1);
-					graph.nodeType.at(v1) = RegionGraph::REGION;
+					graph.markNodeAsRegion(v1);
 				}
 			}
 		}
 	}
 
-	void markRegionNodes(RegionGraph& graph, const std::vector<Polygon>& polygons)
+	void detectNodes(RegionGraph& graph, const std::vector<Polygon>& polygons)
 	{
 		const double MIN_RADII_DIFF = 4.5;
 		struct parentNode_t {
@@ -291,10 +311,8 @@ namespace BWTA
 		// find a leaf node to start
 		for (size_t id = 0; id < graph.adjacencyList.size(); ++id) {
 			if (graph.adjacencyList.at(id).size() == 1) {
-				// mark node as Region
+				graph.markNodeAsRegion(id);
 				visited.at(id) = true;
-				graph.regionNodes.insert(id);
-				graph.nodeType.at(id) = RegionGraph::REGION;
 				parentNode.id = id; parentNode.isMaximal = true;
 				parentNodes.at(id) = parentNode;
 // 				LOG("REGION " << graph.nodes.at(id) << " radius " << graph.minDistToObstacle.at(id));
@@ -327,14 +345,12 @@ namespace BWTA
 				// if parent chokepoint too close, delete parent
 				if (graph.nodeType.at(parentNode.id) == RegionGraph::CHOKEPOINT
 					&& graph.nodes.at(v0).getApproxDistance(graph.nodes.at(parentNode.id)) < 7) {
-					graph.chokeNodes.erase(parentNode.id);
-					graph.nodeType.at(parentNode.id) = RegionGraph::NONE;
+					graph.unmarkChokeNode(parentNode.id);
 #if defined(DEBUG_DRAW) && defined(DEBUG_NODE_DETECTION)
 					drawDebugMessage += "Parent chokepoint deleted, too close\n";
 #endif
 				}
-				graph.regionNodes.insert(v0);
-				graph.nodeType.at(v0) = RegionGraph::REGION;
+				graph.markNodeAsRegion(v0);
 				parentNode.id = v0; parentNode.isMaximal = true;
 #if defined(DEBUG_DRAW) && defined(DEBUG_NODE_DETECTION)
 				drawDebugMessage += "Leaf or intersection";
@@ -353,12 +369,8 @@ namespace BWTA
 					if (!parentNode.isMaximal) {
 						// we have two consecutive minimals, keep the min
 						if (graph.minDistToObstacle.at(v0) < graph.minDistToObstacle.at(parentNode.id)) {
-// 							LOG("CHOKE (better consecutive) " << graph.nodes.at(v0) << " radius: " << graph.minDistToObstacle.at(v0) << " parent: " << graph.minDistToObstacle.at(parentNode.id));
-							graph.chokeNodes.erase(parentNode.id);
-							graph.nodeType.at(parentNode.id) = RegionGraph::NONE;
-								
-							graph.chokeNodes.insert(v0);
-							graph.nodeType.at(v0) = RegionGraph::CHOKEPOINT;
+							graph.unmarkChokeNode(parentNode.id);
+							graph.markNodeAsChoke(v0);
 							parentNode.id = v0; parentNode.isMaximal = false;
 #if defined(DEBUG_DRAW) && defined(DEBUG_NODE_DETECTION)
 							drawDebugMessage += "Better consecutive chokepoint";
@@ -369,8 +381,7 @@ namespace BWTA
 						if (graph.adjacencyList.at(parentNode.id).size() > 2 
 // 							&& graph.nodes.at(v0).getApproxDistance(graph.nodes.at(parentNode.id)) < 7
 							) {
-							graph.chokeNodes.insert(v0);
-							graph.nodeType.at(v0) = RegionGraph::CHOKEPOINT;
+							graph.markNodeAsChoke(v0);
 							parentNode.id = v0; parentNode.isMaximal = false;
 #if defined(DEBUG_DRAW) && defined(DEBUG_NODE_DETECTION)
 							drawDebugMessage += "Parent is intersection";
@@ -379,8 +390,7 @@ namespace BWTA
 						} else if (enoughDifference(graph.minDistToObstacle.at(v0), graph.minDistToObstacle.at(parentNode.id))) {
 // 						if (std::abs(graph.minDistToObstacle.at(v0) - graph.minDistToObstacle.at(parentNode.id)) > MIN_RADII_DIFF
 // 							&& graph.nodes.at(v0).getApproxDistance(graph.nodes.at(parentNode.id)) > 10) {
-								graph.chokeNodes.insert(v0);
-								graph.nodeType.at(v0) = RegionGraph::CHOKEPOINT;
+								graph.markNodeAsChoke(v0);
 								parentNode.id = v0; parentNode.isMaximal = false;
 #if defined(DEBUG_DRAW) && defined(DEBUG_NODE_DETECTION)
 								drawDebugMessage += "Enough difference";
@@ -420,11 +430,9 @@ namespace BWTA
 // 								LOG("REGION (better consecutive) " << graph.nodes.at(v0) << " radius: " << graph.minDistToObstacle.at(v0) << " parent: " << graph.minDistToObstacle.at(parentNode.id));
 								// only delete parent if size == 2
 								if (graph.adjacencyList.at(parentNode.id).size() == 2) {
-									graph.regionNodes.erase(parentNode.id);
-									graph.nodeType.at(parentNode.id) = RegionGraph::NONE;
+									graph.unmarkRegionNode(parentNode.id);
 								}
-								graph.regionNodes.insert(v0);
-								graph.nodeType.at(v0) = RegionGraph::REGION;
+								graph.markNodeAsRegion(v0);
 								parentNode.id = v0; parentNode.isMaximal = true;
 #if defined(DEBUG_DRAW) && defined(DEBUG_NODE_DETECTION)
 								drawDebugMessage += "Better consecutive region node";
@@ -433,8 +441,7 @@ namespace BWTA
 							}
 						} else { // parent is minimal
 							if (enoughDifference(graph.minDistToObstacle.at(v0), graph.minDistToObstacle.at(parentNode.id))) {
-								graph.regionNodes.insert(v0);
-								graph.nodeType.at(v0) = RegionGraph::REGION;
+								graph.markNodeAsRegion(v0);
 								parentNode.id = v0; parentNode.isMaximal = true;
 #if defined(DEBUG_DRAW) && defined(DEBUG_NODE_DETECTION)
 								drawDebugMessage += "Enough difference";
@@ -499,12 +506,8 @@ namespace BWTA
 		return stream.str();
 	}
 
-	void simplifyRegionGraph(const RegionGraph& graph, RegionGraph& graphSimplified)
+	void simplifyGraph(const RegionGraph& graph, RegionGraph& graphSimplified)
 	{
-
-#ifdef DEBUG_DRAW
-		Painter painter;
-#endif
 		// containers to mark visited nodes, and parent list
 		std::vector<bool> visited;
 		visited.resize(graph.nodes.size());
@@ -519,14 +522,12 @@ namespace BWTA
 				leafRegionId = regionId;
 				visited.at(regionId) = true;
 				newleafRegionId = graphSimplified.addNode(graph.nodes.at(regionId), graph.minDistToObstacle.at(regionId));
-				graphSimplified.regionNodes.insert(newleafRegionId);
-				graphSimplified.nodeType.at(newleafRegionId) = RegionGraph::REGION;
+				graphSimplified.markNodeAsRegion(newleafRegionId);
 			}
 			if (graph.adjacencyList.at(regionId).empty()) {
 				// add "island" regions nodes
 				nodeID newId = graphSimplified.addNode(graph.nodes.at(regionId), graph.minDistToObstacle.at(regionId));
-				graphSimplified.regionNodes.insert(newId);
-				graphSimplified.nodeType.at(newId) = RegionGraph::REGION;
+				graphSimplified.markNodeAsRegion(newId);
 			}
 		}
 
@@ -547,16 +548,14 @@ namespace BWTA
 			if (graph.nodeType.at(nodeId) == RegionGraph::CHOKEPOINT) {
 				nodeID newId = graphSimplified.addNode(graph.nodes.at(nodeId), graph.minDistToObstacle.at(nodeId));
 				if (newId != parentId) { // to avoid self inclusions
-					graphSimplified.chokeNodes.insert(newId);
-					graphSimplified.nodeType.at(newId) = RegionGraph::CHOKEPOINT;
+					graphSimplified.markNodeAsChoke(newId);
 					graphSimplified.addEdge(newId, parentId);
 					parentId = newId;
 				}
 			} else if (graph.nodeType.at(nodeId) == RegionGraph::REGION) {
 				nodeID newId = graphSimplified.addNode(graph.nodes.at(nodeId), graph.minDistToObstacle.at(nodeId));
 				if (newId != parentId) { // to avoid self inclusions
-					graphSimplified.regionNodes.insert(newId);
-					graphSimplified.nodeType.at(newId) = RegionGraph::REGION;
+					graphSimplified.markNodeAsRegion(newId);
 					graphSimplified.addEdge(newId, parentId);
 					parentId = newId;
 				}
@@ -568,7 +567,7 @@ namespace BWTA
 
 			// keep exploring unvisited neighbors
 			for (const auto& v1 : graph.adjacencyList.at(nodeId)) {
-				if (!visited.at(v1) ){
+				if (!visited.at(v1)){
 					nodeToVisit.emplace(v1);
 					parentID.at(v1) = parentId;
 					visited.at(v1) = true;
@@ -583,82 +582,75 @@ namespace BWTA
 					if (graph.nodeType.at(nodeId) != RegionGraph::NONE) { // get their own ID
 						n2 = graphSimplified.addNode(graph.nodes.at(nodeId), graph.minDistToObstacle.at(nodeId));
 					}
-					if (n1 != n2) {
+					if (n1 != n2 && graphSimplified.nodeType.at(n1) != RegionGraph::NONE
+						&& graphSimplified.nodeType.at(n2) != RegionGraph::NONE) {
 						graphSimplified.addEdge(n1, n2);
 					}
 				}
 			}
 		}
+	}
 
-#ifdef DEBUG_DRAW
-		painter.drawGraph(graphSimplified);
-		painter.drawNodes(graphSimplified, graphSimplified.regionNodes, Qt::blue);
-		painter.drawNodes(graphSimplified, graphSimplified.chokeNodes, Qt::red);
-		painter.render("5-NodesSimplified");
-#endif
-
-		// Second loop to merge connected regions
-		std::set<nodeID> mergeRegions(graphSimplified.regionNodes);
+	void mergeRegionNodes(RegionGraph& graph)
+	{
+		std::set<nodeID> mergeRegions(graph.regionNodes);
 
 		while (!mergeRegions.empty()) {
-// 			LOG("Graph size: " << mergeRegions.size());
 			// pop first element
-			nodeID v0 = *mergeRegions.begin();
+			nodeID parent = *mergeRegions.begin();
 			mergeRegions.erase(mergeRegions.begin());
 
-			for (auto& it = graphSimplified.adjacencyList.at(v0).begin(); it != graphSimplified.adjacencyList.at(v0).end();) {
-				nodeID v1 = *it;
-				if (v0 == v1) { // This is a self-loop, remove it
-					it = graphSimplified.adjacencyList.at(v0).erase(it);
+			for (auto& it = graph.adjacencyList.at(parent).begin(); it != graph.adjacencyList.at(parent).end();) {
+				nodeID child = *it;
+				if (parent == child) { // This is a self-loop, remove it
+					it = graph.adjacencyList.at(parent).erase(it);
 					continue;
 				}
-				if (graphSimplified.nodeType.at(v0) == RegionGraph::REGION
-					&& graphSimplified.nodeType.at(v1) == RegionGraph::REGION) 
-				{
-// 					LOG(" - Set " << v0 << ":" << getString(graphSimplified.adjacencyList.at(v0)));
-// 					LOG(" - Set " << v1 << ":" << getString(graphSimplified.adjacencyList.at(v1)));
-					if (graphSimplified.minDistToObstacle.at(v0) > graphSimplified.minDistToObstacle.at(v1)) {
-						// keep v0
-						graphSimplified.adjacencyList.at(v0).insert(graphSimplified.adjacencyList.at(v1).begin(), 
-							graphSimplified.adjacencyList.at(v1).end());
-						// for each adjacent, remove v1 add v0 (except v0)
-						for (const auto& v2 : graphSimplified.adjacencyList.at(v1)) {
-							graphSimplified.adjacencyList.at(v2).erase(v1);
-							if (v2 == v0) graphSimplified.adjacencyList.at(v0).erase(v0);
-							else graphSimplified.adjacencyList.at(v2).insert(v0);
+				if (graph.nodeType.at(parent) == RegionGraph::REGION && graph.nodeType.at(child) == RegionGraph::REGION) {
+// 					LOG(" - Set " << parent << ":" << getString(graph.adjacencyList.at(parent)));
+// 					LOG(" - Set " << child << ":" << getString(graph.adjacencyList.at(child)));
+					if (graph.minDistToObstacle.at(parent) > graph.minDistToObstacle.at(child)) {
+						// keep parent
+						graph.adjacencyList.at(parent).insert(graph.adjacencyList.at(child).begin(),
+							graph.adjacencyList.at(child).end());
+						// for each adjacent, remove child add parent (except parent)
+						for (const auto& v2 : graph.adjacencyList.at(child)) {
+							graph.adjacencyList.at(v2).erase(child);
+							if (v2 == parent) graph.adjacencyList.at(parent).erase(parent);
+							else graph.adjacencyList.at(v2).insert(parent);
 						}
-						graphSimplified.adjacencyList.at(v1).clear();
-// 						LOG(" - Set " << v0 << " merged:" << getString(graphSimplified.adjacencyList.at(v0)));
-						graphSimplified.regionNodes.erase(v1);
-// 						LOG(v1 << " erased, " << v0 << " keeped");
+						graph.adjacencyList.at(child).clear();
+// 						LOG(" - Set " << parent << " merged:" << getString(graph.adjacencyList.at(parent)));
+						graph.regionNodes.erase(child);
+// 						LOG(child << " erased, " << parent << " keeped");
 						// restart iterator
-						it = graphSimplified.adjacencyList.at(v0).begin();
+						it = graph.adjacencyList.at(parent).begin();
 // #ifdef DEBUG_DRAW
-// 						painter.drawGraph(graphSimplified);
-// 						painter.drawNodes(graphSimplified, graphSimplified.regionNodes, Qt::blue);
-// 						painter.drawNodes(graphSimplified, graphSimplified.chokeNodes, Qt::red);
+// 						painter.drawGraph(graph);
+// 						painter.drawNodes(graph, graph.regionNodes, Qt::blue);
+// 						painter.drawNodes(graph, graph.chokeNodes, Qt::red);
 // 						painter.render();
 // #endif
 					} else {
-						// keep v1
-						graphSimplified.adjacencyList.at(v1).insert(graphSimplified.adjacencyList.at(v0).begin(),
-							graphSimplified.adjacencyList.at(v0).end());
-						// for each adjacent, remove v0 add v1 (except v1)
-						for (const auto& v2 : graphSimplified.adjacencyList.at(v0)) {
-							graphSimplified.adjacencyList.at(v2).erase(v0);
-							if (v2 == v1) graphSimplified.adjacencyList.at(v1).erase(v1);
-							else graphSimplified.adjacencyList.at(v2).insert(v1);
+						// keep child
+						graph.adjacencyList.at(child).insert(graph.adjacencyList.at(parent).begin(),
+							graph.adjacencyList.at(parent).end());
+						// for each adjacent, remove parent add child (except child)
+						for (const auto& v2 : graph.adjacencyList.at(parent)) {
+							graph.adjacencyList.at(v2).erase(parent);
+							if (v2 == child) graph.adjacencyList.at(child).erase(child);
+							else graph.adjacencyList.at(v2).insert(child);
 						}
-						graphSimplified.adjacencyList.at(v0).clear();
-// 						LOG(" - Set " << v1 << " merged:" << getString(graphSimplified.adjacencyList.at(v1)));
-						graphSimplified.regionNodes.erase(v0);
-// 						LOG(v0 << " erased, " << v1 << " keeped");
-						// v1 should be re-analyzed
-						mergeRegions.insert(v1);
+						graph.adjacencyList.at(parent).clear();
+// 						LOG(" - Set " << child << " merged:" << getString(graph.adjacencyList.at(child)));
+						graph.regionNodes.erase(parent);
+// 						LOG(parent << " erased, " << child << " keeped");
+						// child should be re-analyzed
+						mergeRegions.insert(child);
 // #ifdef DEBUG_DRAW
-// 						painter.drawGraph(graphSimplified);
-// 						painter.drawNodes(graphSimplified, graphSimplified.regionNodes, Qt::blue);
-// 						painter.drawNodes(graphSimplified, graphSimplified.chokeNodes, Qt::red);
+// 						painter.drawGraph(graph);
+// 						painter.drawNodes(graph, graph.regionNodes, Qt::blue);
+// 						painter.drawNodes(graph, graph.chokeNodes, Qt::red);
 // 						painter.render();
 // #endif
 						break;

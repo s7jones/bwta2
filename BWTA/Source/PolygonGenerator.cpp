@@ -210,6 +210,16 @@ namespace BWTA
 // 		}
 	}
 
+	bool isTouchingMapBorder(Contour contour, int  maxX, int maxY)
+	{
+		for (const auto& point : contour) {
+			if (point.x() == 0 || point.x() == maxX ||
+				point.y() == 0 || point.y() == maxY)
+				return true;
+		}
+		return false;
+	}
+
 
 	void generatePolygons(std::vector<BoostPolygon>& polygons, RectangleArray<int>& labelMap)
 	{
@@ -236,8 +246,11 @@ namespace BWTA
 		for (const auto& contour : contours) {
 			BoostPolygon polygon, simPolygon;
 			boost::geometry::assign_points(polygon, contour);
+			bool touchingMapBroder = isTouchingMapBorder(contour, maxX, maxY);
+			auto polArea = boost::geometry::area(polygon);
 			// if polygon isn't too small, add it to the result
-			if (boost::geometry::area(polygon) > MIN_ARE_POLYGON) {
+			if ((touchingMapBroder && polArea > MIN_ARE_POLYGON) || (
+				!touchingMapBroder && polArea > MIN_ARE_INNER_POLYGON)) {
 				// Uses Douglas-Peucker algorithm to simplify points in the polygon
 				// https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm
 				boost::geometry::simplify(polygon, simPolygon, 2.0);
@@ -287,7 +300,7 @@ namespace BWTA
 				// region discarded, relabel
 // 				const auto& p0 = polygon.outer().at(0);
 // 				int labelID = labelMap[(int)p0.x()][(int)p0.y()];
-// 				LOG("Discarded obstacle with label : " << labelID << " and area: " << boost::geometry::area(polygon));
+// 				LOG("Discarded obstacle with label : " << labelID << " and area: " << polArea);
 				// TODO, still has some inaccuracies....
 				scanLineFill(contour, 0, labelMap, nodeMap);
 			}

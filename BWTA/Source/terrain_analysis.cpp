@@ -148,7 +148,7 @@ namespace BWTA
 #endif
 		timer.start();
 
-		markRegionNodes(graph, polygons);
+		detectNodes(graph, polygons);
 
 		LOG(" [Identified region/chokepoints nodes in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
@@ -161,15 +161,27 @@ namespace BWTA
 		timer.start();
 
 		RegionGraph graphSimplified;
-		simplifyRegionGraph(graph, graphSimplified);
+		simplifyGraph(graph, graphSimplified);
 
-		LOG(" [Simplified region graph in " << timer.stopAndGetTime() << " seconds]");
+		LOG(" [Simplified graph in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
 		painter.drawPolygons(polygons);
 		painter.drawGraph(graphSimplified);
 		painter.drawNodes(graphSimplified, graphSimplified.regionNodes, Qt::blue);
 		painter.drawNodes(graphSimplified, graphSimplified.chokeNodes, Qt::red);
-		painter.render("6-NodesPruned");
+		painter.render("6-GraphPruned");
+#endif
+		timer.start();
+
+		mergeRegionNodes(graphSimplified);
+
+		LOG(" [Merged consecutive region nodes in " << timer.stopAndGetTime() << " seconds]");
+#ifdef DEBUG_DRAW
+		painter.drawPolygons(polygons);
+		painter.drawGraph(graphSimplified);
+		painter.drawNodes(graphSimplified, graphSimplified.regionNodes, Qt::blue);
+		painter.drawNodes(graphSimplified, graphSimplified.chokeNodes, Qt::red);
+		painter.render("7-GraphMerged");
 #endif
 		timer.start();
 
@@ -182,7 +194,7 @@ namespace BWTA
 		painter.drawGraph(graphSimplified);
 		painter.drawNodes(graphSimplified, graphSimplified.regionNodes, Qt::blue);
 		painter.drawLines(chokepointSides, Qt::red);
-		painter.render("7-WallOffChokepoints");
+		painter.render("8-WallOffChokepoints");
 #endif
 		timer.start();
 
@@ -194,7 +206,7 @@ namespace BWTA
 		LOG(" [Creating BWTA regions/chokepoints in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
 		painter.drawPolygons(polReg);
-		painter.render("8-Regions");
+		painter.render("9-Regions");
 #endif
 		timer.start();
 
