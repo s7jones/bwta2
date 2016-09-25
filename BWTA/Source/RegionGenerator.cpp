@@ -506,9 +506,11 @@ namespace BWTA
 						nodeID nodeToDelete = v0Parent;
 						if (isMaximal0)  nodeToDelete = v1Parent;
 						graph.unmarkChokeNode(nodeToDelete);
+#if defined(DEBUG_DRAW) && defined(DEBUG_NODE_DETECTION)
 						graph.gateNodesA.insert(nodeToDelete);
 						drawDebugMessage += "\nChoke too close to region (path)";
 						nodesDetected++;
+#endif
 					}
 				}
 			}
