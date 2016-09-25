@@ -5,9 +5,9 @@
 
 namespace BWTA
 {
-	static const std::size_t VISITED_COLOR = 1;
 	static const int SKIP_NEAR_BORDER = 3;
 	static const double DIFF_COEFICIENT = 0.21; // relative difference to consider a change between region<->chokepoint
+	static const int MIN_REG_DIST = 7; // minimum distance between nodes
 // 	#define DEBUG_NODE_DETECTION  // uncomment to print node detection process
 
 	bool enoughDifference(const double& A, const double& B)
@@ -154,6 +154,7 @@ namespace BWTA
 		const int maxYborder = maxY - SKIP_NEAR_BORDER;
 
 		// traverse the Voronoi diagram and generate graph nodes and edges
+		static const std::size_t VISITED_COLOR = 1;
 		for (const auto& edge : voronoi.edges()) {
 			if (!edge.is_primary() || !edge.is_finite() || edge.color() == VISITED_COLOR) continue;
 
@@ -341,10 +342,11 @@ namespace BWTA
 			// get parent
 			parentNode = parentNodes.at(v0);
 
+			bool neutralNode = false;
 			if (graph.adjacencyList.at(v0).size() != 2) {
 				// if parent chokepoint too close, delete parent
 				if (graph.nodeType.at(parentNode.id) == RegionGraph::CHOKEPOINT
-					&& graph.nodes.at(v0).getApproxDistance(graph.nodes.at(parentNode.id)) < 7) {
+					&& graph.nodes.at(v0).getApproxDistance(graph.nodes.at(parentNode.id)) < MIN_REG_DIST) {
 					graph.unmarkChokeNode(parentNode.id);
 #if defined(DEBUG_DRAW) && defined(DEBUG_NODE_DETECTION)
 					drawDebugMessage += "Parent chokepoint deleted, too close\n";
@@ -379,7 +381,7 @@ namespace BWTA
 						}
 					} else { // parent is maximal
 						if (graph.adjacencyList.at(parentNode.id).size() > 2 
-// 							&& graph.nodes.at(v0).getApproxDistance(graph.nodes.at(parentNode.id)) < 7
+							&& graph.nodes.at(v0).getApproxDistance(graph.nodes.at(parentNode.id)) >= MIN_REG_DIST
 							) {
 							graph.markNodeAsChoke(v0);
 							parentNode.id = v0; parentNode.isMaximal = false;
@@ -397,10 +399,11 @@ namespace BWTA
 								nodesDetected++;
 #endif
 						} else {
-							// the radius difference is too small, we mark the node as a "choke-gate"
-							graph.gateNodesA.insert(v0);
-							graph.nodeType.at(v0) = RegionGraph::CHOKEGATEA;
+							// the radius difference is too small
+							neutralNode = true;
 #if defined(DEBUG_DRAW) && defined(DEBUG_NODE_DETECTION)
+							graph.gateNodesA.insert(v0);
+// 							graph.nodeType.at(v0) = RegionGraph::CHOKEGATEA;
 							double A = graph.minDistToObstacle.at(v0);
 							double B = graph.minDistToObstacle.at(parentNode.id);
 							double diff = std::abs(A - B);
@@ -448,9 +451,11 @@ namespace BWTA
 								nodesDetected++;
 #endif
 							} else {
-								graph.gateNodesA.insert(v0);
-								graph.nodeType.at(v0) = RegionGraph::CHOKEGATEA;
+								// the radius difference is too small
+								neutralNode = true;
 #if defined(DEBUG_DRAW) && defined(DEBUG_NODE_DETECTION)
+								graph.gateNodesA.insert(v0);
+// 								graph.nodeType.at(v0) = RegionGraph::CHOKEGATEA;
 								double A = graph.minDistToObstacle.at(v0);
 								double B = graph.minDistToObstacle.at(parentNode.id);
 								double diff = std::abs(A - B);
@@ -464,6 +469,8 @@ namespace BWTA
 #endif
 							}
 						}
+					} else { // not local maximal o minimal
+						neutralNode = true;
 					}
 				}
 			}
@@ -474,6 +481,35 @@ namespace BWTA
 					nodeToVisit.push(v1);
 					visited.at(v1) = true;
 					parentNodes.at(v1) = parentNode;
+				} else {
+					// we reached a connection between visited paths.
+					// we must check if the connected path between choke-region nodes is too close
+					nodeID v0Parent, v1Parent;
+					// get right parent of v0
+					if (graph.nodeType.at(v0) == RegionGraph::REGION || graph.nodeType.at(v0) == RegionGraph::CHOKEPOINT) {
+						v0Parent = v0;
+					} else v0Parent = parentNodes.at(v0).id;
+					// get right parent of v1
+					if (graph.nodeType.at(v1) == RegionGraph::REGION || graph.nodeType.at(v1) == RegionGraph::CHOKEPOINT) {
+						v1Parent = v1;
+					} else v1Parent = parentNodes.at(v1).id;
+					nodeID isMaximal0 = false;
+					if (graph.nodeType.at(v0Parent) == RegionGraph::REGION) isMaximal0 = true;
+					nodeID isMaximal1 = false;
+					if (graph.nodeType.at(v1Parent) == RegionGraph::REGION) isMaximal1 = true;
+
+// 					if (!isMaximal0 && isMaximal1) LOG("Choke-region " << v0Parent << "-" << v1Parent);
+// 					if (isMaximal0 && !isMaximal1) LOG("Region-choke " << v0Parent << "-" << v1Parent);
+
+					if (isMaximal0 != isMaximal1 && 
+						graph.nodes.at(v0Parent).getApproxDistance(graph.nodes.at(v1Parent)) < MIN_REG_DIST) {
+						nodeID nodeToDelete = v0Parent;
+						if (isMaximal0)  nodeToDelete = v1Parent;
+						graph.unmarkChokeNode(nodeToDelete);
+						graph.gateNodesA.insert(nodeToDelete);
+						drawDebugMessage += "\nChoke too close to region (path)";
+						nodesDetected++;
+					}
 				}
 			}
 
