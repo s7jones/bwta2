@@ -9,7 +9,8 @@ namespace BWTA
   {
   public:
     RegionImpl();
-    RegionImpl(Polygon &poly);
+	RegionImpl(const Polygon& poly);
+	RegionImpl(const BoostPolygon& boostPoly, const int& scale = 1);
 
     virtual const Polygon& getPolygon() const;
     virtual const BWAPI::Position& getCenter() const;

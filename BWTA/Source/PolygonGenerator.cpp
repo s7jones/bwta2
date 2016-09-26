@@ -291,11 +291,7 @@ namespace BWTA
 				if (!boost::geometry::is_valid(simPolygon)) {
 					LOG("Error, polygon not valid!!!!!!!!!!!!!! => " << message);
 				}
-				// transform BOOST_Polygon to BWTA_Polygon
 				polygons.push_back(simPolygon);
-// 				Polygon BwtaPolygon;
-// 				for (const auto& pos : simPolygon.outer()) BwtaPolygon.emplace_back((int)pos.x(), (int)pos.y());
-// 				polygons.push_back(BwtaPolygon);
 			} else {
 				// region discarded, relabel
 // 				const auto& p0 = polygon.outer().at(0);

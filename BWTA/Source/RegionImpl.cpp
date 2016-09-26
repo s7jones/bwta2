@@ -1,12 +1,18 @@
 #include "RegionImpl.h"
 namespace BWTA
 {
-  RegionImpl::RegionImpl(){}
-  RegionImpl::RegionImpl(Polygon &poly)
+  RegionImpl::RegionImpl(){} // TODO remove after fixing load_data
+  RegionImpl::RegionImpl(const Polygon& poly)
+	  : _polygon(poly),
+	  _maxDistance(0)
   {
-    this->_polygon=poly;
-    this->_center=poly.getCenter();
-	this->_maxDistance = 0;
+	  this->_center = _polygon.getCenter();
+  }
+  RegionImpl::RegionImpl(const BoostPolygon& boostPoly, const int& scale)
+	  : _polygon(Polygon(boostPoly, scale)),
+	  _maxDistance(0)
+  {
+	  this->_center = _polygon.getCenter();
   }
   const Polygon& RegionImpl::getPolygon() const
   {

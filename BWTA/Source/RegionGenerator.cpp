@@ -851,17 +851,12 @@ namespace BWTA
 		// Create regions from graph nodes
 		std::map<nodeID, Region*> node2region;
 		for (const auto& regionNodeId : graph.regionNodes) {
-			Polygon poly;
 			// find polygon
 			BoostPoint regionPoint(graph.nodes[regionNodeId].x, graph.nodes[regionNodeId].y);
 			for (const auto& regionPol : regionsPoly) {
 				if (boost::geometry::within(regionPoint, regionPol)) {
-					// Translate BoostPolygon to BWTA polygon (Polygon) (and WalkPosition to Position)
-					for (const auto& polyPoint : regionPol.outer()) {
-						poly.emplace_back((int)polyPoint.x() * 8, (int)polyPoint.y() * 8);
-					}
-					// Create the BWTA region
-					Region* newRegion = new RegionImpl(poly);
+					// 8 because we want to transform from WalkPosition to Position
+					Region* newRegion = new RegionImpl(regionPol, 8); 
 					regions.insert(newRegion);
 					node2region.emplace(regionNodeId, newRegion);
 					break;

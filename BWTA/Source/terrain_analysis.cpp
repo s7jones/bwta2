@@ -108,10 +108,7 @@ namespace BWTA
 
 		// translate Boost polygons to BWTA polygons
 		for (const auto& pol : boostPolygons) {
-			Polygon BwtaPolygon;
-			for (const auto& pos : pol.outer()) BwtaPolygon.emplace_back((int)pos.x(), (int)pos.y());
-			// TODO add holes
-			polygons.push_back(BwtaPolygon);
+			polygons.emplace_back(pol);
 		}
 
 		LOG(" [Detected BOOST polygons in " << timer.stopAndGetTime() << " seconds]");
