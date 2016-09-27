@@ -32,11 +32,11 @@ namespace BWTA
 
 		// load map info
 		MapData::mapWidthTileRes = BWAPI::Broodwar->mapWidth();
-		MapData::mapWidthPixelRes = MapData::mapWidthTileRes * 32;
+		MapData::mapWidthPixelRes = MapData::mapWidthTileRes * TILE_SIZE;
 		MapData::mapWidthWalkRes = MapData::mapHeightTileRes * 4;
 
 		MapData::mapHeightTileRes = BWAPI::Broodwar->mapHeight();
-		MapData::mapHeightPixelRes = MapData::mapHeightTileRes * 32;
+		MapData::mapHeightPixelRes = MapData::mapHeightTileRes * TILE_SIZE;
 		MapData::mapHeightWalkRes = MapData::mapHeightTileRes * 4;
 
 		MapData::buildability.resize(MapData::mapWidthTileRes, MapData::mapHeightTileRes);

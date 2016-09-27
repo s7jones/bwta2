@@ -16,5 +16,9 @@ namespace BWTA
 		RectangleArray<Chokepoint*> getChokepoint;
 		RectangleArray<BaseLocation*> getBaseLocationW;
 		RectangleArray<BaseLocation*> getBaseLocation;
+
+		RectangleArray<int> obstacleLabelMap;
+		RectangleArray<int> closestObstacleLabelMap;
+		RectangleArray<int> regionLabelMap;
 	};
 }

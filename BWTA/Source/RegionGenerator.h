@@ -5,6 +5,7 @@
 #include "MapData.h"
 #include "RegionImpl.h"
 #include "ChokepointImpl.h"
+#include "Utils.h"
 
 namespace BWTA
 {

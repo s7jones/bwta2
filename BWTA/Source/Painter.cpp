@@ -309,6 +309,7 @@ namespace BWTA {
 
 	void Painter::drawClosestBaseLocationMap(RectangleArray<BaseLocation*> map, std::set<BaseLocation*> baseLocations)
 	{
+		LOG("Drawing closest BaseLocation for " << baseLocations.size() << " bases");
 		// assign a color to each BaseLocation
 		std::vector<QColor> baseColors = { QColor(0, 114, 189), QColor(217, 83, 25), QColor(237, 177, 32)
 			, QColor(126, 47, 142), QColor(119, 172, 48), QColor(77, 190, 238), QColor(162, 20, 47) };
@@ -342,6 +343,7 @@ namespace BWTA {
 
 	void Painter::drawClosestChokepointMap(RectangleArray<Chokepoint*> map, std::set<Chokepoint*> chokepoints)
 	{
+		LOG("Drawing closest Chokepoint for " << chokepoints.size() << " chokepoints");
 		// assign a color to each Chokepoint
 		std::vector<QColor> baseColors = { QColor(0, 114, 189), QColor(217, 83, 25), QColor(237, 177, 32)
 			, QColor(126, 47, 142), QColor(119, 172, 48), QColor(77, 190, 238), QColor(162, 20, 47) };

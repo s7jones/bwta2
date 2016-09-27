@@ -98,6 +98,9 @@
     <ClCompile Include="Source\RegionGenerator.cpp">
       <Filter>TerrainAnalyzer</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Utils.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\BaseLocationImpl.h">
@@ -189,6 +192,9 @@
     </ClInclude>
     <ClInclude Include="Source\RegionGenerator.h">
       <Filter>TerrainAnalyzer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Utils.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

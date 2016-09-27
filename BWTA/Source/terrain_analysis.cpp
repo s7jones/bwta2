@@ -102,14 +102,18 @@ namespace BWTA
 
 		std::vector<Polygon> polygons;
 		std::vector<BoostPolygon> boostPolygons;
-		RectangleArray<int> labelMap(MapData::walkability.getWidth(), MapData::walkability.getHeight());
-		labelMap.setTo(0);
-		generatePolygons(boostPolygons, labelMap);
+// 		RectangleArray<int> labelMap(MapData::walkability.getWidth(), MapData::walkability.getHeight());
+// 		labelMap.setTo(0);
+		BWTA_Result::obstacleLabelMap.resize(MapData::walkability.getWidth(), MapData::walkability.getHeight());
+		BWTA_Result::obstacleLabelMap.setTo(0);
+		generatePolygons(boostPolygons, BWTA_Result::obstacleLabelMap);
 
-		// translate Boost polygons to BWTA polygons
+		// translate Boost polygons to BWTA polygons. TODO probably we don't need that
 		for (const auto& pol : boostPolygons) {
 			polygons.emplace_back(pol);
 		}
+		// Save polygons in BWTA_Result::unwalkablePolygons
+		for (auto& polygon : polygons) BWTA_Result::unwalkablePolygons.insert(&polygon);
 
 		LOG(" [Detected BOOST polygons in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
@@ -121,11 +125,35 @@ namespace BWTA
 // 			painter.render();
 // 		}
 #endif
+
+		// testing labeling
+// 		RectangleArray<int> labelMap2(MapData::walkability.getWidth(), MapData::walkability.getHeight());
+// 		labelMap2.setTo(0);
+// 		for (size_t x = 0; x < BWTA_Result::obstacleLabelMap.getWidth(); ++x) {
+// 			for (size_t y = 0; y < BWTA_Result::obstacleLabelMap.getHeight(); ++y) {
+// 				bool insidePol = false;
+// 				BoostPoint boostPoint(x, y);
+// 				for (const auto& pol : boostPolygons) {
+// 					if (boost::geometry::covered_by(boostPoint, pol)) {
+// 						insidePol = true;
+// 						break;
+// 					}
+// 				}
+// 				if (BWTA_Result::obstacleLabelMap[x][y] > 0 && 
+// 					MapData::walkability[x][y] && !insidePol) labelMap2[x][y] = 1;
+// 				if (BWTA_Result::obstacleLabelMap[x][y] <= 0 
+// 					&& !MapData::walkability[x][y] && insidePol) labelMap2[x][y] = 2;
+// 			}
+// 		}
+// 		labelMap2.saveToFile("logs/labelMap2.txt");
+
+// 		exit(-1);
+
 		timer.start();
 
 		RegionGraph graph;
 		bgi::rtree<BoostSegmentI, bgi::quadratic<16> > rtree;
-		generateVoronoid(polygons, labelMap, graph, rtree);
+		generateVoronoid(polygons, BWTA_Result::obstacleLabelMap, graph, rtree);
 		
 		LOG(" [Computed BOOST Voronoi in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
@@ -185,7 +213,7 @@ namespace BWTA
 		std::map<nodeID, chokeSides_t> chokepointSides;
 		getChokepointSides(polygons, graphSimplified, rtree, chokepointSides);
 
-		LOG(" [Wall of chokepoints in " << timer.stopAndGetTime() << " seconds]");
+		LOG(" [Chokepoints sides computed in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
 		painter.drawPolygons(polygons);
 		painter.drawGraph(graphSimplified);
@@ -196,11 +224,11 @@ namespace BWTA
 		timer.start();
 
 		std::vector<BoostPolygon> polReg;
-		createRegionsFromGraph(boostPolygons, labelMap, graphSimplified, chokepointSides,
+		createRegionsFromGraph(boostPolygons, BWTA_Result::obstacleLabelMap, graphSimplified, chokepointSides,
 			BWTA_Result::regions, BWTA_Result::chokepoints,
 			polReg);
 
-		LOG(" [Creating BWTA regions/chokepoints in " << timer.stopAndGetTime() << " seconds]");
+		LOG(" [Created BWTA regions/chokepoints in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
 		painter.drawPolygons(polReg);
 		painter.render("9-Regions");
@@ -513,8 +541,6 @@ namespace BWTA
 		// *************************************************
 */
 
-		exit(-1);
-
 		detectBaseLocations(BWTA_Result::baselocations);
 // 		for (auto i : BWTA_Result::baselocations) {
 // 			log("BaseLocation at Position " << i->getPosition() << " Tile " << i->getTilePosition());
@@ -544,6 +570,7 @@ namespace BWTA
 		painter.drawClosestChokepointMap(BWTA_Result::getChokepointW, BWTA_Result::chokepoints);
 		painter.render("ClosestChokepointMap");
 #endif
+		exit(-1);
 
 	}
 

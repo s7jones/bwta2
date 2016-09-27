@@ -21,5 +21,11 @@ namespace BWTA
 		extern RectangleArray<Chokepoint*> getChokepoint;
 		extern RectangleArray<BaseLocation*> getBaseLocationW;
 		extern RectangleArray<BaseLocation*> getBaseLocation;
+
+		// TODO save this data
+		extern RectangleArray<int> obstacleLabelMap;
+		extern RectangleArray<int> closestObstacleLabelMap;
+		extern RectangleArray<int> regionLabelMap;
+		// TODO add closestRegionLabelMap
 	};
 }

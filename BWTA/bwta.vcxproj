@@ -292,6 +292,7 @@
     <ClCompile Include="Source\RegionImpl.cpp" />
     <ClCompile Include="Source\terrain_analysis.cpp" />
     <ClCompile Include="Source\util.cpp" />
+    <ClCompile Include="Source\Utils.cpp" />
     <ClCompile Include="Source\VertexData.cpp" />
     <ClCompile Include="Source\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -323,6 +324,7 @@
     <ClInclude Include="Source\RegionImpl.h" />
     <ClInclude Include="Source\terrain_analysis.h" />
     <ClInclude Include="Source\Timer.h" />
+    <ClInclude Include="Source\Utils.h" />
     <ClInclude Include="Source\VertexData.h" />
     <ClInclude Include="..\include\BWTA\BaseLocation.h" />
     <ClInclude Include="..\include\BWTA.h" />

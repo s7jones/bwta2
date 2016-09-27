@@ -220,7 +220,7 @@ namespace BWTA
 
 			// find what region this base location is in and tell that region about the base location
 			for (auto& region : BWTA_Result::regions) {
-				if (region->getPolygon().isInside(base->getPosition())) {
+				if (region->getPolygon().isInside(base->getPosition())) { // TODO use regionLabMap
 					baseI->region = region;
 					((RegionImpl*)region)->baseLocations.insert(base);
 					break;

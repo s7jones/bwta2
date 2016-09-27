@@ -725,66 +725,25 @@ namespace BWTA
 
 	void getChokepointSides(const std::vector<Polygon>& polygons, const RegionGraph& graph, const bgi::rtree<BoostSegmentI, bgi::quadratic<16> >& rtree, std::map<nodeID, chokeSides_t>& chokepointSides)
 	{
-// #ifdef DEBUG_DRAW
-// 		Painter painter;
-// #endif
-
 		for (const auto& id : graph.chokeNodes) {
 			BoostPoint pt(graph.nodes[id].x, graph.nodes[id].y);
-			std::vector<BoostSegment> nearestSegments;
-			BoostSegment s1, s2;
-
+			BWAPI::WalkPosition side1, side2;
 			// get nearest value
 			auto it = rtree.qbegin(bgi::nearest(pt, 100));
-			s1 = (*it).first;
-			BWAPI::WalkPosition side1 = getProjectedPoint(pt, s1);
-			BWAPI::WalkPosition side2;
-// 			nearestSegments.push_back((*it).first);
+			side1 = getProjectedPoint(pt, (*it).first);
 			++it;
 
 			// iterate over nearest Values
 			for (it; it != rtree.qend(); ++it) {
-
-// #ifdef DEBUG_DRAW
-// 				// iterative drawing of nodes detected
-// 				painter.drawPolygons(polygons);
-// 				// explored segments
-// 				for (const auto& seg : nearestSegments) {
-// 					painter.drawLine(seg, Qt::blue);
-// 				}
-// 				painter.drawLine(s1, Qt::green); // first segment
-// 				painter.drawLine((*it).first, Qt::red); // current segment
-// 				painter.render();
-// #endif
-
-				// if distance to all previous nearest segments is different than 0, we have a second segment candidate
-// 				bool found = true;
-// 				for (const auto& seg : nearestSegments) {
-// 					double dist = boost::geometry::comparable_distance(seg, (*it).first);
-// 					if (dist == 0) {
-// 						found = false;
-// 						break;
-// 					}
-// 				}
-// 				if (found) {
-// 					s2 = (*it).first;
-// 					break;
-// 				}
-
 				side2 = getProjectedPoint(pt, (*it).first);
 				if ((side1.x < pt.x() && side2.x > pt.x()) ||
 					(side1.x > pt.x() && side2.x < pt.x()) ||
 					(side1.y < pt.y() && side2.y > pt.y()) ||
 					(side1.y > pt.y() && side2.y < pt.y())) {
-// 					s2 = (*it).first;
 					break;
 				}
-
-// 				nearestSegments.push_back((*it).first);
 			}
 
-// 			BWAPI::WalkPosition side1 = getProjectedPoint(pt, s1);
-// 			BWAPI::WalkPosition side2 = getProjectedPoint(pt, s2);
 			chokepointSides.emplace(id, chokeSides_t(side1, side2));
 		}
 	}
@@ -795,10 +754,9 @@ namespace BWTA
 		std::vector<BoostPolygon>& polReg)
 	{
 		// create regions polygons
-		// *********************************************
+		// *************************************************************
 
-		// first we start with the "negative" geometry of polygon obstacles
-		// Set vertices of the map
+		// Create a new box geometry of the whole map
 		BoostPoint topLeft(0, 0);
 		BoostPoint bottomLeft(0, labelMap.getHeight() - 1);
 		BoostPoint bottomRight(labelMap.getWidth() - 1, labelMap.getHeight() - 1);
@@ -808,14 +766,14 @@ namespace BWTA
 		boost::geometry::assign_points(mapBorder, points);
 		boost::geometry::correct(mapBorder);
 
-		// subtract obstacles
+		// subtract obstacles to get the "negative" geometry of polygon obstacles
 		typedef boost::geometry::model::multi_polygon<BoostPolygon> BoostMultiPoly;
 		BoostMultiPoly output, obstacles;
 		obstacles.reserve(polygons.size());
 		std::copy(polygons.begin(), polygons.end(), back_inserter(obstacles));
 		boost::geometry::difference(mapBorder, obstacles, output);
 
-		// divide regions
+		// convert chokepoints to lines
 		typedef boost::geometry::model::linestring<BoostPoint> BoostLine;
 		typedef boost::geometry::model::multi_linestring<BoostLine> BoostMultiLine;
 		BoostMultiLine chokeLines;
@@ -828,35 +786,52 @@ namespace BWTA
 			chokeLines.push_back(chokeLine);
 		}
 
-		// Declare strategies
+		// expand (buffer) the choke lines to ensure they will "cross" regions
 		const double buffer_distance = 0.5;
 		boost::geometry::strategy::buffer::distance_symmetric<double> distance_strategy(buffer_distance);
 		boost::geometry::strategy::buffer::join_miter join_strategy;
 		boost::geometry::strategy::buffer::end_round end_strategy;
 		boost::geometry::strategy::buffer::point_square circle_strategy;
 		boost::geometry::strategy::buffer::side_straight side_strategy;
-		// Create the buffer of a linestring
+		
 		BoostMultiPoly cutPolygons;
 		boost::geometry::buffer(chokeLines, cutPolygons,
 			distance_strategy, side_strategy,
 			join_strategy, end_strategy, circle_strategy);
 
+		// compute the difference between the expanded choke lines (cutPolygons) and the walkable polygon (output)
+		// to get the polygon regions
 		BoostMultiPoly regionsPoly;
 		boost::geometry::difference(output, cutPolygons, regionsPoly);
 		
-// 		LOG("Output size: " << regionsPoly.size());
 		polReg.reserve(regionsPoly.size());
 		std::copy(regionsPoly.begin(), regionsPoly.end(), back_inserter(polReg));
 
+		// compute label region map
+		// ===========================================================================
+		RectangleArray<int> regionLabel(MapData::mapWidthWalkRes, MapData::mapHeightWalkRes);
+		regionLabel.setTo(0);
+		RectangleArray<bool> nodeMap(MapData::mapWidthWalkRes, MapData::mapHeightWalkRes);
+		nodeMap.setTo(false);
+		int regionLabelId = 1;
+
+		for (auto& poly : polReg) {
+			scanLineFill(poly.outer(), regionLabelId++, regionLabel);
+		}
+// 		regionLabel.saveToFile("logs/regionLabel.txt");
+		// TODO we still need to label the choke lines!!!!!!
+
 		// Create regions from graph nodes
+		// ===========================================================================
 		std::map<nodeID, Region*> node2region;
 		for (const auto& regionNodeId : graph.regionNodes) {
 			// find polygon
 			BoostPoint regionPoint(graph.nodes[regionNodeId].x, graph.nodes[regionNodeId].y);
 			for (const auto& regionPol : regionsPoly) {
-				if (boost::geometry::within(regionPoint, regionPol)) {
-					// 8 because we want to transform from WalkPosition to Position
+				if (boost::geometry::within(regionPoint, regionPol)) { // TODO this can be improved checking label map
+					// 8 because we want to transform from WalkPosition to PixelPosition
 					Region* newRegion = new RegionImpl(regionPol, 8); 
+					// TODO save radius and label
 					regions.insert(newRegion);
 					node2region.emplace(regionNodeId, newRegion);
 					break;
@@ -886,6 +861,8 @@ namespace BWTA
 			}
 			((RegionImpl*)region)->_chokepoints = chokepoints;
 		}
+
+		// TODO compute hue color
 
 	}
 }

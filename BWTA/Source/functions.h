@@ -1,7 +1,6 @@
 #pragma once
 
 #include "VertexData.h"
-#include <BWTA/RectangleArray.h>
 #include <BWTA/BaseLocation.h>
 #include <BWTA/Polygon.h>
 

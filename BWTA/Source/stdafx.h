@@ -45,6 +45,7 @@
 
 // Internal utilities
 #include "Timer.h"
+#include <BWTA/RectangleArray.h>
 
 // Typedefs
 using TileID = uint16_t;
@@ -74,7 +75,6 @@ typedef boost::polygon::segment_data<int32> VoronoiSegment;
 
 namespace bg = boost::geometry;
 namespace bgi = boost::geometry::index;
-
 
 #ifdef OFFLINE
 #define BWTA_PATH "logs/"
