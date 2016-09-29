@@ -101,6 +101,9 @@
     <ClCompile Include="Source\Utils.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
+    <ClCompile Include="Source\GraphColoring.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\BaseLocationImpl.h">
@@ -194,6 +197,9 @@
       <Filter>TerrainAnalyzer</Filter>
     </ClInclude>
     <ClInclude Include="Source\Utils.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GraphColoring.h">
       <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>

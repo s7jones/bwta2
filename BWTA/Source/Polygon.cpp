@@ -23,9 +23,6 @@ namespace BWTA
 	{
 		for (const auto& point : b) this->push_back(point);
 		this->holes = b.getHoles();
-		this->labelId = b.labelId;
-		this->connectedComponentId = b.connectedComponentId;
-		this->opennessPoint = b.opennessPoint;
 	}
 
 	double Polygon::getArea() const

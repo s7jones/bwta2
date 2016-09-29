@@ -2,6 +2,10 @@
 #include "Painter.h"
 
 namespace BWTA {
+
+	std::vector<QColor> baseColors = { QColor(0, 114, 189), QColor(217, 83, 25), QColor(237, 177, 32),
+		QColor(126, 47, 142), QColor(119, 172, 48), QColor(77, 190, 238), QColor(162, 20, 47) };
+
 	Painter::Painter() :
 		renderCounter(1)
 	{
@@ -93,11 +97,11 @@ namespace BWTA {
 		}
 	}
 
-	void Painter::drawPolygon(const Polygon& polygon, QColor color) {
+	void Painter::drawPolygon(const Polygon& polygon, QColor color, double scale) {
 		QVector<QPointF> qp;
 		for (int i = 0; i < (int)polygon.size(); i++) {
-			int j = (i + 1) % polygon.size();
-			qp.push_back(QPointF(polygon[i].x, polygon[i].y));
+// 			int j = (i + 1) % polygon.size();
+			qp.push_back(QPointF(polygon[i].x * scale, polygon[i].y * scale));
 		}
 		painter->setPen(QPen(Qt::black));
 		painter->setBrush(QBrush(color));
@@ -206,6 +210,11 @@ namespace BWTA {
 		}
 	}
 
+	void Painter::drawRegions(std::vector<Region*> regions) {
+		for (const auto& r : regions) {
+			drawPolygon(r->getPolygon(), baseColors.at(r->getColorLabel()), 0.125);
+		}
+	}
 
 	QColor Painter::hsl2rgb(double h, double sl, double l)
 	{
@@ -345,9 +354,6 @@ namespace BWTA {
 	{
 		LOG("Drawing closest Chokepoint for " << chokepoints.size() << " chokepoints");
 		// assign a color to each Chokepoint
-		std::vector<QColor> baseColors = { QColor(0, 114, 189), QColor(217, 83, 25), QColor(237, 177, 32)
-			, QColor(126, 47, 142), QColor(119, 172, 48), QColor(77, 190, 238), QColor(162, 20, 47) };
-
 		std::map<Chokepoint*, QColor> chokeToColor;
 		chokeToColor[NULL] = QColor(180, 180, 180);
 		int i = 0;

@@ -12,19 +12,28 @@ namespace BWTA
 	RegionImpl(const Polygon& poly);
 	RegionImpl(const BoostPolygon& boostPoly, const int& scale = 1);
 
-    virtual const Polygon& getPolygon() const;
-    virtual const BWAPI::Position& getCenter() const;
-    virtual const std::set<Chokepoint*>& getChokepoints() const;
-    virtual const std::set<BaseLocation*>& getBaseLocations() const;
-    virtual bool isReachable(Region* region) const;
-    virtual const std::set<Region*>& getReachableRegions() const;
-	virtual const int getMaxDistance() const;
+	const Polygon& getPolygon() const override							{ return this->_polygon; };
+	const BWAPI::Position& getCenter() const override					{ return this->_center; };
+	const std::set<Chokepoint*>& getChokepoints() const override		{ return this->_chokepoints; };
+	const std::set<BaseLocation*>& getBaseLocations() const override	{ return this->baseLocations; };
+	const std::set<Region*>& getReachableRegions() const override		{ return this->reachableRegions; };
+	const int getMaxDistance() const override							{ return this->_maxDistance; };
+	const int getColorLabel() const override							{ return this->_color; };
+	const BWAPI::Position& getOpennessPosition() const override			{ return this->_opennessPoint; };
+	const double getOpennessDistance() const override					{ return this->_opennessDistance; };
+
+	bool isReachable(Region* region) const override;
 
     Polygon _polygon;
     BWAPI::Position _center;
     std::set<Chokepoint*> _chokepoints;
     std::set<BaseLocation*> baseLocations;
     std::set<Region*> reachableRegions;
-	int _maxDistance;
+	int _maxDistance; // TODO remove this, should be the same as _opennessDistance
+	int _color;		// color map ID
+	BWAPI::Position _opennessPoint; // maximum distance point equidistant to the border
+	double _opennessDistance; // distance from opennessPoint to the border
+	int _labelId;
+	int _connectedComponentId;
   };
 }

@@ -19,7 +19,7 @@ namespace BWTA
 		BWTA_Result::baselocations.clear();
 		BWTA_Result::startlocations.clear();
 	}
-  const std::set<Region*>& getRegions()
+  const std::vector<Region*>& getRegions()
   {
     return BWTA_Result::regions;
   }

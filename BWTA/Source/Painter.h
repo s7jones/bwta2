@@ -21,7 +21,7 @@ namespace BWTA {
 		void render(const std::string& label = std::string());
 		void drawMapBorder();
 		void drawArrangement(Arrangement_2* arrangement);
-		void drawPolygon(const Polygon& polygon, QColor color);
+		void drawPolygon(const Polygon& polygon, QColor color, double scale = 1.0);
 		void drawPolygon(PolygonD& polygon, QColor color);
 		void drawPolygons(const std::vector<Polygon>& polygons);
 		void drawPolygons(std::set<Polygon*>& polygons);
@@ -29,6 +29,7 @@ namespace BWTA {
 		void drawNodes(std::set<Node*> nodes, QColor color);
 		void drawNodesAndConnectToNeighbors(std::set<Node*> nodes, QColor nodeColor);
 		void drawFourColorMap(std::set<Node*> regions);
+		void drawRegions(std::vector<Region*> regions);
 		void drawHeatMap(RectangleArray<int> map, float maxValue);
 		void drawClosestBaseLocationMap(RectangleArray<BaseLocation*> map, std::set<BaseLocation*> baseLocations);
 		void drawClosestChokepointMap(RectangleArray<Chokepoint*> map, std::set<Chokepoint*> chokepoints);

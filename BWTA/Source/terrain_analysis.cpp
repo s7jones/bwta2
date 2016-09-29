@@ -119,36 +119,12 @@ namespace BWTA
 #ifdef DEBUG_DRAW
 		painter.drawPolygons(polygons);
 		painter.render("1-BoostPolygons");
-		// Prints each polygon to debug 
+		// Prints each polygon individually to debug 
 // 		for (auto tmpPol : polygons) {
 // 			painter.drawPolygon(tmpPol, QColor(180, 180, 180));
 // 			painter.render();
 // 		}
 #endif
-
-		// testing labeling
-// 		RectangleArray<int> labelMap2(MapData::walkability.getWidth(), MapData::walkability.getHeight());
-// 		labelMap2.setTo(0);
-// 		for (size_t x = 0; x < BWTA_Result::obstacleLabelMap.getWidth(); ++x) {
-// 			for (size_t y = 0; y < BWTA_Result::obstacleLabelMap.getHeight(); ++y) {
-// 				bool insidePol = false;
-// 				BoostPoint boostPoint(x, y);
-// 				for (const auto& pol : boostPolygons) {
-// 					if (boost::geometry::covered_by(boostPoint, pol)) {
-// 						insidePol = true;
-// 						break;
-// 					}
-// 				}
-// 				if (BWTA_Result::obstacleLabelMap[x][y] > 0 && 
-// 					MapData::walkability[x][y] && !insidePol) labelMap2[x][y] = 1;
-// 				if (BWTA_Result::obstacleLabelMap[x][y] <= 0 
-// 					&& !MapData::walkability[x][y] && insidePol) labelMap2[x][y] = 2;
-// 			}
-// 		}
-// 		labelMap2.saveToFile("logs/labelMap2.txt");
-
-// 		exit(-1);
-
 		timer.start();
 
 		RegionGraph graph;
@@ -225,12 +201,13 @@ namespace BWTA
 
 		std::vector<BoostPolygon> polReg;
 		createRegionsFromGraph(boostPolygons, BWTA_Result::obstacleLabelMap, graphSimplified, chokepointSides,
-			BWTA_Result::regions, BWTA_Result::chokepoints,
-			polReg);
+			BWTA_Result::regions, BWTA_Result::chokepoints, polReg);
 
 		LOG(" [Created BWTA regions/chokepoints in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
-		painter.drawPolygons(polReg);
+		regionColoring();
+		painter.drawPolygons(polygons);
+		painter.drawRegions(BWTA_Result::regions);
 		painter.render("9-Regions");
 #endif
 		timer.start();

@@ -16,7 +16,7 @@ namespace BWTA
   int getMaxDistanceTransform();
   RectangleArray<int>* getDistanceTransformMap();
 
-  const std::set<Region*>& getRegions();
+  const std::vector<Region*>& getRegions();
   const std::set<Chokepoint*>& getChokepoints();
   const std::set<BaseLocation*>& getBaseLocations();
   const std::set<BaseLocation*>& getStartLocations();

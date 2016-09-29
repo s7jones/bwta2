@@ -17,5 +17,9 @@ namespace BWTA
 		virtual bool isReachable(Region* region) const = 0;
 		virtual const std::set<Region*>& getReachableRegions() const = 0;
 		virtual const int getMaxDistance() const = 0;
+		virtual const int getColorLabel() const = 0;
+		virtual const BWAPI::Position& getOpennessPosition() const = 0;
+		virtual const double getOpennessDistance() const = 0;
+
 	};
 }

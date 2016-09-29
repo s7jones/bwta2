@@ -7,8 +7,8 @@ namespace BWTA
 	namespace BWTA_Result
 	{
 		// List of objects extracted
-		// TODO instead of set should be vector?
-		extern std::set<Region*> regions;
+		// TODO instead of set use vector
+		extern std::vector<Region*> regions;
 		extern std::set<Chokepoint*> chokepoints;
 		extern std::set<BaseLocation*> baselocations;
 		extern std::set<BaseLocation*> startlocations;

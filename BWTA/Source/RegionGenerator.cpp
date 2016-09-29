@@ -2,6 +2,7 @@
 
 #include "Painter.h"
 #include <boost/geometry/index/rtree.hpp>
+#include "BWTA_Result.h"
 
 namespace BWTA
 {
@@ -723,6 +724,20 @@ namespace BWTA
 		return a;
 	}
 
+	void extendLine(BoostPoint& a, BoostPoint& b)
+	{
+		BoostPoint extendCenter = getMidpoint(a, b);
+		// translate to extend
+		boost::geometry::subtract_point(a, extendCenter);
+		boost::geometry::subtract_point(b, extendCenter);
+		// extend
+		boost::geometry::multiply_value(a, 1.1);
+		boost::geometry::multiply_value(b, 1.1);
+		// translate back
+		boost::geometry::add_point(a, extendCenter);
+		boost::geometry::add_point(b, extendCenter);
+	}
+
 	void getChokepointSides(const std::vector<Polygon>& polygons, const RegionGraph& graph, const bgi::rtree<BoostSegmentI, bgi::quadratic<16> >& rtree, std::map<nodeID, chokeSides_t>& chokepointSides)
 	{
 		for (const auto& id : graph.chokeNodes) {
@@ -748,13 +763,25 @@ namespace BWTA
 		}
 	}
 
+	template <class _Tp1>
+	_Tp1 get_set2(std::map<_Tp1, _Tp1> &a, _Tp1 i)
+	{
+		if (a.find(i) == a.end()) a[i] = i;
+		if (i == a[i]) return i;
+		a[i] = get_set2(a, a[i]);
+		return a[i];
+	}
+
 	void createRegionsFromGraph(const std::vector<BoostPolygon>& polygons, const RectangleArray<int>& labelMap,
 		const RegionGraph& graph, const std::map<nodeID, chokeSides_t>& chokepointSides, 
-		std::set<Region*>& regions, std::set<Chokepoint*>& chokepoints,
+		std::vector<Region*>& regions, std::set<Chokepoint*>& chokepoints,
 		std::vector<BoostPolygon>& polReg)
 	{
+		Timer timer;
+		timer.start();
+
 		// create regions polygons
-		// *************************************************************
+		// ===========================================================================
 
 		// Create a new box geometry of the whole map
 		BoostPoint topLeft(0, 0);
@@ -773,13 +800,14 @@ namespace BWTA
 		std::copy(polygons.begin(), polygons.end(), back_inserter(obstacles));
 		boost::geometry::difference(mapBorder, obstacles, output);
 
-		// convert chokepoints to lines
+		// convert chokepoints to lines (and extend both sides)
 		typedef boost::geometry::model::linestring<BoostPoint> BoostLine;
 		typedef boost::geometry::model::multi_linestring<BoostLine> BoostMultiLine;
 		BoostMultiLine chokeLines;
 		for (const auto& choke : chokepointSides) {
 			BoostPoint a(choke.second.side1.x, choke.second.side1.y);
 			BoostPoint b(choke.second.side2.x, choke.second.side2.y);
+			extendLine(a, b);
 			std::vector<BoostPoint> line = { a, b };
 			BoostLine chokeLine;
 			boost::geometry::assign_points(chokeLine, line);
@@ -800,12 +828,15 @@ namespace BWTA
 			join_strategy, end_strategy, circle_strategy);
 
 		// compute the difference between the expanded choke lines (cutPolygons) and the walkable polygon (output)
-		// to get the polygon regions
+		// to get the final polygon regions (polReg)
 		BoostMultiPoly regionsPoly;
 		boost::geometry::difference(output, cutPolygons, regionsPoly);
 		
 		polReg.reserve(regionsPoly.size());
 		std::copy(regionsPoly.begin(), regionsPoly.end(), back_inserter(polReg));
+
+		LOG(" - Polygon region computed in " << timer.stopAndGetTime() << " seconds");
+		timer.start();
 
 		// compute label region map
 		// ===========================================================================
@@ -814,30 +845,36 @@ namespace BWTA
 		RectangleArray<bool> nodeMap(MapData::mapWidthWalkRes, MapData::mapHeightWalkRes);
 		nodeMap.setTo(false);
 		int regionLabelId = 1;
+		std::map<int, BoostPolygon*> labelToPolygon;
 
 		for (auto& poly : polReg) {
-			scanLineFill(poly.outer(), regionLabelId++, regionLabel);
+			// TODO we still need to label the choke lines!!!!!!
+			scanLineFill(poly.outer(), regionLabelId, regionLabel);
+			labelToPolygon[regionLabelId] = &poly;
+			regionLabelId++;
 		}
 // 		regionLabel.saveToFile("logs/regionLabel.txt");
-		// TODO we still need to label the choke lines!!!!!!
+
+		LOG(" - Label region map computed in " << timer.stopAndGetTime() << " seconds");
+		timer.start();
 
 		// Create regions from graph nodes
 		// ===========================================================================
 		std::map<nodeID, Region*> node2region;
 		for (const auto& regionNodeId : graph.regionNodes) {
-			// find polygon
-			BoostPoint regionPoint(graph.nodes[regionNodeId].x, graph.nodes[regionNodeId].y);
-			for (const auto& regionPol : regionsPoly) {
-				if (boost::geometry::within(regionPoint, regionPol)) { // TODO this can be improved checking label map
-					// 8 because we want to transform from WalkPosition to PixelPosition
-					Region* newRegion = new RegionImpl(regionPol, 8); 
-					// TODO save radius and label
-					regions.insert(newRegion);
-					node2region.emplace(regionNodeId, newRegion);
-					break;
-				}
-			}
+			// get node regionLabel
+			int labelId = regionLabel[graph.nodes[regionNodeId].x][graph.nodes[regionNodeId].y];
+			BoostPolygon* regionPol = labelToPolygon[labelId];
+			RegionImpl* newRegionImpl = new RegionImpl(*regionPol, 8); // 8 => walk to pixel resolution
+			newRegionImpl->_opennessDistance = graph.minDistToObstacle.at(regionNodeId);
+			newRegionImpl->_opennessPoint = BWAPI::Position(graph.nodes.at(regionNodeId));
+			newRegionImpl->_labelId = labelId;
+
+			Region* newRegion = newRegionImpl;
+			regions.push_back(newRegion);
+			node2region.emplace(regionNodeId, newRegion);
 		}
+		// TODO we don't need regionPol function output (just print BWTA::Region)
 
 		//LOG(" - Finding chokepoints and linking them to regions.");
 		std::map<nodeID, Chokepoint*> node2chokepoint;
@@ -862,7 +899,39 @@ namespace BWTA
 			((RegionImpl*)region)->_chokepoints = chokepoints;
 		}
 
-		// TODO compute hue color
+		LOG(" - Created BWTA Regions and Chokepoints in " << timer.stopAndGetTime() << " seconds");
+		timer.start();
 
+		// compute reachable region for each region
+		// ===========================================================================
+		std::map<RegionImpl*, RegionImpl*> regionGroup;
+		for (auto regionInterface : BWTA_Result::regions) {
+			RegionImpl* region1 = (RegionImpl*)regionInterface;
+			for (auto chokepointInterface : regionInterface->getChokepoints()) {
+				ChokepointImpl* chokepoint = (ChokepointImpl*)chokepointInterface;
+				RegionImpl* region2 = (RegionImpl*)(chokepoint->_regions.first);
+				if (region1 == region2) {
+					region2 = (RegionImpl*)(chokepoint->_regions.second);
+				}
+				regionGroup[get_set2(regionGroup, region2)] = get_set2(regionGroup, region1);
+			}
+		}
+
+		// TODO set reachable ID to speed up queries later
+		for (auto regionInterface : BWTA_Result::regions) {
+			RegionImpl* region1 = (RegionImpl*)regionInterface;
+			region1->reachableRegions.insert(region1);
+			for (auto regionInterface2 : BWTA_Result::regions) {
+				RegionImpl* region2 = (RegionImpl*)regionInterface2;
+				if (region1 == region2) continue;
+				if (get_set2(regionGroup, region1) == get_set2(regionGroup, region2)) {
+					region1->reachableRegions.insert(region2);
+					region2->reachableRegions.insert(region1);
+				}
+			}
+		}
+
+		LOG(" - Reachable regions computed in " << timer.stopAndGetTime() << " seconds");
+		timer.start();
 	}
 }

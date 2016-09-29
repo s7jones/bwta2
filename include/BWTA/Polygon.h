@@ -19,8 +19,5 @@ namespace BWTA
 		const std::vector<Polygon>& getHoles() const { return holes; };
 
 		std::vector<Polygon> holes;
-		int labelId;
-		int connectedComponentId;
-		BWAPI::Position opennessPoint;
 	};
 }

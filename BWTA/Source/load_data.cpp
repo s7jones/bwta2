@@ -277,7 +277,7 @@ namespace BWTA
     {
       Region* r=new RegionImpl();
       regions.push_back(r);
-      BWTA_Result::regions.insert(r);
+	  BWTA_Result::regions.push_back(r);
     }
     for(int i=0;i<unwalkablePolygon_amount;i++)
     {
@@ -474,10 +474,7 @@ namespace BWTA
     {
       cid[*c]=c_id++;
     }
-    for(std::set<Region*>::const_iterator r=BWTA_Result::regions.begin();r!=BWTA_Result::regions.end();r++)
-    {
-      rid[*r]=r_id++;
-    }
+	for (auto& r : BWTA_Result::regions) rid[r] = r_id++;
     std::ofstream file_out;
     file_out.open(filename.c_str());
     int file_version=BWTA_FILE_VERSION;
@@ -537,34 +534,31 @@ namespace BWTA
       file_out << (*c)->getCenter().y << "\n";
       file_out << (*c)->getWidth() << "\n";
     }
-    for(std::set<Region*>::const_iterator r=BWTA_Result::regions.begin();r!=BWTA_Result::regions.end();r++)
-    {
-      file_out << rid[*r] << "\n";
-      Polygon poly=(*r)->getPolygon();
+	for (const auto& r : BWTA_Result::regions) {
+      file_out << rid[r] << "\n";
+      Polygon poly=r->getPolygon();
       file_out << poly.size() << "\n";
       for(unsigned int i=0;i<poly.size();i++)
       {
         file_out << poly[i].x << "\n";
         file_out << poly[i].y << "\n";
       }
-      file_out << (*r)->getCenter().x << "\n";
-      file_out << (*r)->getCenter().y << "\n";
-      file_out << (*r)->getChokepoints().size() << "\n";
-      for(std::set<Chokepoint*>::const_iterator c=(*r)->getChokepoints().begin();c!=(*r)->getChokepoints().end();c++)
+      file_out << r->getCenter().x << "\n";
+      file_out << r->getCenter().y << "\n";
+      file_out << r->getChokepoints().size() << "\n";
+      for(std::set<Chokepoint*>::const_iterator c=r->getChokepoints().begin();c!=r->getChokepoints().end();c++)
       {
         file_out << cid[*c] << "\n";
       }
-      file_out << (*r)->getBaseLocations().size() << "\n";
-      for(std::set<BaseLocation*>::const_iterator b=(*r)->getBaseLocations().begin();b!=(*r)->getBaseLocations().end();b++)
+      file_out << r->getBaseLocations().size() << "\n";
+      for(std::set<BaseLocation*>::const_iterator b=r->getBaseLocations().begin();b!=r->getBaseLocations().end();b++)
       {
         file_out << bid[*b] << "\n";
       }
-      for(std::set<Region*>::const_iterator r2=BWTA_Result::regions.begin();r2!=BWTA_Result::regions.end();r2++)
-      {
-        int connected=0;
-        if ((*r)->isReachable(*r2))
-          connected=1;
-        file_out << connected << "\n";
+	  for (const auto& r2 : BWTA_Result::regions) {
+		  int connected = 0;
+		  if (r->isReachable(r2)) connected = 1;
+		  file_out << connected << "\n";
       }
     }
     for(int x=0;x<(int)BWTA_Result::getRegion.getWidth();x++)

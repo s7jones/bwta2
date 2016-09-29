@@ -21,6 +21,7 @@
 #include "Heap.h"
 #include "PolygonGenerator.h"
 #include "RegionGenerator.h"
+#include "GraphColoring.h"
 
 namespace BWTA
 {

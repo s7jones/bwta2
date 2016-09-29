@@ -12,14 +12,6 @@
 
 namespace BWTA
 {
-	template <class _Tp1>
-	_Tp1 get_set2(std::map<_Tp1, _Tp1> &a, _Tp1 i)
-	{
-		if (a.find(i) == a.end()) a[i] = i;
-		if (i == a[i]) return i;
-		a[i] = get_set2(a, a[i]);
-		return a[i];
-	}
 
 	template<typename T>
 	struct objectDistance_t {
@@ -121,88 +113,10 @@ namespace BWTA
 		}
 	}
 
-// 	template<typename T>
-// 	void walkResMapToTileResMap(const RectangleArray<T*>& walkResMap, RectangleArray<T*>& tileResMap)
-// 	{
-// 		for (size_t x = 0; x < MapData::mapWidthTileRes; ++x) {
-// 			for (size_t y = 0; y < MapData::mapHeightTileRes; ++y) {
-// 				Heap<T*, int> h;
-// 				for (int xi = 0; xi < 4; ++xi) {
-// 					for (int yi = 0; yi < 4; ++yi) {
-// 						T* bl = walkResMap[x * 4 + xi][y * 4 + yi];
-// 						if (bl == NULL) continue;
-// 						if (h.contains(bl)) {
-// 							int n = h.get(bl) + 1;
-// 							h.set(bl, n);
-// 						} else {
-// 							h.push(std::make_pair(bl, 1));
-// 						}
-// 					}
-// 				}
-// 				if (!h.empty()) tileResMap[x][y] = h.top().first;
-// 			}
-// 		}
-// 	}
-
 	void calculate_connectivity()
 	{
 		Timer timer;
 		timer.start();
-
-		// compute reachable region for each region
-		// ===========================================================================
-		std::map<RegionImpl*, RegionImpl*> regionGroup;
-		for (auto regionInterface : BWTA_Result::regions) {
-			RegionImpl* region1 = (RegionImpl*)regionInterface;
-			for (auto chokepointInterface : regionInterface->getChokepoints()) {
-				ChokepointImpl* chokepoint = (ChokepointImpl*)chokepointInterface;
-				RegionImpl* region2 = (RegionImpl*)(chokepoint->_regions.first);
-				if (region1 == region2) {
-					region2 = (RegionImpl*)(chokepoint->_regions.second);
-				}
-				regionGroup[get_set2(regionGroup, region2)] = get_set2(regionGroup, region1);
-			}
-		}
-
-		// TODO set reachable ID to speed up queries
-		for (auto regionInterface : BWTA_Result::regions) {
-			RegionImpl* region1 = (RegionImpl*)regionInterface;
-			region1->reachableRegions.insert(region1);
-			for (auto regionInterface2 : BWTA_Result::regions) {
-				RegionImpl* region2 = (RegionImpl*)regionInterface2;
-				if (region1 == region2) continue;
-				if (get_set2(regionGroup, region1) == get_set2(regionGroup, region2)) {
-					region1->reachableRegions.insert(region2);
-					region2->reachableRegions.insert(region1);
-				}
-			}
-		}
-
-		LOG(" - Reachable regions computed in " << timer.stopAndGetTime() << " seconds");
-		timer.start();
-
-		// compute label region map
-		// ===========================================================================
-// 		for (int x = 0; x < (int)MapData::mapWidthTileRes; x++) {
-// 			for (int y = 0; y < (int)MapData::mapHeightTileRes; y++) {
-// 				Region* closestRegion = NULL;
-// 				bool inRegion = false;
-// 				BWAPI::Position pixelPoint(x * TILE_SIZE + 16, y * TILE_SIZE + 16);
-// 
-// 				for (auto region : BWTA_Result::regions) {
-// 					if (region->getPolygon().isInside(pixelPoint)) {
-// 						closestRegion = region;
-// 						inRegion = true;
-// 						break;
-// 					}
-// 				}
-// 
-// 				if (inRegion) BWTA_Result::getRegion[x][y] = closestRegion;
-// 			}
-// 		}
-// 
-// 		LOG(" - Region Label computed in " << timer.stopAndGetTime() << " seconds");
-// 		timer.start();
 
 		// compute closest unwalkable polygon map
 		// ===========================================================================
@@ -213,7 +127,7 @@ namespace BWTA
 			for (const auto& pos : *pol) seedLabels.emplace(pos.x, pos.y, labelId);
 		}
 		computeClosestObjectMap(seedLabels, BWTA_Result::closestObstacleLabelMap);
-		BWTA_Result::closestObstacleLabelMap.saveToFile("logs/closestObstacleMap.txt");
+// 		BWTA_Result::closestObstacleLabelMap.saveToFile("logs/closestObstacleMap.txt");
 		
 		LOG(" - Closest UnwalkablePolygonMap computed in " << timer.stopAndGetTime() << " seconds");
 		timer.start();

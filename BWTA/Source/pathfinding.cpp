@@ -281,9 +281,8 @@ namespace BWTA
 
 	void buildChokeNodes()
 	{
-		std::set<BWTA::Region*> regions = BWTA::getRegions();
-		for (std::set<BWTA::Region*>::const_iterator region = regions.begin(); region != regions.end(); ++region) {
-			const std::set<BWTA::Chokepoint*> chokes = (*region)->getChokepoints();
+		for (const auto& region : BWTA::getRegions()) {
+			const std::set<BWTA::Chokepoint*> chokes = region->getChokepoints();
 			for (std::set<BWTA::Chokepoint*>::const_iterator choke1 = chokes.begin(); choke1 != chokes.end(); ++choke1) {
 				for (std::set<BWTA::Chokepoint*>::const_iterator choke2 = choke1; choke2 != chokes.end(); ++choke2) {
 					if (choke1 == choke2) continue;
