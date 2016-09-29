@@ -15,13 +15,13 @@
 #include "ChokepointImpl.h"
 #include "BaseLocationImpl.h"
 #include "BaseLocationGenerator.h"
-#include "extract_polygons.h"
 #include "BWTA_Result.h"
 #include "MapData.h"
 #include "Heap.h"
 #include "PolygonGenerator.h"
 #include "RegionGenerator.h"
 #include "GraphColoring.h"
+#include "ClosestObjectMap.h"
 
 namespace BWTA
 {

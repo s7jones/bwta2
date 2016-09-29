@@ -76,8 +76,8 @@ namespace BWTA
 			analyze_map();
 			LOG("Map analyzed in " << timer.stopAndGetTime() << " seconds");
 
-			save_data(filename);
-			LOG("Saved map data.");
+// 			save_data(filename);
+// 			LOG("Saved map data.");
 		}
 
 #ifndef OFFLINE
@@ -115,7 +115,7 @@ namespace BWTA
 		// Save polygons in BWTA_Result::unwalkablePolygons
 		for (auto& polygon : polygons) BWTA_Result::unwalkablePolygons.insert(&polygon);
 
-		LOG(" [Detected BOOST polygons in " << timer.stopAndGetTime() << " seconds]");
+		LOG(" [Detected polygons in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
 		painter.drawPolygons(polygons);
 		painter.render("1-BoostPolygons");
@@ -131,7 +131,7 @@ namespace BWTA
 		bgi::rtree<BoostSegmentI, bgi::quadratic<16> > rtree;
 		generateVoronoid(polygons, BWTA_Result::obstacleLabelMap, graph, rtree);
 		
-		LOG(" [Computed BOOST Voronoi in " << timer.stopAndGetTime() << " seconds]");
+		LOG(" [Computed Voronoi in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
 		painter.drawPolygons(polygons);
 		painter.drawGraph(graph);
@@ -526,9 +526,9 @@ namespace BWTA
 		LOG(" [Calculated base locations in " << timer.stopAndGetTime() << " seconds]");
 		timer.start();
 
-		calculate_connectivity();
+		computeAllClosestObjectMaps();
 
-		LOG(" [Calculated connectivity in " << timer.stopAndGetTime() << " seconds]");
+		LOG(" [Calculated closest maps in " << timer.stopAndGetTime() << " seconds]");
 		timer.start();
 
 		calculateBaseLocationProperties();
@@ -547,7 +547,7 @@ namespace BWTA
 		painter.drawClosestChokepointMap(BWTA_Result::getChokepointW, BWTA_Result::chokepoints);
 		painter.render("ClosestChokepointMap");
 #endif
-		exit(-1);
+// 		exit(-1);
 
 	}
 

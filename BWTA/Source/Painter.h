@@ -28,7 +28,7 @@ namespace BWTA {
 		void drawPolygons(const std::vector<BoostPolygon>& polygons);
 		void drawNodes(std::set<Node*> nodes, QColor color);
 		void drawNodesAndConnectToNeighbors(std::set<Node*> nodes, QColor nodeColor);
-		void drawFourColorMap(std::set<Node*> regions);
+// 		void drawFourColorMap(std::set<Node*> regions);
 		void drawRegions(std::vector<Region*> regions);
 		void drawHeatMap(RectangleArray<int> map, float maxValue);
 		void drawClosestBaseLocationMap(RectangleArray<BaseLocation*> map, std::set<BaseLocation*> baseLocations);
@@ -46,7 +46,7 @@ namespace BWTA {
 		QSvgGenerator* svg;
 		int renderCounter;
 
-		QColor hsl2rgb(double h, double sl, double l);
+// 		QColor hsl2rgb(double h, double sl, double l);
 		void getHeatMapColor(float value, float &red, float &green, float &blue);
 	};
 }

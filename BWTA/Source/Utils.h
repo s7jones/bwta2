@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Heap.h"
+
 namespace BWTA
 {
 

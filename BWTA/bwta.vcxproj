@@ -276,10 +276,9 @@
     <ClCompile Include="Source\BaseLocationImpl.cpp" />
     <ClCompile Include="Source\BWTA.cpp" />
     <ClCompile Include="Source\BWTA_Result.cpp" />
-    <ClCompile Include="Source\calculate_connectivity.cpp" />
     <ClCompile Include="Source\ChokepointImpl.cpp" />
-    <ClCompile Include="Source\extract_polygons.cpp" />
     <ClCompile Include="Source\BaseLocationGenerator.cpp" />
+    <ClCompile Include="Source\ClosestObjectMap.cpp" />
     <ClCompile Include="Source\get_voronoi_edges.cpp" />
     <ClCompile Include="Source\Graph.cpp" />
     <ClCompile Include="Source\GraphColoring.cpp" />
@@ -310,9 +309,9 @@
     <ClInclude Include="Source\BaseLocationImpl.h" />
     <ClInclude Include="Source\BWTA_Result.h" />
     <ClInclude Include="Source\ChokepointImpl.h" />
+    <ClInclude Include="Source\ClosestObjectMap.h" />
     <ClInclude Include="Source\Color.h" />
     <ClInclude Include="Source\ConnectedComponent.h" />
-    <ClInclude Include="Source\extract_polygons.h" />
     <ClInclude Include="Source\BaseLocationGenerator.h" />
     <ClInclude Include="Source\functions.h" />
     <ClInclude Include="Source\Globals.h" />

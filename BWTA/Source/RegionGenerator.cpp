@@ -24,9 +24,7 @@ namespace BWTA
 	void addVerticalBorder(std::vector<VoronoiSegment>& segments, std::vector<BoostSegmentI>& rtreeSegments, size_t& idPoint, 
 		const std::set<int>& border, int x, int maxY)
 	{
-// 		for (const auto& val : border) {
-// 			LOG(val);
-// 		}
+// 		for (const auto& val : border) LOG(val);
 
 		auto it = border.begin();
 		if (*it == 0) ++it;
@@ -57,9 +55,7 @@ namespace BWTA
 	void addHorizontalBorder(std::vector<VoronoiSegment>& segments, std::vector<BoostSegmentI>& rtreeSegments, size_t& idPoint, 
 		const std::set<int>& border, int y, int maxX)
 	{
-// 		for (const auto& val : border) {
-// 			LOG(val);
-// 		}
+// 		for (const auto& val : border) LOG(val);
 
 		auto it = border.begin();
 		if (*it == 0) ++it;
@@ -391,8 +387,6 @@ namespace BWTA
 							nodesDetected++;
 #endif
 						} else if (enoughDifference(graph.minDistToObstacle.at(v0), graph.minDistToObstacle.at(parentNode.id))) {
-// 						if (std::abs(graph.minDistToObstacle.at(v0) - graph.minDistToObstacle.at(parentNode.id)) > MIN_RADII_DIFF
-// 							&& graph.nodes.at(v0).getApproxDistance(graph.nodes.at(parentNode.id)) > 10) {
 								graph.markNodeAsChoke(v0);
 								parentNode.id = v0; parentNode.isMaximal = false;
 #if defined(DEBUG_DRAW) && defined(DEBUG_NODE_DETECTION)
@@ -539,9 +533,7 @@ namespace BWTA
 	std::string getString(std::set<nodeID> nodeSet)
 	{
 		std::stringstream stream;
-		for (auto& id : nodeSet) {
-			stream << id << ",";
-		}
+		for (auto& id : nodeSet) stream << id << ",";
 		return stream.str();
 	}
 
@@ -724,6 +716,7 @@ namespace BWTA
 		return a;
 	}
 
+	// extend both line's sides from the line's middle
 	void extendLine(BoostPoint& a, BoostPoint& b)
 	{
 		BoostPoint extendCenter = getMidpoint(a, b);

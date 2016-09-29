@@ -24,24 +24,12 @@
     <Filter Include="TerrainAnalyzer">
       <UniqueIdentifier>{a33752a1-051b-45f4-95f7-2fa22ab04960}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Interface Implementation">
+      <UniqueIdentifier>{c14715b4-7aaf-48c3-b447-c47697b7ab90}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\BaseLocationImpl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\BWTA.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\BWTA_Result.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\calculate_connectivity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ChokepointImpl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\extract_polygons.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\get_voronoi_edges.cpp">
@@ -57,12 +45,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Node.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Polygon.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\RegionImpl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\terrain_analysis.cpp">
@@ -104,24 +86,33 @@
     <ClCompile Include="Source\GraphColoring.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
+    <ClCompile Include="Source\BaseLocationImpl.cpp">
+      <Filter>Interface Implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWTA.cpp">
+      <Filter>Interface Implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ChokepointImpl.cpp">
+      <Filter>Interface Implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Polygon.cpp">
+      <Filter>Interface Implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\RegionImpl.cpp">
+      <Filter>Interface Implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ClosestObjectMap.cpp">
+      <Filter>TerrainAnalyzer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\BaseLocationImpl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Source\BWTA_Result.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ChokepointImpl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Color.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\ConnectedComponent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\extract_polygons.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\functions.h">
@@ -137,9 +128,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Node.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\RegionImpl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\terrain_analysis.h">
@@ -201,6 +189,18 @@
     </ClInclude>
     <ClInclude Include="Source\GraphColoring.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BaseLocationImpl.h">
+      <Filter>Interface Implementation</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ChokepointImpl.h">
+      <Filter>Interface Implementation</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\RegionImpl.h">
+      <Filter>Interface Implementation</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ClosestObjectMap.h">
+      <Filter>TerrainAnalyzer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

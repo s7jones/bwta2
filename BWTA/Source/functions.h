@@ -96,8 +96,6 @@ namespace BWTA
 
   int get_set(std::vector<int> &a,int i);
 
-  void calculate_connectivity();
-
   bool fileExists(std::string filename);
   int fileVersion(std::string filename);
 

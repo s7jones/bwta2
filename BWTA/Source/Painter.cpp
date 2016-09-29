@@ -178,37 +178,37 @@ namespace BWTA {
 		}
 	}
 
-	void Painter::drawFourColorMap(std::set<Node*> regions) {
-		// Assign a HUE to each region
-		double d, s;
-		for (auto& region : regions) {
-			region->hue = rand()*1.0 / RAND_MAX;
-		}
-		for (int l = 0; l<6; l++) {
-			for (auto& region : regions) {
-				for (auto& neighbor : region->neighbors) {
-					Node* region2 = neighbor->other_neighbor(region);
-					d = region2->hue - region->hue;
-					if (d > 0.5) d = d - 1.0;
-					if (d < -0.5) d = d + 1.0;
-					s = d - 0.5;
-					if (d < 0) s += 1.0;
-					s *= 0.05;
-					region->hue += s;
-					region2->hue -= s;
-					while (region->hue < 0) region->hue += 1.0;
-					while (region->hue >= 1.0) region->hue -= 1.0;
-					while (region2->hue < 0) region2->hue += 1.0;
-					while (region2->hue >= 1.0) region2->hue -= 1.0;
-				}
-			}
-		}
-		// Draw regions
-		for (auto& region : regions) {
-			PolygonD polygon = region->get_polygon();
-			drawPolygon(region->get_polygon(), hsl2rgb(region->hue, 1.0, 0.75));
-		}
-	}
+// 	void Painter::drawFourColorMap(std::set<Node*> regions) {
+// 		// Assign a HUE to each region
+// 		double d, s;
+// 		for (auto& region : regions) {
+// 			region->hue = rand()*1.0 / RAND_MAX;
+// 		}
+// 		for (int l = 0; l<6; l++) {
+// 			for (auto& region : regions) {
+// 				for (auto& neighbor : region->neighbors) {
+// 					Node* region2 = neighbor->other_neighbor(region);
+// 					d = region2->hue - region->hue;
+// 					if (d > 0.5) d = d - 1.0;
+// 					if (d < -0.5) d = d + 1.0;
+// 					s = d - 0.5;
+// 					if (d < 0) s += 1.0;
+// 					s *= 0.05;
+// 					region->hue += s;
+// 					region2->hue -= s;
+// 					while (region->hue < 0) region->hue += 1.0;
+// 					while (region->hue >= 1.0) region->hue -= 1.0;
+// 					while (region2->hue < 0) region2->hue += 1.0;
+// 					while (region2->hue >= 1.0) region2->hue -= 1.0;
+// 				}
+// 			}
+// 		}
+// 		// Draw regions
+// 		for (auto& region : regions) {
+// 			PolygonD polygon = region->get_polygon();
+// 			drawPolygon(region->get_polygon(), hsl2rgb(region->hue, 1.0, 0.75));
+// 		}
+// 	}
 
 	void Painter::drawRegions(std::vector<Region*> regions) {
 		for (const auto& r : regions) {
@@ -216,64 +216,64 @@ namespace BWTA {
 		}
 	}
 
-	QColor Painter::hsl2rgb(double h, double sl, double l)
-	{
-		double v;
-		double r, g, b;
-		r = l;   // default to gray
-		g = l;
-		b = l;
-		v = (l <= 0.5) ? (l * (1.0 + sl)) : (l + sl - l * sl);
-		if (v > 0)
-		{
-			double m;
-			double sv;
-			int sextant;
-			double fract, vsf, mid1, mid2;
-			m = l + l - v;
-			sv = (v - m) / v;
-			h *= 6.0;
-			sextant = (int)h;
-			fract = h - sextant;
-			vsf = v * sv * fract;
-			mid1 = m + vsf;
-			mid2 = v - vsf;
-			switch (sextant)
-			{
-			case 0:
-				r = v;
-				g = mid1;
-				b = m;
-				break;
-			case 1:
-				r = mid2;
-				g = v;
-				b = m;
-				break;
-			case 2:
-				r = m;
-				g = v;
-				b = mid1;
-				break;
-			case 3:
-				r = m;
-				g = mid2;
-				b = v;
-				break;
-			case 4:
-				r = mid1;
-				g = m;
-				b = v;
-				break;
-			case 5:
-				r = v;
-				g = m;
-				b = mid2;
-				break;
-			}
-		}
-		return QColor(r*255.0, g*255.0, b*255.0);
-	}
+// 	QColor Painter::hsl2rgb(double h, double sl, double l)
+// 	{
+// 		double v;
+// 		double r, g, b;
+// 		r = l;   // default to gray
+// 		g = l;
+// 		b = l;
+// 		v = (l <= 0.5) ? (l * (1.0 + sl)) : (l + sl - l * sl);
+// 		if (v > 0)
+// 		{
+// 			double m;
+// 			double sv;
+// 			int sextant;
+// 			double fract, vsf, mid1, mid2;
+// 			m = l + l - v;
+// 			sv = (v - m) / v;
+// 			h *= 6.0;
+// 			sextant = (int)h;
+// 			fract = h - sextant;
+// 			vsf = v * sv * fract;
+// 			mid1 = m + vsf;
+// 			mid2 = v - vsf;
+// 			switch (sextant)
+// 			{
+// 			case 0:
+// 				r = v;
+// 				g = mid1;
+// 				b = m;
+// 				break;
+// 			case 1:
+// 				r = mid2;
+// 				g = v;
+// 				b = m;
+// 				break;
+// 			case 2:
+// 				r = m;
+// 				g = v;
+// 				b = mid1;
+// 				break;
+// 			case 3:
+// 				r = m;
+// 				g = mid2;
+// 				b = v;
+// 				break;
+// 			case 4:
+// 				r = mid1;
+// 				g = m;
+// 				b = v;
+// 				break;
+// 			case 5:
+// 				r = v;
+// 				g = m;
+// 				b = mid2;
+// 				break;
+// 			}
+// 		}
+// 		return QColor(r*255.0, g*255.0, b*255.0);
+// 	}
 
 	void Painter::getHeatMapColor(float value, float &red, float &green, float &blue)
 	{
