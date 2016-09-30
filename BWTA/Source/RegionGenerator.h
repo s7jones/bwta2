@@ -47,13 +47,13 @@ namespace BWTA
 	};
 
 
-	void generateVoronoid(const std::vector<Polygon>& polygons, const RectangleArray<int>& labelMap, 
+	void generateVoronoid(const std::vector<Polygon*>& polygons, const RectangleArray<int>& labelMap, 
 		RegionGraph& graph, bgi::rtree<BoostSegmentI, bgi::quadratic<16> >& rtree);
 	void pruneGraph(RegionGraph& graph);
-	void detectNodes(RegionGraph& graph, const std::vector<Polygon>& polygons);
+	void detectNodes(RegionGraph& graph, const std::vector<Polygon*>& polygons);
 	void simplifyGraph(const RegionGraph& graph, RegionGraph& graphSimplified);
 	void mergeRegionNodes(RegionGraph& graph);
-	void getChokepointSides(const std::vector<Polygon>& polygons, const RegionGraph& graph, const bgi::rtree<BoostSegmentI, bgi::quadratic<16> >& rtree, std::map<nodeID, chokeSides_t>& chokepointSides);
+	void getChokepointSides(const RegionGraph& graph, const bgi::rtree<BoostSegmentI, bgi::quadratic<16> >& rtree, std::map<nodeID, chokeSides_t>& chokepointSides);
 	void createRegionsFromGraph(const std::vector<BoostPolygon>& polygons, const RectangleArray<int>& labelMap,
 		const RegionGraph& graph, const std::map<nodeID, chokeSides_t>& chokepointSides,
 		std::vector<Region*>& regions, std::set<Chokepoint*>& chokepoints,

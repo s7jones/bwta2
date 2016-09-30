@@ -1,58 +1,12 @@
 #include "functions.h"
 
 #include "Heap.h"
-#include <stdarg.h>
 #include <sys/stat.h>
 #include "MapData.h"
 #include <BWTA/Polygon.h>
 
 namespace BWTA
 {
-  double cast_to_double( double q)
-  {
-    return q;
-  }
-  double cast_to_double( CGAL::MP_Float q)
-  {
-    return CGAL::to_double(q);
-  }
-  double cast_to_double( CGAL::Quotient<CGAL::MP_Float> q)
-  {
-    return CGAL::INTERN_MP_FLOAT::to_double(q.numerator())/CGAL::INTERN_MP_FLOAT::to_double(q.denominator());
-  }
-
-  double cast_to_double( CGAL::Gmpq q)
-  {
-    return q.to_double();
-  }
-  double cast_to_double( CGAL::Lazy_exact_nt<CGAL::Gmpq > q)
-  {
-    return CGAL::to_double(q.approx());
-  }
-  bool is_real( double q)
-  {
-    return q+1>q;
-  }
-  bool is_real( CGAL::MP_Float q)
-  {
-    return q+1>q;
-  }
-  bool is_real( CGAL::Quotient<CGAL::MP_Float> q)
-  {
-    return q+1>q;
-  }
-  bool is_real( CGAL::Gmpq q)
-  {
-    return q+1>q;
-  }
-  bool is_real( CGAL::Lazy_exact_nt<CGAL::Gmpq > q)
-  {
-    return q+1>q;
-  }
-  double get_distance(Point a, Point b)
-  {
-    return sqrt(cast_to_double((a.x()-b.x())*(a.x()-b.x())+(a.y()-b.y())*(a.y()-b.y())));
-  }
 
   int str2int(std::string str) {
     std::stringstream t(str);

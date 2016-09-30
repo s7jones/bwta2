@@ -83,7 +83,7 @@ namespace BWTA
 	}
 
 
-	void generateVoronoid(const std::vector<Polygon>& polygons, const RectangleArray<int>& labelMap, 
+	void generateVoronoid(const std::vector<Polygon*>& polygons, const RectangleArray<int>& labelMap, 
 		RegionGraph& graph, bgi::rtree<BoostSegmentI, bgi::quadratic<16> >& rtree)
 	{
 		std::vector<VoronoiSegment> segments;
@@ -100,29 +100,30 @@ namespace BWTA
 		size_t i, j;
 		for (const auto& polygon : polygons) {
 			// Add the vertices of the polygon
-			size_t lastPoint = polygon.size() - 1;
+			size_t lastPoint = polygon->size() - 1;
 			// Notice that polygons are closed, i.e. the last vertex is equal to the first
 			for (i = 0, j = 1; i < lastPoint; ++i, ++j) {
 
 				// save border points
-				if (polygon[i].x == 0 && polygon[j].x == 0) {
-					leftBorder.insert(polygon[i].y);
-					leftBorder.insert(polygon[j].y);
-				} else if (polygon[i].x == maxX && polygon[j].x == maxX)  {
-					rightBorder.insert(polygon[i].y);
-					rightBorder.insert(polygon[j].y);
+				if (polygon->at(i).x == 0 && polygon->at(j).x == 0) {
+					leftBorder.insert(polygon->at(i).y);
+					leftBorder.insert(polygon->at(j).y);
+				} else if (polygon->at(i).x == maxX && polygon->at(j).x == maxX)  {
+					rightBorder.insert(polygon->at(i).y);
+					rightBorder.insert(polygon->at(j).y);
 				}
-				if (polygon[i].y == 0 && polygon[j].y == 0) {
-					topBorder.insert(polygon[i].x);
-					topBorder.insert(polygon[j].x);
+				if (polygon->at(i).y == 0 && polygon->at(j).y == 0) {
+					topBorder.insert(polygon->at(i).x);
+					topBorder.insert(polygon->at(j).x);
 				}
 				
-// 				LOG("Segment (" << polygon[j].x << "," << polygon[j].y << ") to (" << polygon[i].x << "," << polygon[i].y << ")");
+// 				LOG("Segment " << polygon->at(j) << " to " << polygon->at(i) );
 				segments.push_back(VoronoiSegment(
-					VoronoiPoint(polygon[j].x, polygon[j].y),
-					VoronoiPoint(polygon[i].x, polygon[i].y)));
+					VoronoiPoint(polygon->at(j).x, polygon->at(j).y),
+					VoronoiPoint(polygon->at(i).x, polygon->at(i).y)));
 
-				rtreeSegments.push_back(std::make_pair(BoostSegment(BoostPoint(polygon[j].x, polygon[j].y), BoostPoint(polygon[i].x, polygon[i].y)), idPoint++));
+				rtreeSegments.push_back(std::make_pair(BoostSegment(BoostPoint(polygon->at(j).x, polygon->at(j).y),
+					BoostPoint(polygon->at(i).x, polygon->at(i).y)), idPoint++));
 			}
 			// TODO Add the vertices of each hole in the polygon
 // 			for (const auto& hole : polygon.holes) {
@@ -290,7 +291,7 @@ namespace BWTA
 		}
 	}
 
-	void detectNodes(RegionGraph& graph, const std::vector<Polygon>& polygons)
+	void detectNodes(RegionGraph& graph, const std::vector<Polygon*>& polygons)
 	{
 		const double MIN_RADII_DIFF = 4.5;
 		struct parentNode_t {
@@ -731,7 +732,7 @@ namespace BWTA
 		boost::geometry::add_point(b, extendCenter);
 	}
 
-	void getChokepointSides(const std::vector<Polygon>& polygons, const RegionGraph& graph, const bgi::rtree<BoostSegmentI, bgi::quadratic<16> >& rtree, std::map<nodeID, chokeSides_t>& chokepointSides)
+	void getChokepointSides(const RegionGraph& graph, const bgi::rtree<BoostSegmentI, bgi::quadratic<16> >& rtree, std::map<nodeID, chokeSides_t>& chokepointSides)
 	{
 		for (const auto& id : graph.chokeNodes) {
 			BoostPoint pt(graph.nodes[id].x, graph.nodes[id].y);
@@ -833,16 +834,16 @@ namespace BWTA
 
 		// compute label region map
 		// ===========================================================================
-		RectangleArray<int> regionLabel(MapData::mapWidthWalkRes, MapData::mapHeightWalkRes);
-		regionLabel.setTo(0);
+		BWTA_Result::regionLabelMap.resize(MapData::mapWidthWalkRes, MapData::mapHeightWalkRes);
+		BWTA_Result::regionLabelMap.setTo(0);
 		RectangleArray<bool> nodeMap(MapData::mapWidthWalkRes, MapData::mapHeightWalkRes);
 		nodeMap.setTo(false);
 		int regionLabelId = 1;
 		std::map<int, BoostPolygon*> labelToPolygon;
 
 		for (auto& poly : polReg) {
-			// TODO we still need to label the choke lines!!!!!!
-			scanLineFill(poly.outer(), regionLabelId, regionLabel);
+			// TODO we still need to label the choke lines!!!!!! or use tile resolution
+			scanLineFill(poly.outer(), regionLabelId, BWTA_Result::regionLabelMap);
 			labelToPolygon[regionLabelId] = &poly;
 			regionLabelId++;
 		}
@@ -856,12 +857,12 @@ namespace BWTA
 		std::map<nodeID, Region*> node2region;
 		for (const auto& regionNodeId : graph.regionNodes) {
 			// get node regionLabel
-			int labelId = regionLabel[graph.nodes[regionNodeId].x][graph.nodes[regionNodeId].y];
+			int labelId = BWTA_Result::regionLabelMap[graph.nodes[regionNodeId].x][graph.nodes[regionNodeId].y];
 			BoostPolygon* regionPol = labelToPolygon[labelId];
 			RegionImpl* newRegionImpl = new RegionImpl(*regionPol, 8); // 8 => walk to pixel resolution
 			newRegionImpl->_opennessDistance = graph.minDistToObstacle.at(regionNodeId);
 			newRegionImpl->_opennessPoint = BWAPI::Position(graph.nodes.at(regionNodeId));
-			newRegionImpl->_labelId = labelId;
+			newRegionImpl->_label = labelId;
 
 			Region* newRegion = newRegionImpl;
 			regions.push_back(newRegion);

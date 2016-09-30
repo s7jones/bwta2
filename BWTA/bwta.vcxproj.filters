@@ -32,28 +32,16 @@
     <ClCompile Include="Source\BWTA_Result.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\get_voronoi_edges.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Graph.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\load_data.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\MapData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Node.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\terrain_analysis.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\util.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\VertexData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\stdafx.cpp">
@@ -109,31 +97,16 @@
     <ClInclude Include="Source\BWTA_Result.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Color.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ConnectedComponent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Source\functions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Globals.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Graph.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Source\MapData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Node.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Source\terrain_analysis.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\VertexData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\BWTA\BaseLocation.h">

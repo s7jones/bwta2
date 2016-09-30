@@ -258,8 +258,8 @@ namespace BWTA
     for(int i=0;i<unwalkablePolygon_amount;i++)
     {
       Polygon* p=new Polygon();
-      unwalkablePolygons.push_back(p);
-      BWTA_Result::unwalkablePolygons.insert(p);
+      unwalkablePolygons.push_back(p); // TODO why we need 2 vectors??
+	  BWTA_Result::unwalkablePolygons.push_back(p);
     }
     for(int i=0;i<baselocation_amount;i++)
     {
@@ -462,7 +462,7 @@ namespace BWTA
     int b_id=0;
     int c_id=0;
     int r_id=0;
-    for(std::set<Polygon*>::const_iterator p=BWTA_Result::unwalkablePolygons.begin();p!=BWTA_Result::unwalkablePolygons.end();p++)
+    for(auto p=BWTA_Result::unwalkablePolygons.begin();p!=BWTA_Result::unwalkablePolygons.end();p++)
     {
       pid[*p]=p_id++;
     }
@@ -485,7 +485,7 @@ namespace BWTA
     file_out << BWTA_Result::regions.size() << "\n";
     file_out << BWTA_Result::getRegion.getWidth() << "\n";
     file_out << BWTA_Result::getRegion.getHeight() << "\n";
-    for(std::set<Polygon*>::const_iterator p=BWTA_Result::unwalkablePolygons.begin();p!=BWTA_Result::unwalkablePolygons.end();p++)
+    for(auto p=BWTA_Result::unwalkablePolygons.begin();p!=BWTA_Result::unwalkablePolygons.end();p++)
     {
       file_out << pid[*p] << "\n";
       file_out << (*p)->size() << "\n";

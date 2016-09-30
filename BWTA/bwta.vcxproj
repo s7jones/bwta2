@@ -104,7 +104,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../externalInclude;../include;$(BWAPI_DIR)/include;$(CGAL_DIR)/include;$(BOOST_INCLUDEDIR);$(QTDIR)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../externalInclude;../include;$(BWAPI_DIR)/include;$(BOOST_INCLUDEDIR);$(QTDIR)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -139,7 +139,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../externalInclude;../include;$(BWAPI_DIR)/include;$(CGAL_DIR)/include;$(BOOST_INCLUDEDIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../externalInclude;../include;$(BWAPI_DIR)/include;$(BOOST_INCLUDEDIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_SECURE_SC=0</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -175,7 +175,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../externalInclude;../include;$(BWAPI_DIR)/include;$(CGAL_DIR)/include;$(BOOST_INCLUDEDIR);$(QTDIR)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../externalInclude;../include;$(BWAPI_DIR)/include;$(BOOST_INCLUDEDIR);$(QTDIR)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_SECURE_SCL=0;DEBUG_DRAW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -209,7 +209,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../externalInclude;../include;$(BWAPI_DIR)/include;$(CGAL_DIR)/include;$(BOOST_INCLUDEDIR);$(QTDIR)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../externalInclude;../include;$(BWAPI_DIR)/include;$(BOOST_INCLUDEDIR);$(QTDIR)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;OFFLINE;DEBUG_DRAW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -243,7 +243,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../externalInclude;../include;$(BWAPI_DIR)/include;$(CGAL_DIR)/include;$(BOOST_INCLUDEDIR);$(QTDIR)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../externalInclude;../include;$(BWAPI_DIR)/include;$(BOOST_INCLUDEDIR);$(QTDIR)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;OFFLINE;DEBUG_DRAW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -279,12 +279,9 @@
     <ClCompile Include="Source\ChokepointImpl.cpp" />
     <ClCompile Include="Source\BaseLocationGenerator.cpp" />
     <ClCompile Include="Source\ClosestObjectMap.cpp" />
-    <ClCompile Include="Source\get_voronoi_edges.cpp" />
-    <ClCompile Include="Source\Graph.cpp" />
     <ClCompile Include="Source\GraphColoring.cpp" />
     <ClCompile Include="Source\load_data.cpp" />
     <ClCompile Include="Source\MapData.cpp" />
-    <ClCompile Include="Source\Node.cpp" />
     <ClCompile Include="Source\Painter.cpp" />
     <ClCompile Include="Source\Polygon.cpp" />
     <ClCompile Include="Source\PolygonGenerator.cpp" />
@@ -293,7 +290,6 @@
     <ClCompile Include="Source\terrain_analysis.cpp" />
     <ClCompile Include="Source\util.cpp" />
     <ClCompile Include="Source\Utils.cpp" />
-    <ClCompile Include="Source\VertexData.cpp" />
     <ClCompile Include="Source\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseOffline|Win32'">Create</PrecompiledHeader>
@@ -310,15 +306,11 @@
     <ClInclude Include="Source\BWTA_Result.h" />
     <ClInclude Include="Source\ChokepointImpl.h" />
     <ClInclude Include="Source\ClosestObjectMap.h" />
-    <ClInclude Include="Source\Color.h" />
-    <ClInclude Include="Source\ConnectedComponent.h" />
     <ClInclude Include="Source\BaseLocationGenerator.h" />
     <ClInclude Include="Source\functions.h" />
     <ClInclude Include="Source\Globals.h" />
-    <ClInclude Include="Source\Graph.h" />
     <ClInclude Include="Source\GraphColoring.h" />
     <ClInclude Include="Source\MapData.h" />
-    <ClInclude Include="Source\Node.h" />
     <ClInclude Include="Source\Painter.h" />
     <ClInclude Include="Source\PolygonGenerator.h" />
     <ClInclude Include="Source\RegionGenerator.h" />
@@ -326,7 +318,6 @@
     <ClInclude Include="Source\terrain_analysis.h" />
     <ClInclude Include="Source\Timer.h" />
     <ClInclude Include="Source\Utils.h" />
-    <ClInclude Include="Source\VertexData.h" />
     <ClInclude Include="..\include\BWTA\BaseLocation.h" />
     <ClInclude Include="..\include\BWTA.h" />
     <ClInclude Include="..\include\BWTA\Chokepoint.h" />

@@ -4,7 +4,6 @@
 #include "BaseLocationImpl.h"
 #include "RegionImpl.h"
 #include "ChokepointImpl.h"
-#include "ConnectedComponent.h"
 #include "MapData.h"
 #include "Heap.h"
 namespace BWTA

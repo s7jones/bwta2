@@ -1,7 +1,6 @@
 #include <BWTA/RectangleArray.h>
 #include <BWTA.h>
 
-#include "ConnectedComponent.h"
 #include "MapData.h"
 #include "functions.h"
 #include "BWTA_Result.h"

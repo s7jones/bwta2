@@ -13,3 +13,15 @@ typedef signed   __int16 s16;
 typedef signed   __int32 s32;
 typedef signed   __int64 s64;
 typedef u16 TileID;
+
+#pragma warning(disable: 4244) // known precision conversion warning with algorithms::buffer http://lists.boost.org/boost-users/2015/05/84281.php
+#include <boost/geometry.hpp>
+#pragma warning(default: 4244) 
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
+
+// geometry typedefs
+typedef boost::geometry::model::d2::point_xy<double> BoostPoint;
+typedef boost::geometry::model::segment<BoostPoint> BoostSegment;
+using BoostSegmentI = std::pair < BoostSegment, std::size_t > ;
+typedef boost::geometry::model::polygon<BoostPoint> BoostPolygon;

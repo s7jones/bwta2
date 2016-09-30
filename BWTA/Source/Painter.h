@@ -10,7 +10,6 @@
 
 #include "MapData.h"
 #include "functions.h"
-#include "Node.h"
 #include "RegionGenerator.h"
 
 namespace BWTA {
@@ -20,15 +19,10 @@ namespace BWTA {
 		~Painter();
 		void render(const std::string& label = std::string());
 		void drawMapBorder();
-		void drawArrangement(Arrangement_2* arrangement);
 		void drawPolygon(const Polygon& polygon, QColor color, double scale = 1.0);
-		void drawPolygon(PolygonD& polygon, QColor color);
 		void drawPolygons(const std::vector<Polygon>& polygons);
-		void drawPolygons(std::set<Polygon*>& polygons);
+		void drawPolygons(const std::vector<Polygon*>& polygons);
 		void drawPolygons(const std::vector<BoostPolygon>& polygons);
-		void drawNodes(std::set<Node*> nodes, QColor color);
-		void drawNodesAndConnectToNeighbors(std::set<Node*> nodes, QColor nodeColor);
-// 		void drawFourColorMap(std::set<Node*> regions);
 		void drawRegions(std::vector<Region*> regions);
 		void drawHeatMap(RectangleArray<int> map, float maxValue);
 		void drawClosestBaseLocationMap(RectangleArray<BaseLocation*> map, std::set<BaseLocation*> baseLocations);
@@ -46,7 +40,6 @@ namespace BWTA {
 		QSvgGenerator* svg;
 		int renderCounter;
 
-// 		QColor hsl2rgb(double h, double sl, double l);
 		void getHeatMapColor(float value, float &red, float &green, float &blue);
 	};
 }

@@ -187,19 +187,20 @@ namespace BWTA
 
 	void calculateBaseLocationProperties()
 	{
-		RectangleArray<double> distanceMap;
+		RectangleArray<double> distanceMap; 
 		for (auto& base : BWTA_Result::baselocations) {
-			BWAPI::TilePosition baseTile(base->getTilePosition());
-			getGroundDistanceMap(baseTile, distanceMap);
 			BaseLocationImpl* baseI = (BaseLocationImpl*)base;
 
+			// TODO this can be optimized only computing the distance between reachable base locations
+			BWAPI::TilePosition baseTile = base->getTilePosition();
+			getGroundDistanceMap(baseTile, distanceMap);
 			// assume the base location is an island unless we can walk from this base location to another base location
 			for (const auto& base2 : BWTA_Result::baselocations) {
 				if (base == base2) {
 					baseI->groundDistances[base2] = 0;
 					baseI->airDistances[base2] = 0;
 				} else {
-					BWAPI::TilePosition base2Tile(base2->getTilePosition());
+					BWAPI::TilePosition base2Tile = base2->getTilePosition();
 					if (baseI->_isIsland && isConnected(baseTile, base2Tile)) {
 						baseI->_isIsland = false;
 					}
@@ -219,13 +220,16 @@ namespace BWTA
 			}
 
 			// find what region this base location is in and tell that region about the base location
-			for (auto& region : BWTA_Result::regions) {
-				if (region->getPolygon().isInside(base->getPosition())) { // TODO use regionLabMap
-					baseI->region = region;
-					((RegionImpl*)region)->baseLocations.insert(base);
+			BWAPI::WalkPosition baseWalkPos(base->getPosition());
+			int baseRegionLabel = BWTA_Result::regionLabelMap[baseWalkPos.x][baseWalkPos.y];
+			for (const auto& r : BWTA_Result::regions) {
+				if (r->getLabel() == baseRegionLabel) { // TODO I need a vector to map labelId to Region*
+					baseI->region = r;
+					((RegionImpl*)r)->baseLocations.insert(base);
 					break;
 				}
 			}
+
 		}
 	}
 }

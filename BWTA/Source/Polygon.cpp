@@ -2,7 +2,7 @@
 #include "functions.h"
 namespace BWTA
 {
-	std::map<const Polygon*, PolygonD> polygonDs;
+// 	std::map<const Polygon*, PolygonD> polygonDs;
 
 	Polygon::Polygon()  // TODO remove after fixing load_data
 	{
@@ -66,22 +66,6 @@ namespace BWTA
 		cx = int((double)cx / area);
 		cy = int((double)cy / area);
 		return BWAPI::Position(cx, cy);
-	}
-
-	bool Polygon::isInside(BWAPI::Position p) const
-	{
-		// Create if needed the CGAL polygon
-		if (polygonDs.find(this) == polygonDs.end()) {
-			polygonDs[this] = PolygonD();
-			for (const auto& point : *this) polygonDs.at(this).push_back(Point(point.x, point.y));
-		}
-
-		Point queryPoint(p.x, p.y);
-		if (polygonDs.at(this).bounded_side(queryPoint) == CGAL::ON_UNBOUNDED_SIDE) return false;
-		for (const auto& hole : holes) {
-			if (hole.isInside(p)) return false;
-		}
-		return true;
 	}
 
 	BWAPI::Position Polygon::getNearestPoint(BWAPI::Position p) const

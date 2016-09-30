@@ -20,7 +20,7 @@ namespace BWTA
   const std::set<Chokepoint*>& getChokepoints();
   const std::set<BaseLocation*>& getBaseLocations();
   const std::set<BaseLocation*>& getStartLocations();
-  const std::set<Polygon*>& getUnwalkablePolygons();
+  const std::vector<Polygon*>& getUnwalkablePolygons();
 
   BaseLocation* getStartLocation(BWAPI::Player player);
 
