@@ -185,8 +185,7 @@ namespace BWTA
 			std::vector<BoostSegmentI> returnedValues;
 			BoostPoint pt(graph.nodes[i].x, graph.nodes[i].y);
 			rtree.query(bgi::nearest(pt, 1), std::back_inserter(returnedValues));
-			// TODO can be speed up using comaparable_distance
-			graph.minDistToObstacle[i] = bg::distance(returnedValues.front().first, pt);
+			graph.minDistToObstacle[i] = boost::geometry::distance(returnedValues.front().first, pt);
 		}
 	}
 

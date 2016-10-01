@@ -1,6 +1,17 @@
 #pragma once
 
 #include "Heap.h"
+#include <BWTA/Polygon.h>
+
+// geometry typedefs
+using BoostSegment = boost::geometry::model::segment<BoostPoint>;
+using BoostSegmentI = std::pair < BoostSegment, std::size_t > ;
+using Contour = std::vector<BoostPoint>;
+// Voronoi typedefs
+typedef boost::polygon::voronoi_diagram<double> BoostVoronoi;
+typedef boost::int32_t int32;
+typedef boost::polygon::point_data<int32> VoronoiPoint;
+typedef boost::polygon::segment_data<int32> VoronoiSegment;
 
 namespace BWTA
 {

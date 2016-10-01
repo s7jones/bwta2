@@ -340,12 +340,12 @@ namespace BWTA
 		return 0;
 	}
 	//------------------------------------------- GET TILE VARIATION -------------------------------------------
-	u8 getTileVariation(TileID tileType)
+	uint8_t getTileVariation(TileID tileType)
 	{
 		return tileType & 0xF;
 	}
 	//--------------------------------------------- GET MINITILE -----------------------------------------------
-	u16 getMiniTile(int x, int y)
+	uint16_t getMiniTile(int x, int y)
 	{
 		int tx = x / 4;
 		int ty = y / 4;
@@ -370,8 +370,8 @@ namespace BWTA
 	//-------------------------------------------- SET WALKABILITY ---------------------------------------------
 	void setOfflineWalkability(RectangleArray<bool> &walkability)
 	{
-		u16 h = MapData::mapHeightWalkRes;
-		u16 w = MapData::mapWidthWalkRes;
+		uint16_t h = MapData::mapHeightWalkRes;
+		uint16_t w = MapData::mapWidthWalkRes;
 		for (unsigned int y = 0; y < h; ++y)
 			for (unsigned int x = 0; x < w; ++x)
 				walkability[x][y] = (getMiniTile(x, y) & MiniTileFlags::Walkable) != 0;

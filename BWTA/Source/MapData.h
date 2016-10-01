@@ -3,6 +3,8 @@
 #include <BWTA.h>
 #include "TileType.h"
 
+using TileID = uint16_t;
+
 namespace BWTA
 {
 	typedef std::list<Chokepoint*> ChokePath;

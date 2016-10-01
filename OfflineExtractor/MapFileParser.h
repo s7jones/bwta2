@@ -6,6 +6,7 @@
 #include <StormLib.h>
 #include <iostream>
 #include <fstream>
+#include <boost/filesystem.hpp>
 
 #include "..\BWTA\Source\MapData.h"
 #include "..\BWTA\Source\TileType.h"

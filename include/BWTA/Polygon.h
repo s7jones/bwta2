@@ -1,6 +1,11 @@
 #pragma once
 #include <BWAPI.h>
 #include <vector>
+#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+
+using BoostPoint = boost::geometry::model::d2::point_xy < double > ;
+using BoostPolygon = boost::geometry::model::polygon < BoostPoint > ;
 
 namespace BWTA
 {
