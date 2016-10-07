@@ -1,11 +1,5 @@
-#include "functions.h"
-#include <BWTA.h>
-#include "BWTA_Result.h"
-#include "BaseLocationImpl.h"
-#include "RegionImpl.h"
-#include "ChokepointImpl.h"
-#include "MapData.h"
-#include "Heap.h"
+#include "Pathfinding.h"
+
 namespace BWTA
 {
   double AstarSearchDistance(BWAPI::TilePosition start, BWAPI::TilePosition end)

@@ -1,17 +1,8 @@
-#include "functions.h"
-#include "BWTA_Result.h"
-#include "BaseLocationImpl.h"
-#include "ChokepointImpl.h"
-#include "RegionImpl.h"
-#include "BaseLocationGenerator.h"
-#include "MapData.h"
-#include "terrain_analysis.h"
+#include "LoadData.h"
 
-using namespace std;
 using namespace BWAPI;
 namespace BWTA
 {
-
 	struct square_t {
 		size_t minX;
 		size_t maxX;
@@ -148,11 +139,6 @@ namespace BWTA
 				}
 				MapData::walkability[x][y] = cornerWalkable;
 
-// 				for (int x2 = std::max(x - 1, (size_t)0); x2 <= std::min(maxWidth1, x + 1); x2++) {
-// 					for (int y2 = std::max(y - 1, (size_t)0); y2 <= std::min(maxHeight1, y + 1); y2++) {
-// 						MapData::walkability[x2][y2] &= MapData::rawWalkability[x][y];
-// 					}
-// 				}
 				// the lowResWalkability has built tile resolution
 				// so a built tile is walkable only if all 4x4 tiles are walkable
 				MapData::lowResWalkability[x / 4][y / 4] &= MapData::rawWalkability[x][y];
@@ -453,7 +439,6 @@ namespace BWTA
 
   void save_data(std::string filename)
   {
-    //save_data_xml();
     std::map<Polygon*,int> pid;
     std::map<BaseLocation*,int> bid;
     std::map<Chokepoint*,int> cid;

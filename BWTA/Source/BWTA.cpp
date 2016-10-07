@@ -2,7 +2,7 @@
 #include "BWTA_Result.h"
 #include "Heap.h"
 #include "MapData.h"
-#include "functions.h"
+#include "Pathfinding.h"
 
 namespace BWTA
 {

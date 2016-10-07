@@ -2,12 +2,103 @@
 
 #include "BaseLocationImpl.h"
 #include "RegionImpl.h"
+#include "Heap.h"
 
 namespace BWTA
 {
 	const int MIN_CLUSTER_DIST = 6; // minerals less than this distance will be grouped into the same cluster
 	const size_t MIN_RESOURCES = 3; // a cluster with less than this will be discarded
 	const int MAX_INFLUENCE_DISTANCE_RADIUS = 12; // max radius distance from a resource to place a base
+
+	void calculateTileDistances(const RectangleArray<bool>& walkable,
+		const BWAPI::TilePosition &start,
+		const double& maxDistance,
+		RectangleArray<double>& distanceMap)
+	{
+		Heap<BWAPI::TilePosition, double> heap(true);
+		distanceMap.setTo(-1);
+		heap.push(std::make_pair(start, 0));
+		distanceMap[start.x][start.y] = 0;
+		while (!heap.empty()) {
+			BWAPI::TilePosition pos = heap.top().first;
+			double distance = heap.top().second;
+			heap.pop();
+			int x = pos.x;
+			int y = pos.y;
+			if (distance > maxDistance && maxDistance > 0) break;
+			int min_x = std::max(x - 1, 0);
+			int max_x = std::min(x + 1, (int)walkable.getWidth() - 1);
+			int min_y = std::max(y - 1, 0);
+			int max_y = std::min(y + 1, (int)walkable.getHeight() - 1);
+			for (int ix = min_x; ix <= max_x; ix++) {
+				for (int iy = min_y; iy <= max_y; iy++) {
+					double f = std::abs(ix - x) + std::abs(iy - y);
+					if (f > 1) f = 1.4;
+					double v = distance + f;
+					if (distanceMap[ix][iy] > v) {
+						heap.push(std::make_pair(BWAPI::TilePosition(x, y), v));
+						distanceMap[ix][iy] = v;
+					} else {
+						if (distanceMap[ix][iy] == -1 && walkable[ix][iy]) {
+							distanceMap[ix][iy] = v;
+							heap.push(std::make_pair(BWAPI::TilePosition(ix, iy), v));
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// TODO review this method, probably we can optimize it
+	void calculate_walk_distances_area(const BWAPI::Position &start
+		, int width
+		, int height
+		, int max_distance
+		, RectangleArray<int> &distance_map)
+	{
+		Heap< BWAPI::Position, int > heap(true);
+		for (unsigned int x = 0; x < distance_map.getWidth(); x++) {
+			for (unsigned int y = 0; y < distance_map.getHeight(); y++) {
+				distance_map[x][y] = -1;
+			}
+		}
+		int sx = (int)start.x;
+		int sy = (int)start.y;
+		for (int x = sx; x < sx + width; x++) {
+			for (int y = sy; y<sy + height; y++) {
+				heap.push(std::make_pair(BWAPI::Position(x, y), 0));
+				distance_map[x][y] = 0;
+			}
+		}
+		while (!heap.empty()) {
+			BWAPI::Position pos = heap.top().first;
+			int distance = heap.top().second;
+			heap.pop();
+			int x = (int)pos.x;
+			int y = (int)pos.y;
+			if (distance>max_distance && max_distance>0) break;
+			int min_x = std::max(x - 1, 0);
+			int max_x = std::min(x + 1, MapData::mapWidthWalkRes - 1);
+			int min_y = std::max(y - 1, 0);
+			int max_y = std::min(y + 1, MapData::mapHeightWalkRes - 1);
+			for (int ix = min_x; ix <= max_x; ix++) {
+				for (int iy = min_y; iy <= max_y; iy++) {
+					int f = std::abs(ix - x) * 10 + std::abs(iy - y) * 10;
+					if (f > 10) { f = 14; }
+					int v = distance + f;
+					if (distance_map[ix][iy] > v) {
+						heap.push(std::make_pair(BWAPI::Position(x, y), v));
+						distance_map[ix][iy] = v;
+					} else {
+						if (distance_map[ix][iy] == -1 && MapData::rawWalkability[ix][iy] == true) {
+							distance_map[ix][iy] = v;
+							heap.push(std::make_pair(BWAPI::Position(ix, iy), v));
+						}
+					}
+				}
+			}
+		}
+	}
 
 	std::vector<int> findNeighbors(const std::vector<unitTypeTilePos_t>& resources, const unitTypeTilePos_t& resource)
 	{

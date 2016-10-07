@@ -1,40 +1,40 @@
-#include "terrain_analysis.h"
+
+#ifdef DEBUG_DRAW
+#include "Painter.h"
+#include "GraphColoring.h"
+#endif
+
+#include "LoadData.h"
+#include "BaseLocationGenerator.h"
+#include "PolygonGenerator.h"
+#include "RegionGenerator.h"
+#include "ClosestObjectMap.h"
 
 namespace BWTA
 {
-	bool createDir(std::string& path)
-	{
-		boost::filesystem::path dir(path);
-		if (boost::filesystem::create_directories(dir)) {
-			return true;
-		}
-		return false;
-	}
-
-	void readMap(){} // for backwards interface compatibility
+	void analyze_map();
 
 	void analyze()
 	{
 		cleanMemory();
-
 		Timer timer;
 
 #ifndef OFFLINE
 		loadMapFromBWAPI();
 #endif
+		
+		loadMap(); // compute extra map info
 
-		// compute extra map info
-		loadMap();
-
-		// Verify if "bwta2" directory exists, and create it if it doesn't.
+		// Verify if "BWTA2" directory exists, and create it if it doesn't.
 		std::string bwtaPath(BWTA_PATH);
 		if (!boost::filesystem::exists(bwtaPath)) {
-			createDir(bwtaPath);
+			boost::filesystem::path dir(bwtaPath);
+			boost::filesystem::create_directories(dir);
 		}
 
 		std::string filename = bwtaPath + MapData::hash + ".bwta";
 
-		if (fileExists(filename) && fileVersion(filename) == BWTA_FILE_VERSION) {
+		if (isFileVersionCorrect(filename)) {
 			LOG("Recognized map, loading map data...");
 
 			timer.start();

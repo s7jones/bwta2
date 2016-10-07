@@ -120,4 +120,20 @@ namespace BWTA
 		}
 	}
 
+	bool isFileVersionCorrect(std::string filename)
+	{
+		if (boost::filesystem::exists(filename)) {
+			// get file version
+			std::ifstream file_in;
+			file_in.open(filename.c_str());
+			int version;
+			file_in >> version;
+			file_in.close();
+
+			// return comparison
+			return version == BWTA_FILE_VERSION;
+		}
+		return false;
+	}
+
 }

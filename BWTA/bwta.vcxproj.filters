@@ -1,14 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
     <Filter Include="Interface">
       <UniqueIdentifier>{4311c728-e729-46cb-bdce-9e8496bd297e}</UniqueIdentifier>
     </Filter>
@@ -29,32 +21,11 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\BWTA_Result.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\load_data.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\MapData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\terrain_analysis.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\util.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\stdafx.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
     <ClCompile Include="Source\BalanceMetrics.cpp">
       <Filter>Balance</Filter>
     </ClCompile>
     <ClCompile Include="Source\DistanceTransform.cpp">
       <Filter>Balance</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\pathfinding.cpp">
-      <Filter>Pathfinding</Filter>
     </ClCompile>
     <ClCompile Include="Source\Painter.cpp">
       <Filter>Utils</Filter>
@@ -92,23 +63,20 @@
     <ClCompile Include="Source\ClosestObjectMap.cpp">
       <Filter>TerrainAnalyzer</Filter>
     </ClCompile>
+    <ClCompile Include="Source\MapData.cpp" />
+    <ClCompile Include="Source\BWTA_Result.cpp" />
+    <ClCompile Include="Source\Pathfinding.cpp">
+      <Filter>Pathfinding</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\stdafx.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\LoadData.cpp" />
+    <ClCompile Include="Source\TerrainAnalysis.cpp">
+      <Filter>TerrainAnalyzer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\BWTA_Result.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\functions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Globals.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\MapData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\terrain_analysis.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\BWTA\BaseLocation.h">
       <Filter>Interface</Filter>
     </ClInclude>
@@ -138,9 +106,6 @@
     </ClInclude>
     <ClInclude Include="Source\DistanceTransform.h">
       <Filter>Balance</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\TileType.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Painter.h">
       <Filter>Utils</Filter>
@@ -174,6 +139,13 @@
     </ClInclude>
     <ClInclude Include="Source\ClosestObjectMap.h">
       <Filter>TerrainAnalyzer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\LoadData.h" />
+    <ClInclude Include="Source\MapData.h" />
+    <ClInclude Include="Source\BWTA_Result.h" />
+    <ClInclude Include="Source\TileType.h" />
+    <ClInclude Include="Source\Pathfinding.h">
+      <Filter>Pathfinding</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

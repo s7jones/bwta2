@@ -2,7 +2,6 @@
 #include <BWTA.h>
 
 #include "MapData.h"
-#include "functions.h"
 #include "BWTA_Result.h"
 
 namespace BWTA

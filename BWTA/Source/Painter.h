@@ -9,7 +9,6 @@
 #include <QtGui/QGuiApplication>
 
 #include "MapData.h"
-#include "functions.h"
 #include "RegionGenerator.h"
 
 namespace BWTA {

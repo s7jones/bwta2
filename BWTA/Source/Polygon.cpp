@@ -1,8 +1,7 @@
 #include <BWTA/Polygon.h>
-#include "functions.h"
+
 namespace BWTA
 {
-// 	std::map<const Polygon*, PolygonD> polygonDs;
 
 	Polygon::Polygon()  // TODO remove after fixing load_data
 	{

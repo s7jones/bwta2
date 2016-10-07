@@ -1,6 +1,5 @@
 #pragma once
 
-#include "functions.h"
 #include "BWTA.h"
 
 namespace BWTA

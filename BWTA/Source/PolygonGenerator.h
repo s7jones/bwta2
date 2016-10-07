@@ -2,7 +2,6 @@
 
 #include <BWTA/Polygon.h>
 
-#include "functions.h"
 #include "MapData.h"
 #include "Utils.h"
 

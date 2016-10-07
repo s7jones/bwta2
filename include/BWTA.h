@@ -7,8 +7,7 @@
 #include <BWTA/RectangleArray.h>
 namespace BWTA
 {
-  void readMap();
-  void analyze();
+  void analyze(); // will check if we can load cache file or we need to analyze the map
   void computeDistanceTransform();
   void balanceAnalysis();
   void cleanMemory();

@@ -6,7 +6,6 @@
 
 #include "MapData.h"
 #include "RegionImpl.h"
-#include "functions.h"
 #include "BWTA_Result.h"
 #pragma once
 

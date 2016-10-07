@@ -280,26 +280,21 @@
     <ClCompile Include="Source\BaseLocationGenerator.cpp" />
     <ClCompile Include="Source\ClosestObjectMap.cpp" />
     <ClCompile Include="Source\GraphColoring.cpp" />
-    <ClCompile Include="Source\load_data.cpp" />
+    <ClCompile Include="Source\LoadData.cpp" />
     <ClCompile Include="Source\MapData.cpp" />
     <ClCompile Include="Source\Painter.cpp" />
     <ClCompile Include="Source\Polygon.cpp" />
     <ClCompile Include="Source\PolygonGenerator.cpp" />
     <ClCompile Include="Source\RegionGenerator.cpp" />
     <ClCompile Include="Source\RegionImpl.cpp" />
-    <ClCompile Include="Source\terrain_analysis.cpp" />
-    <ClCompile Include="Source\util.cpp" />
-    <ClCompile Include="Source\Utils.cpp" />
     <ClCompile Include="Source\stdafx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseOffline|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugOffline|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release-Log|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Source\TerrainAnalysis.cpp" />
+    <ClCompile Include="Source\Utils.cpp" />
     <ClCompile Include="Source\BalanceMetrics.cpp" />
     <ClCompile Include="Source\DistanceTransform.cpp" />
-    <ClCompile Include="Source\pathfinding.cpp" />
+    <ClCompile Include="Source\Pathfinding.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\BaseLocationImpl.h" />
@@ -307,15 +302,14 @@
     <ClInclude Include="Source\ChokepointImpl.h" />
     <ClInclude Include="Source\ClosestObjectMap.h" />
     <ClInclude Include="Source\BaseLocationGenerator.h" />
-    <ClInclude Include="Source\functions.h" />
-    <ClInclude Include="Source\Globals.h" />
     <ClInclude Include="Source\GraphColoring.h" />
+    <ClInclude Include="Source\LoadData.h" />
     <ClInclude Include="Source\MapData.h" />
     <ClInclude Include="Source\Painter.h" />
+    <ClInclude Include="Source\Pathfinding.h" />
     <ClInclude Include="Source\PolygonGenerator.h" />
     <ClInclude Include="Source\RegionGenerator.h" />
     <ClInclude Include="Source\RegionImpl.h" />
-    <ClInclude Include="Source\terrain_analysis.h" />
     <ClInclude Include="Source\Timer.h" />
     <ClInclude Include="Source\Utils.h" />
     <ClInclude Include="..\include\BWTA\BaseLocation.h" />
