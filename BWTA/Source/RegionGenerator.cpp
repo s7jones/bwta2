@@ -478,7 +478,7 @@ namespace BWTA
 					parentNodes.at(v1) = parentNode;
 				} else {
 					// we reached a connection between visited paths.
-					// we must check if the connected path between choke-region nodes is too close
+					
 					nodeID v0Parent, v1Parent;
 					// get right parent of v0
 					if (graph.nodeType.at(v0) == RegionGraph::REGION || graph.nodeType.at(v0) == RegionGraph::CHOKEPOINT) {
@@ -496,6 +496,7 @@ namespace BWTA
 // 					if (!isMaximal0 && isMaximal1) LOG("Choke-region " << v0Parent << "-" << v1Parent);
 // 					if (isMaximal0 && !isMaximal1) LOG("Region-choke " << v0Parent << "-" << v1Parent);
 
+					// if the connected path between choke-region nodes is too close, remove choke
 					if (isMaximal0 != isMaximal1 && 
 						graph.nodes.at(v0Parent).getApproxDistance(graph.nodes.at(v1Parent)) < MIN_REG_DIST) {
 						nodeID nodeToDelete = v0Parent;
@@ -504,6 +505,19 @@ namespace BWTA
 #if defined(DEBUG_DRAW) && defined(DEBUG_NODE_DETECTION)
 						graph.gateNodesA.insert(nodeToDelete);
 						drawDebugMessage += "\nChoke too close to region (path)";
+						nodesDetected++;
+#endif
+					} else 
+						// if two consecutive minimals, keep the min
+						if (!isMaximal0 && isMaximal0 == isMaximal1 && v0Parent != v1Parent) {
+						nodeID nodeToDelete = v0Parent;
+						if (graph.minDistToObstacle.at(v0Parent) < graph.minDistToObstacle.at(v1Parent)) {
+							nodeToDelete = v1Parent;
+						}
+						graph.unmarkChokeNode(nodeToDelete);
+#if defined(DEBUG_DRAW) && defined(DEBUG_NODE_DETECTION)
+						graph.gateNodesA.insert(nodeToDelete);
+						drawDebugMessage += "\nTwo consecutive choke, removed max (path)";
 						nodesDetected++;
 #endif
 					}

@@ -6,6 +6,9 @@ namespace BWTA {
 	std::vector<QColor> baseColors = { QColor(0, 114, 189), QColor(217, 83, 25), QColor(237, 177, 32),
 		QColor(126, 47, 142), QColor(119, 172, 48), QColor(77, 190, 238), QColor(162, 20, 47) };
 
+	std::vector<QColor> mapColors = { QColor(180, 180, 180), QColor(204, 193, 218), QColor(230, 185, 184),
+		QColor(252, 216, 181), QColor(215, 228, 189), QColor(77, 190, 238), QColor(162, 20, 47) };
+
 	Painter::Painter() :
 		renderCounter(1)
 	{
@@ -91,7 +94,7 @@ namespace BWTA {
 
 	void Painter::drawRegions(std::vector<Region*> regions) {
 		for (const auto& r : regions) {
-			drawPolygon(r->getPolygon(), baseColors.at(r->getColorLabel()), 0.125);
+			drawPolygon(r->getPolygon(), mapColors.at(r->getColorLabel()), 0.125);
 		}
 	}
 
