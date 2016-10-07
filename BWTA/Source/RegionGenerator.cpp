@@ -758,14 +758,13 @@ namespace BWTA
 			// iterate over nearest Values
 			for (it; it != rtree.qend(); ++it) {
 				side2 = getProjectedPoint(pt, (*it).first);
-				if ((side1.x < pt.x() && side2.x > pt.x()) ||
-					(side1.x > pt.x() && side2.x < pt.x()) ||
-					(side1.y < pt.y() && side2.y > pt.y()) ||
-					(side1.y > pt.y() && side2.y < pt.y())) {
+				if (((side1.x <= pt.x() && side2.x >= pt.x()) || (side1.x >= pt.x() && side2.x <= pt.x())) &&
+					((side1.y <= pt.y() && side2.y >= pt.y()) || (side1.y >= pt.y() && side2.y <= pt.y()))) {
 					break;
 				}
 			}
 
+			LOG("Chokepoint: (" << pt.x() << "," << pt.y() << ") sides: " << side1 << " " << side2);
 			chokepointSides.emplace(id, chokeSides_t(side1, side2));
 		}
 	}
