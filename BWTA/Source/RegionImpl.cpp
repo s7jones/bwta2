@@ -6,7 +6,8 @@ namespace BWTA
   RegionImpl::RegionImpl(const Polygon& poly)
 	  : _polygon(poly),
 	  _maxDistance(0),
-	  _color(0)
+	  _color(0),
+	  _hue(0.0)
   {
 	  this->_center = _polygon.getCenter();
   }
@@ -14,7 +15,8 @@ namespace BWTA
   RegionImpl::RegionImpl(const BoostPolygon& boostPoly, const int& scale)
 	  : _polygon(Polygon(boostPoly, scale)),
 	  _maxDistance(0),
-	  _color(0)
+	  _color(0),
+	  _hue(0.0)
   {
 	  this->_center = _polygon.getCenter();
   }

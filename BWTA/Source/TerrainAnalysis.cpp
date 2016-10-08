@@ -168,9 +168,12 @@ namespace BWTA
 
 		LOG(" [Created BWTA regions/chokepoints in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
-		regionColoring();
+// 		regionColoring();
+		regionColoringHUE();
 		painter.drawPolygons(BWTA_Result::unwalkablePolygons);
-		painter.drawRegions(BWTA_Result::regions);
+// 		painter.drawRegions(BWTA_Result::regions);
+		painter.drawRegions2(BWTA_Result::regions);
+		painter.drawChokepoints(BWTA_Result::chokepoints);
 		painter.render("9-Regions");
 #endif
 		timer.start();

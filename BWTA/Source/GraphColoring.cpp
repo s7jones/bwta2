@@ -49,6 +49,7 @@ namespace BWTA
 					while (isAdjacent(i, NN[j])) { // remove vertex that adjacent to the found vertex
 						NN[j] = NN[NNSzie - 1];
 						NNSzie--; // decrease the NNCount
+						if (NNSzie == 0) break;
 					}
 				}
 			}
@@ -146,6 +147,48 @@ namespace BWTA
 		for (size_t i = 0; i < BWTA_Result::regions.size(); ++i) {
 			RegionImpl* reg = (RegionImpl*)BWTA_Result::regions.at(i);
 			reg->_color = color.at(i);
+		}
+	}
+
+	const std::vector<size_t> getAdjacents(const size_t& regId) {
+		std::vector<size_t> adjacentList;
+		for (size_t regId2 = 0; regId2 < BWTA_Result::regions.size(); ++regId2) {
+			if (regId != regId2 && isAdjacent(regId, regId2)) {
+				adjacentList.push_back(regId2);
+			}
+		}
+		return adjacentList;
+	}
+
+	void regionColoringHUE() {
+		size_t numRegions = BWTA_Result::regions.size();
+		std::vector<double> hueList; hueList.resize(numRegions);
+		// Assign a random HUE to each region
+		for (auto& hue : hueList) hue = rand()*1.0 / RAND_MAX;
+		// Check constrain satisfaction
+		double d, s;
+		for (int l = 0; l < 6; ++l) {
+			for (size_t regId = 0; regId < numRegions; ++regId) {
+				for (auto& neighborId : getAdjacents(regId)) {
+					d = hueList.at(neighborId) - hueList.at(regId);
+					if (d > 0.5) d = d - 1.0;
+					if (d < -0.5) d = d + 1.0;
+					s = d - 0.5;
+					if (d < 0) s += 1.0;
+					s *= 0.05;
+					hueList.at(regId) += s;
+					hueList.at(neighborId) -= s;
+					while (hueList.at(regId) < 0) hueList.at(regId) += 1.0;
+					while (hueList.at(regId) >= 1.0) hueList.at(regId) -= 1.0;
+					while (hueList.at(neighborId) < 0) hueList.at(neighborId) += 1.0;
+					while (hueList.at(neighborId) >= 1.0) hueList.at(neighborId) -= 1.0;
+				}
+			}
+		}
+		// save each color to each region
+		for (size_t i = 0; i < BWTA_Result::regions.size(); ++i) {
+			RegionImpl* reg = (RegionImpl*)BWTA_Result::regions.at(i);
+			reg->_hue = hueList.at(i);
 		}
 	}
 

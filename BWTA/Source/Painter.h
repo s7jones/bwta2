@@ -23,6 +23,9 @@ namespace BWTA {
 		void drawPolygons(const std::vector<Polygon*>& polygons);
 		void drawPolygons(const std::vector<BoostPolygon>& polygons);
 		void drawRegions(std::vector<Region*> regions);
+		void drawRegions2(std::vector<Region*> regions);
+		QColor hsl2rgb(double h, double sl, double l);
+		void drawChokepoints(std::set<Chokepoint*> chokepoints);
 		void drawHeatMap(RectangleArray<int> map, float maxValue);
 		void drawClosestBaseLocationMap(RectangleArray<BaseLocation*> map, std::set<BaseLocation*> baseLocations);
 		void drawClosestChokepointMap(RectangleArray<Chokepoint*> map, std::set<Chokepoint*> chokepoints);

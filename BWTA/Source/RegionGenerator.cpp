@@ -764,7 +764,7 @@ namespace BWTA
 				}
 			}
 
-			LOG("Chokepoint: (" << pt.x() << "," << pt.y() << ") sides: " << side1 << " " << side2);
+// 			LOG("Chokepoint: (" << pt.x() << "," << pt.y() << ") sides: " << side1 << " " << side2);
 			chokepointSides.emplace(id, chokeSides_t(side1, side2));
 		}
 	}
@@ -810,10 +810,15 @@ namespace BWTA
 		typedef boost::geometry::model::linestring<BoostPoint> BoostLine;
 		typedef boost::geometry::model::multi_linestring<BoostLine> BoostMultiLine;
 		BoostMultiLine chokeLines;
+// 		auto it = chokepointSides.begin();
+// 		std::advance(it, 0);
+// 		const auto& choke = *it;
 		for (const auto& choke : chokepointSides) {
 			BoostPoint a(choke.second.side1.x, choke.second.side1.y);
 			BoostPoint b(choke.second.side2.x, choke.second.side2.y);
 			extendLine(a, b);
+// 			LOG("Converted (" << choke.second.side1.x << "," << choke.second.side1.y << ")-(" << choke.second.side2.x << "," << choke.second.side2.y << ") "
+// 				<< "to (" << a.x() << "," << a.y() << ")-(" << b.x() << "," << b.y() << ")");
 			std::vector<BoostPoint> line = { a, b };
 			BoostLine chokeLine;
 			boost::geometry::assign_points(chokeLine, line);

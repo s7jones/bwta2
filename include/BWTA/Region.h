@@ -17,6 +17,7 @@ namespace BWTA
 		virtual const std::set<Region*>& getReachableRegions() const = 0;
 		virtual const int getMaxDistance() const = 0;
 		virtual const int getColorLabel() const = 0;
+		virtual const double getHUE() const = 0;
 		virtual const int getLabel() const = 0;
 		virtual const BWAPI::Position& getOpennessPosition() const = 0;
 		virtual const double getOpennessDistance() const = 0;

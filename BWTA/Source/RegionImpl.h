@@ -19,6 +19,7 @@ namespace BWTA
 	const std::set<Region*>& getReachableRegions() const override		{ return this->reachableRegions; };
 	const int getMaxDistance() const override							{ return this->_maxDistance; };
 	const int getColorLabel() const override							{ return this->_color; };
+	const double getHUE() const override								{ return this->_hue; };
 	const int getLabel() const override									{ return this->_label; };
 	const BWAPI::Position& getOpennessPosition() const override			{ return this->_opennessPoint; };
 	const double getOpennessDistance() const override					{ return this->_opennessDistance; };
@@ -32,6 +33,7 @@ namespace BWTA
     std::set<Region*> reachableRegions;
 	int _maxDistance; // TODO remove this, should be the same as _opennessDistance
 	int _color;						// color map ID
+	double _hue;
 	int _label;						// region label id from BWTA_Result::regionLabelMap
 	BWAPI::Position _opennessPoint; // maximum distance point equidistant to the border
 	double _opennessDistance;		// distance from opennessPoint to the border
