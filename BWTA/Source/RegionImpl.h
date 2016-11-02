@@ -2,6 +2,8 @@
 #include <BWTA/Polygon.h>
 #include <BWTA/Region.h>
 #include <BWTA/BaseLocation.h>
+#include "PolygonImpl.h"
+
 namespace BWTA
 {
   class Chokepoint;
@@ -12,7 +14,7 @@ namespace BWTA
 	RegionImpl(const Polygon& poly);
 	RegionImpl(const BoostPolygon& boostPoly, const int& scale = 1);
 
-	const Polygon& getPolygon() const override							{ return this->_polygon; };
+	const Polygon& getPolygon() const override							{ return _polygon; };
 	const BWAPI::Position& getCenter() const override					{ return this->_center; };
 	const std::set<Chokepoint*>& getChokepoints() const override		{ return this->_chokepoints; };
 	const std::set<BaseLocation*>& getBaseLocations() const override	{ return this->baseLocations; };
@@ -26,7 +28,7 @@ namespace BWTA
 
 	bool isReachable(Region* region) const override;
 
-    Polygon _polygon;
+    PolygonImpl _polygon;
     BWAPI::Position _center;
     std::set<Chokepoint*> _chokepoints;
     std::set<BaseLocation*> baseLocations;

@@ -1,16 +1,16 @@
-#include <BWTA/Polygon.h>
+#include "PolygonImpl.h"
 
 namespace BWTA
 {
 
-	Polygon::Polygon()  // TODO remove after fixing load_data
+	PolygonImpl::PolygonImpl()  // TODO remove after fixing load_data
 	{
 // 	  LOG("Empty polygon construct called"); 
 	}
 
 	// scale is used if you want to change the scale of the positions of the original BoostPolygon
 	// like WalkPosition to Position
-	Polygon::Polygon(const BoostPolygon& boostPol, const int& scale)
+	PolygonImpl::PolygonImpl(const BoostPolygon& boostPol, const int& scale)
 	{
 		for (const auto& polyPoint : boostPol.outer()) {
 			this->emplace_back((int)polyPoint.x() * scale, (int)polyPoint.y() * scale);
@@ -18,13 +18,20 @@ namespace BWTA
 		// TODO add holes
 	}
 
-	Polygon::Polygon(const Polygon& b)
+	PolygonImpl::PolygonImpl(const Polygon& b)
 	{
 		for (const auto& point : b) this->push_back(point);
-		this->holes = b.getHoles();
+		for (const auto& h : b.getHoles()) {
+			holes.push_back(new PolygonImpl(*h));
+		}
 	}
 
-	double Polygon::getArea() const
+	void PolygonImpl::addHole(const PolygonImpl &h)
+	{
+		holes.push_back(new PolygonImpl(h));
+	}
+
+	const double PolygonImpl::getArea() const
 	{
 		if (this->size() < 3) return 0;
 
@@ -36,7 +43,7 @@ namespace BWTA
 		return std::fabs((double)a / 2.0);
 	}
 
-	double Polygon::getPerimeter() const
+	const double PolygonImpl::getPerimeter() const
 	{
 		if (this->size() < 2) return 0;
 
@@ -48,7 +55,7 @@ namespace BWTA
 		return p;
 	}
 
-	BWAPI::Position Polygon::getCenter() const
+	const BWAPI::Position PolygonImpl::getCenter() const
 	{
 		int temp = this->back().x*this->front().y - this->front().x*this->back().y;
 		int cx = (this->back().x + this->front().x) * temp;
@@ -67,7 +74,7 @@ namespace BWTA
 		return BWAPI::Position(cx, cy);
 	}
 
-	BWAPI::Position Polygon::getNearestPoint(BWAPI::Position p) const
+	BWAPI::Position PolygonImpl::getNearestPoint(const BWAPI::Position &p) const
 	{
 		double x3 = p.x;
 		double y3 = p.y;
@@ -94,7 +101,7 @@ namespace BWTA
 		}
 
 		for (const auto& hole : holes) {
-			BWAPI::Position hnp = hole.getNearestPoint(p);
+			BWAPI::Position hnp = hole->getNearestPoint(p);
 			if (hnp.getDistance(p) < minp.getDistance(p)) minp = hnp;
 		}
 		return minp;

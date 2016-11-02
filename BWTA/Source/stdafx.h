@@ -27,6 +27,12 @@
 #include <boost/polygon/polygon.hpp>
 namespace bgi = boost::geometry::index;
 
+#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+
+using BoostPoint = boost::geometry::model::d2::point_xy < double > ;
+using BoostPolygon = boost::geometry::model::polygon < BoostPoint > ;
+
 #define PI 3.1415926
 
 // Internal utilities

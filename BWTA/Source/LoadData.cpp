@@ -139,6 +139,19 @@ namespace BWTA
 				}
 				MapData::walkability[x][y] = cornerWalkable;
 
+				// make thin unwalkable areas bigger
+				if (!MapData::walkability[x][y] && x >= 2 && x < maxWidth2) {
+					int unwalkTiles = 0;
+					size_t wideX = x + 2;
+					for (size_t x2 = x - 2; x2 <= wideX; ++x2) {
+						if (!MapData::rawWalkability[x2][y]) unwalkTiles++;
+					}
+					if (unwalkTiles <= 2) {
+// 						MapData::walkability[x - 2][y] = false;
+						MapData::walkability[x - 1][y] = false;
+					}
+				}
+
 				// the lowResWalkability has built tile resolution
 				// so a built tile is walkable only if all 4x4 tiles are walkable
 				MapData::lowResWalkability[x / 4][y / 4] &= MapData::rawWalkability[x][y];
@@ -149,6 +162,12 @@ namespace BWTA
 		for (size_t x = 1; x < maxWidth1; ++x) {
 			if (!MapData::walkability[x - 1][0] && MapData::walkability[x][0] && !MapData::walkability[x + 1][0]) {
 				MapData::walkability[x][0] = false;
+			}
+		}
+		for (size_t x = 1; x < maxWidth2; ++x) {
+			if (!MapData::walkability[x - 1][0] && MapData::walkability[x][0] && MapData::walkability[x + 1][0] && !MapData::walkability[x + 2][0]) {
+				MapData::walkability[x][0] = false;
+				MapData::walkability[x+1][0] = false;
 			}
 		}
 		for (size_t y = 1; y < maxHeight1; ++y) {
@@ -223,15 +242,14 @@ namespace BWTA
     int region_amount;
     int map_width;
     int map_height;
-    std::vector<Polygon*> unwalkablePolygons;
+    std::vector<PolygonImpl*> unwalkablePolygons;
     std::vector<BaseLocation*> baselocations;
     std::vector<Chokepoint*> chokepoints;
     std::vector<Region*> regions;
     std::ifstream file_in;
     file_in.open(filename.c_str());
     file_in >> version;
-    if (version!=BWTA_FILE_VERSION)
-    {
+    if (version!=BWTA_FILE_VERSION)  {
       file_in.close();
       return;
     }
@@ -243,7 +261,7 @@ namespace BWTA
     file_in >> map_height;
     for(int i=0;i<unwalkablePolygon_amount;i++)
     {
-      Polygon* p=new Polygon();
+      PolygonImpl* p = new PolygonImpl();
       unwalkablePolygons.push_back(p); // TODO why we need 2 vectors??
 	  BWTA_Result::unwalkablePolygons.push_back(p);
     }
@@ -280,14 +298,14 @@ namespace BWTA
       for(int j=0;j<hole_count;j++)
       {
         file_in >> polygon_size;
-        Polygon h;
+        PolygonImpl h;
         for(int k=0;k<polygon_size;k++)
         {
           int x,y;
           file_in >> x >> y;
           h.push_back(BWAPI::Position(x,y));
         }
-        unwalkablePolygons[i]->holes.push_back(h);
+		unwalkablePolygons[i]->addHole(h);
       }
     }
     for(int i=0;i<baselocation_amount;i++)
@@ -480,13 +498,12 @@ namespace BWTA
         file_out << (**p)[i].y << "\n";
       }
       file_out << (*p)->getHoles().size() << "\n";
-      for(std::vector<Polygon>::const_iterator h=(*p)->getHoles().begin();h!=(*p)->getHoles().end();h++)
-      {
-        file_out << (*h).size() << "\n";
-        for(unsigned int i=0;i<(*h).size();i++)
+	  for (const auto& h : (*p)->getHoles()) {
+        file_out << h->size() << "\n";
+        for(unsigned int i=0;i<h->size();i++)
         {
-          file_out << (*h)[i].x << "\n";
-          file_out << (*h)[i].y << "\n";
+          file_out << h->at(i).x << "\n";
+          file_out << h->at(i).y << "\n";
         }
       }
     }
@@ -521,7 +538,7 @@ namespace BWTA
     }
 	for (const auto& r : BWTA_Result::regions) {
       file_out << rid[r] << "\n";
-      Polygon poly=r->getPolygon();
+      PolygonImpl poly = r->getPolygon();
       file_out << poly.size() << "\n";
       for(unsigned int i=0;i<poly.size();i++)
       {

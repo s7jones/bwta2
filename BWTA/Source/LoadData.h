@@ -6,6 +6,7 @@
 #include "BaseLocationImpl.h"
 #include "ChokepointImpl.h"
 #include "RegionImpl.h"
+#include "PolygonImpl.h"
 
 namespace BWTA
 {

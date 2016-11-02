@@ -210,7 +210,7 @@
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <AdditionalIncludeDirectories>../externalInclude;../include;$(BWAPI_DIR)/include;$(BOOST_INCLUDEDIR);$(QTDIR)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;OFFLINE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;OFFLINE;DEBUG_DRAW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -283,7 +283,7 @@
     <ClCompile Include="Source\LoadData.cpp" />
     <ClCompile Include="Source\MapData.cpp" />
     <ClCompile Include="Source\Painter.cpp" />
-    <ClCompile Include="Source\Polygon.cpp" />
+    <ClCompile Include="Source\PolygonImpl.cpp" />
     <ClCompile Include="Source\PolygonGenerator.cpp" />
     <ClCompile Include="Source\RegionGenerator.cpp" />
     <ClCompile Include="Source\RegionImpl.cpp" />
@@ -311,6 +311,7 @@
     <ClInclude Include="Source\Painter.h" />
     <ClInclude Include="Source\Pathfinding.h" />
     <ClInclude Include="Source\PolygonGenerator.h" />
+    <ClInclude Include="Source\PolygonImpl.h" />
     <ClInclude Include="Source\RegionGenerator.h" />
     <ClInclude Include="Source\RegionImpl.h" />
     <ClInclude Include="Source\Timer.h" />

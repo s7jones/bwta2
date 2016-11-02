@@ -62,8 +62,8 @@ namespace BWTA {
 	void Painter::drawPolygons(const std::vector<Polygon>& polygons) {
 		for (const auto& polygon : polygons) {
 			drawPolygon(polygon, QColor(180, 180, 180));
-			for (auto& hole : polygon.holes) {
-				drawPolygon(hole, QColor(255, 100, 255));
+			for (auto& hole : polygon.getHoles()) {
+				drawPolygon(*hole, QColor(255, 100, 255));
 			}
 		}
 	}
@@ -71,8 +71,8 @@ namespace BWTA {
 	void Painter::drawPolygons(const std::vector<Polygon*>& polygons) {
 		for (const auto& polygon : polygons) {
 			drawPolygon(*polygon, QColor(180, 180, 180));
-			for (const auto& hole : polygon->holes) {
-				drawPolygon(hole, QColor(255, 100, 255));
+			for (const auto& hole : polygon->getHoles()) {
+				drawPolygon(*hole, QColor(255, 100, 255));
 			}
 		}
 	}

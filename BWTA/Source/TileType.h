@@ -1,5 +1,8 @@
 #pragma once
 #pragma pack(1)
+
+#include <cstdint>
+
 /** Represents information shared for all tiles in one tile group. */
 class TileType
 {

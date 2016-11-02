@@ -13,7 +13,7 @@ namespace BWTA
   }
 
   RegionImpl::RegionImpl(const BoostPolygon& boostPoly, const int& scale)
-	  : _polygon(Polygon(boostPoly, scale)),
+	  : _polygon(PolygonImpl(boostPoly, scale)),
 	  _maxDistance(0),
 	  _color(0),
 	  _hue(0.0)

@@ -74,7 +74,7 @@ namespace BWTA
 
 		// translate Boost polygons to BWTA polygons
 		for (const auto& pol : boostPolygons) {
-			Polygon* bwtaPol = new Polygon(pol);
+			Polygon* bwtaPol = new PolygonImpl(pol);
 			BWTA_Result::unwalkablePolygons.push_back(bwtaPol);
 		}
 

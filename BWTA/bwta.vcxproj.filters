@@ -54,9 +54,6 @@
     <ClCompile Include="Source\ChokepointImpl.cpp">
       <Filter>Interface Implementation</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Polygon.cpp">
-      <Filter>Interface Implementation</Filter>
-    </ClCompile>
     <ClCompile Include="Source\RegionImpl.cpp">
       <Filter>Interface Implementation</Filter>
     </ClCompile>
@@ -74,6 +71,9 @@
     <ClCompile Include="Source\LoadData.cpp" />
     <ClCompile Include="Source\TerrainAnalysis.cpp">
       <Filter>TerrainAnalyzer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PolygonImpl.cpp">
+      <Filter>Interface Implementation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -146,6 +146,9 @@
     <ClInclude Include="Source\TileType.h" />
     <ClInclude Include="Source\Pathfinding.h">
       <Filter>Pathfinding</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\PolygonImpl.h">
+      <Filter>Interface Implementation</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
