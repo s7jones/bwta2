@@ -314,6 +314,7 @@ namespace BWTA
       file_in >> id >> px >> py >> tpx >> tpy;
       ((BaseLocationImpl*)baselocations[i])->position=BWAPI::Position(px,py);
       ((BaseLocationImpl*)baselocations[i])->tilePosition=BWAPI::TilePosition(tpx,tpy);
+	  //LOG("Found Base Location at " << baselocations[i]->getTilePosition());
       int rid;
       file_in >> rid;
       ((BaseLocationImpl*)baselocations[i])->region=regions[rid];
