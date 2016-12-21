@@ -7,6 +7,20 @@ BWTA2 offers more functionalities (see **[Release Notes](https://bitbucket.org/a
 
 **[Download](https://bitbucket.org/auriarte/bwta2/downloads)** the last version and follow the **[starting guide](https://bitbucket.org/auriarte/bwta2/wiki/Getting%20Started)**
 
+## Citing this work ##
+
+If you use `BWTA2` for academic research, you are highly encouraged (though not required) to cite the following paper:
+
+```
+#!TeX
+@inproceedings{uriarte16b,
+  author    = {Uriarte, Alberto and Onta\~{n}\'{o}n, Santiago},
+  title     = {Improving Terrain Analysis and Applications to RTS Game AI},
+  booktitle = {AIIDE},
+  year      = {2016}
+}
+```
+
 ## Information for developers ##
 
 CGAL library is used to create the [Segment Delaunay Graph](http://doc.cgal.org/latest/Segment_Delaunay_graph_2/index.html). [How to install](http://www.cgal.org/windows_installation.html) (only if you need to compile the project).
