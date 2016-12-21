@@ -26,7 +26,7 @@ namespace BWTA
 	void scanLineFill(Contour contour, const int& labelID,
 		RectangleArray<int>& labelMap, RectangleArray<bool>& nodeMap, bool fillContour = false);
 	// polyCorners only has the points of the polygon
-	void scanLineFill(Contour polyCorners, const int& labelID, RectangleArray<int>& labelMap);
+	void scanLineFill(const Contour &polyCorners, const int& labelID, RectangleArray<int>& labelMap);
 
 	void polygonBoundingBox(const Contour& contour, size_t& maxX, size_t& minX, size_t& maxY, size_t& minY);
 	bool isFileVersionCorrect(std::string filename);
@@ -40,7 +40,7 @@ namespace BWTA
 				for (int xi = 0; xi < 4; ++xi) {
 					for (int yi = 0; yi < 4; ++yi) {
 						T* bl = walkResMap[x * 4 + xi][y * 4 + yi];
-						if (bl == NULL) continue;
+						if (bl == nullptr) continue;
 						if (h.contains(bl)) {
 							int n = h.get(bl) + 1;
 							h.set(bl, n);

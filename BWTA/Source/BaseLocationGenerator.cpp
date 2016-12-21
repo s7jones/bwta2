@@ -208,7 +208,7 @@ namespace BWTA
 			int clusterMinX = (int)baseBuildMap.getWidth() - 1;
 			int clusterMaxY = 0;
 			int clusterMinY = (int)baseBuildMap.getHeight() - 1;
-			for (size_t j = 0; j < clusters.at(i).size(); ++j) {
+			for (size_t j = 0; j < clusters[i].size(); ++j) {
 				//this will flood the nearby tiles with their distances to the current mineral
 				calculateTileDistances(MapData::lowResWalkability, clusters[i][j].pos, (double)MAX_INFLUENCE_DISTANCE_RADIUS, distanceMap);
 				int x = clusters[i][j].pos.x;
@@ -241,7 +241,7 @@ namespace BWTA
 				}
 			}
 			if (maxScore > 0) {
-				baseLocations.insert(new BaseLocationImpl(bestTile));
+				baseLocations.insert(new BaseLocationImpl(bestTile, clusters[i]));
 			}
 		}
 		LOG(" - Best baseLocations computed in " << timer.stopAndGetTime() << " seconds");
@@ -256,7 +256,7 @@ namespace BWTA
 		for (std::set<BWTA::BaseLocation*>::iterator i = baseLocations.begin(); i != baseLocations.end(); i++) {
 			BWAPI::Position p((*i)->getTilePosition().x * 4, (*i)->getTilePosition().y * 4);
 			calculate_walk_distances_area(p, 16, 12, 10 * 4 * 10, distanceMap);
-			BWTA::BaseLocationImpl* ii = (BWTA::BaseLocationImpl*)(*i);
+			BWTA::BaseLocationImpl* ii = dynamic_cast<BWTA::BaseLocationImpl*>(*i);
 			
 			for (auto geyser : BWAPI::Broodwar->getStaticGeysers()) {
 				int x = geyser->getInitialTilePosition().x * 4 + 8;

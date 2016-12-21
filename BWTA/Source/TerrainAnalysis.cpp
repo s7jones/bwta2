@@ -1,7 +1,6 @@
 
 #ifdef DEBUG_DRAW
 #include "Painter.h"
-#include "GraphColoring.h"
 #endif
 
 #include "LoadData.h"
@@ -81,7 +80,7 @@ namespace BWTA
 		LOG(" [Detected polygons in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
 		painter.drawPolygons(BWTA_Result::unwalkablePolygons);
-		painter.render("1-BoostPolygons");
+		painter.render("01-Polygons");
 		// Prints each polygon individually to debug 
 // 		for (auto tmpPol : polygons) {
 // 			painter.drawPolygon(tmpPol, QColor(180, 180, 180));
@@ -98,7 +97,7 @@ namespace BWTA
 #ifdef DEBUG_DRAW
 		painter.drawPolygons(BWTA_Result::unwalkablePolygons);
 		painter.drawGraph(graph);
-		painter.render("2-BoostVoronoi");
+		painter.render("02-Voronoi");
 #endif
 		timer.start();
 
@@ -108,7 +107,7 @@ namespace BWTA
 #ifdef DEBUG_DRAW
 		painter.drawPolygons(BWTA_Result::unwalkablePolygons);
 		painter.drawGraph(graph);
-		painter.render("3-VoronoiPruned");
+		painter.render("03-VoronoiPruned");
 #endif
 		timer.start();
 
@@ -120,7 +119,7 @@ namespace BWTA
 		painter.drawGraph(graph);
 		painter.drawNodes(graph, graph.regionNodes, Qt::blue);
 		painter.drawNodes(graph, graph.chokeNodes, Qt::red);
-		painter.render("5-NodesDetected");
+		painter.render("05-NodesDetected");
 #endif
 		timer.start();
 
@@ -133,7 +132,7 @@ namespace BWTA
 		painter.drawGraph(graphSimplified);
 		painter.drawNodes(graphSimplified, graphSimplified.regionNodes, Qt::blue);
 		painter.drawNodes(graphSimplified, graphSimplified.chokeNodes, Qt::red);
-		painter.render("6-GraphPruned");
+		painter.render("06-GraphPruned");
 #endif
 		timer.start();
 
@@ -145,7 +144,7 @@ namespace BWTA
 		painter.drawGraph(graphSimplified);
 		painter.drawNodes(graphSimplified, graphSimplified.regionNodes, Qt::blue);
 		painter.drawNodes(graphSimplified, graphSimplified.chokeNodes, Qt::red);
-		painter.render("7-GraphMerged");
+		painter.render("07-GraphMerged");
 #endif
 		timer.start();
 
@@ -158,7 +157,7 @@ namespace BWTA
 		painter.drawGraph(graphSimplified);
 		painter.drawNodes(graphSimplified, graphSimplified.regionNodes, Qt::blue);
 		painter.drawLines(chokepointSides, Qt::red);
-		painter.render("8-WallOffChokepoints");
+		painter.render("08-WallOffChokepoints");
 #endif
 		timer.start();
 
@@ -168,17 +167,13 @@ namespace BWTA
 
 		LOG(" [Created BWTA regions/chokepoints in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
-// 		regionColoring();
-		regionColoringHUE();
 		painter.drawPolygons(BWTA_Result::unwalkablePolygons);
-// 		painter.drawRegions(BWTA_Result::regions);
+// 		painter.drawRegions(BWTA_Result::regions); // uses another graph coloring
 		painter.drawRegions2(BWTA_Result::regions);
 		painter.drawChokepoints(BWTA_Result::chokepoints);
-		painter.render("9-Regions");
+		painter.render("09-Regions");
 #endif
 		timer.start();
-
-
 
 		detectBaseLocations(BWTA_Result::baselocations);
 // 		for (auto i : BWTA_Result::baselocations) {
@@ -204,10 +199,15 @@ namespace BWTA
 
 		LOG(" [Calculated base location properties in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
-		painter.drawClosestBaseLocationMap(BWTA_Result::getBaseLocationW, BWTA_Result::baselocations);
-		painter.render("ClosestBaseLocationMap");
-		painter.drawClosestChokepointMap(BWTA_Result::getChokepointW, BWTA_Result::chokepoints);
-		painter.render("ClosestChokepointMap");
+//		painter.drawClosestBaseLocationMap(BWTA_Result::getBaseLocationW, BWTA_Result::baselocations);
+//		painter.render("ClosestBaseLocationMap");
+//		painter.drawClosestChokepointMap(BWTA_Result::getChokepointW, BWTA_Result::chokepoints);
+//		painter.render("ClosestChokepointMap");
+		painter.drawPolygons(BWTA_Result::unwalkablePolygons);
+		painter.drawRegions2(BWTA_Result::regions);
+		painter.drawChokepoints(BWTA_Result::chokepoints);
+		painter.drawBaseLocations(BWTA_Result::baselocations);
+		painter.render("10-Final");
 #endif
 
 	}

@@ -1,5 +1,7 @@
 #ifdef DEBUG_DRAW
 #include "Painter.h"
+#include "GraphColoring.h"
+#include "BaseLocationImpl.h"
 
 namespace BWTA {
 
@@ -12,16 +14,9 @@ namespace BWTA {
 	Painter::Painter() :
 		renderCounter(1)
 	{
-		// PNG
-		image = new QImage(MapData::mapWidthWalkRes, MapData::mapHeightWalkRes, QImage::Format_ARGB32_Premultiplied);
-		painter = new QPainter(image);
-		painter->setRenderHint(QPainter::Antialiasing);
-	}
-
-	Painter::~Painter()
-	{
-		delete painter;
-		delete image;
+		image = QImage(MapData::mapWidthWalkRes, MapData::mapHeightWalkRes, QImage::Format_ARGB32_Premultiplied);
+		painter.begin(&image);
+		painter.setRenderHint(QPainter::Antialiasing);
 	}
 
 	void Painter::render(const std::string& label)
@@ -35,34 +30,42 @@ namespace BWTA {
 			filename += MapData::mapFileName + "-" + label + ".png";
 		}
 
-		image->save(filename.c_str(), "PNG");
-		image->fill(Qt::white); // set background to white again
+		image.save(filename.c_str(), "PNG");
+
+		// restart device
+		painter.end();
+		image = QImage(MapData::mapWidthWalkRes, MapData::mapHeightWalkRes, QImage::Format_ARGB32_Premultiplied);
+		painter.begin(&image);
+		painter.setRenderHint(QPainter::Antialiasing);
 	}
 
 	void Painter::drawMapBorder() {
 		QPen qp(QColor(0, 0, 0));
 		qp.setWidth(2);
-		painter->setPen(qp);
-		painter->drawLine(0, 0, 0, MapData::walkability.getHeight() - 1);
-		painter->drawLine(0, MapData::walkability.getHeight() - 1, MapData::walkability.getWidth() - 1, MapData::walkability.getHeight() - 1);
-		painter->drawLine(MapData::walkability.getWidth() - 1, MapData::walkability.getHeight() - 1, MapData::walkability.getWidth() - 1, 0);
-		painter->drawLine(MapData::walkability.getWidth() - 1, 0, 0, 0);
+		painter.setPen(qp);
+		painter.drawLine(0, 0, 0, MapData::walkability.getHeight() - 1);
+		painter.drawLine(0, MapData::walkability.getHeight() - 1, MapData::walkability.getWidth() - 1, MapData::walkability.getHeight() - 1);
+		painter.drawLine(MapData::walkability.getWidth() - 1, MapData::walkability.getHeight() - 1, MapData::walkability.getWidth() - 1, 0);
+		painter.drawLine(MapData::walkability.getWidth() - 1, 0, 0, 0);
 	}
 
 	void Painter::drawPolygon(const Polygon& polygon, QColor color, double scale) {
 		QVector<QPointF> qp;
-		for (int i = 0; i < (int)polygon.size(); i++) {
-			qp.push_back(QPointF(polygon[i].x * scale, polygon[i].y * scale));
+		for (const auto &point : polygon) {
+			qp.push_back(QPointF(point.x * scale, point.y * scale));
 		}
-		painter->setPen(QPen(Qt::black));
-		painter->setBrush(QBrush(color));
-		painter->drawPolygon(QPolygonF(qp));
+//		for (size_t i = 0; i < polygon.size(); ++i) {
+//			qp.push_back(QPointF(polygon[i].x * scale, polygon[i].y * scale));
+//		}
+		painter.setPen(QPen(Qt::black));
+		painter.setBrush(QBrush(color));
+		painter.drawPolygon(QPolygonF(qp));
 	}
 
 	void Painter::drawPolygons(const std::vector<Polygon>& polygons) {
 		for (const auto& polygon : polygons) {
 			drawPolygon(polygon, QColor(180, 180, 180));
-			for (auto& hole : polygon.getHoles()) {
+			for (const auto& hole : polygon.getHoles()) {
 				drawPolygon(*hole, QColor(255, 100, 255));
 			}
 		}
@@ -85,19 +88,29 @@ namespace BWTA {
 				qp.push_back(QPointF(point.x(), point.y()));
 			}
 
-			painter->setPen(QPen(Qt::black));
-			painter->setBrush(QBrush(QColor(180, 180, 180)));
-			painter->drawPolygon(QPolygonF(qp));
+			painter.setPen(QPen(Qt::black));
+			painter.setBrush(QBrush(QColor(180, 180, 180)));
+			painter.drawPolygon(QPolygonF(qp));
 		}
 	}
 
 	void Painter::drawRegions(std::vector<Region*> regions) {
+		static bool colored = false;
+		if (!colored) {
+			regionColoring();
+			colored = true;
+		}
 		for (const auto& r : regions) {
 			drawPolygon(r->getPolygon(), mapColors.at(r->getColorLabel()), 0.125);
 		}
 	}
 
 	void Painter::drawRegions2(std::vector<Region*> regions) {
+		static bool colored = false;
+		if (!colored) {
+			regionColoringHUE();
+			colored = true;
+		}
 		for (const auto& r : regions) {
 			drawPolygon(r->getPolygon(), hsl2rgb(r->getHUE(), 1.0, 0.75), 0.125);
 		}
@@ -106,13 +119,10 @@ namespace BWTA {
 	QColor Painter::hsl2rgb(double h, double sl, double l)
 	{
 		double v;
-		double r, g, b;
-		r = l;   // default to gray
-		g = l;
-		b = l;
+		// default to gray
+		double r = 1, g = 1, b = 1;
 		v = (l <= 0.5) ? (l * (1.0 + sl)) : (l + sl - l * sl);
-		if (v > 0)
-		{
+		if (v > 0) {
 			double m;
 			double sv;
 			int sextant;
@@ -120,42 +130,29 @@ namespace BWTA {
 			m = l + l - v;
 			sv = (v - m) / v;
 			h *= 6.0;
-			sextant = (int)h;
+			sextant = static_cast<int>(h);
 			fract = h - sextant;
 			vsf = v * sv * fract;
 			mid1 = m + vsf;
 			mid2 = v - vsf;
-			switch (sextant)
-			{
+			switch (sextant) {
 			case 0:
-				r = v;
-				g = mid1;
-				b = m;
+				r = v; g = mid1; b = m;
 				break;
 			case 1:
-				r = mid2;
-				g = v;
-				b = m;
+				r = mid2; g = v; b = m;
 				break;
 			case 2:
-				r = m;
-				g = v;
-				b = mid1;
+				r = m; g = v; b = mid1;
 				break;
 			case 3:
-				r = m;
-				g = mid2;
-				b = v;
+				r = m; g = mid2; b = v;
 				break;
 			case 4:
-				r = mid1;
-				g = m;
-				b = v;
+				r = mid1; g = m; b = v;
 				break;
 			case 5:
-				r = v;
-				g = m;
-				b = mid2;
+				r = v; g = m; b = mid2;
 				break;
 			}
 		}
@@ -165,16 +162,16 @@ namespace BWTA {
 	void Painter::drawChokepoints(std::set<Chokepoint*> chokepoints) {
 		QPen qp(QColor(255, 0, 0));
 		qp.setWidth(3);
-		painter->setPen(qp);
+		painter.setPen(qp);
 		for (const auto& c : chokepoints) {
-			auto sides = c->getSides();
+			auto &sides = c->getSides();
 			BWAPI::WalkPosition pos1(sides.first);
 			BWAPI::WalkPosition pos2(sides.second);
-			painter->drawLine(pos1.x, pos1.y, pos2.x, pos2.y);
+			painter.drawLine(pos1.x, pos1.y, pos2.x, pos2.y);
 		}
 	}
 
-	void Painter::getHeatMapColor(float value, float &red, float &green, float &blue)
+	void Painter::getHeatMapColor(float value, int &red, int &green, int &blue) const
 	{
 		const int NUM_COLORS = 3;
 		static float color[NUM_COLORS][3] = { { 255, 0, 0 }, { 0, 255, 0 }, { 0, 0, 255 } };
@@ -188,28 +185,28 @@ namespace BWTA {
 		else if (value >= 1)	{ idx1 = idx2 = NUM_COLORS - 1; }	// accounts for an input >=0
 		else {
 			value = value * (NUM_COLORS - 1);	// will multiply value by 3
-			idx1 = (int)floor(value);			// our desired color will be after this index
+			idx1 = static_cast<int>(std::floor(value));	// our desired color will be after this index
 			idx2 = idx1 + 1;					// ... and before this index (inclusive)
 			fractBetween = value - float(idx1); // distance between the two indexes (0-1)
 		}
 
-		red   = (color[idx2][0] - color[idx1][0])*fractBetween + color[idx1][0];
-		green = (color[idx2][1] - color[idx1][1])*fractBetween + color[idx1][1];
-		blue  = (color[idx2][2] - color[idx1][2])*fractBetween + color[idx1][2];
+		red   = static_cast<int>((color[idx2][0] - color[idx1][0])*fractBetween + color[idx1][0]);
+		green = static_cast<int>((color[idx2][1] - color[idx1][1])*fractBetween + color[idx1][1]);
+		blue  = static_cast<int>((color[idx2][2] - color[idx1][2])*fractBetween + color[idx1][2]);
 	}
 
 	void Painter::drawHeatMap(RectangleArray<int> map, float maxValue)
 	{
-		float red, green, blue;
+		int red, green, blue;
 		QColor heatColor;
 		for (unsigned int x = 0; x < map.getWidth(); ++x) {
 			for (unsigned int y = 0; y < map.getHeight(); ++y) {
-				float normalized = (float)map[x][y] / maxValue;
+				float normalized = static_cast<float>(map[x][y]) / maxValue;
 				getHeatMapColor(normalized, red, green, blue);
-				heatColor = QColor((int)red, (int)green, (int)blue);
-				painter->setPen(QPen(heatColor));
-				painter->setBrush(QBrush(heatColor));
-				painter->drawEllipse(x, y, 1, 1);
+				heatColor = QColor(red, green, blue);
+				painter.setPen(QPen(heatColor));
+				painter.setBrush(QBrush(heatColor));
+				painter.drawEllipse(x, y, 1, 1);
 			}
 		}
 	}
@@ -222,7 +219,7 @@ namespace BWTA {
 			, QColor(126, 47, 142), QColor(119, 172, 48), QColor(77, 190, 238), QColor(162, 20, 47) };
 
 		std::map<BaseLocation*, QColor> baseToColor;
-		baseToColor[NULL] = QColor(180, 180, 180);
+		baseToColor[nullptr] = QColor(180, 180, 180);
 		int i = 0;
 		for (const auto& baseLocation : baseLocations) {
 			i = i % baseColors.size();
@@ -233,18 +230,18 @@ namespace BWTA {
 		// draw BaseLocation closest map
 		for (unsigned int x = 0; x < map.getWidth(); ++x) {
 			for (unsigned int y = 0; y < map.getHeight(); ++y) {
-				painter->setPen(QPen(baseToColor[map[x][y]]));
-				painter->setBrush(QBrush(baseToColor[map[x][y]]));
-				painter->drawEllipse(x, y, 1, 1);
+				painter.setPen(QPen(baseToColor[map[x][y]]));
+				painter.setBrush(QBrush(baseToColor[map[x][y]]));
+				painter.drawEllipse(x, y, 1, 1);
 			}
 		}
 
 		// draw BaseLocation origin
 		QColor color(0, 0, 0);
-		painter->setPen(QPen(color));
-		painter->setBrush(QBrush(color));
+		painter.setPen(QPen(color));
+		painter.setBrush(QBrush(color));
 		for (const auto& base : baseLocations) {
-			painter->drawEllipse(base->getTilePosition().x * 4 - 6, base->getTilePosition().y * 4 - 6, 12, 12);
+			painter.drawEllipse(base->getTilePosition().x * 4 - 6, base->getTilePosition().y * 4 - 6, 12, 12);
 		}
 	}
 
@@ -253,7 +250,7 @@ namespace BWTA {
 		LOG("Drawing closest Chokepoint for " << chokepoints.size() << " chokepoints");
 		// assign a color to each Chokepoint
 		std::map<Chokepoint*, QColor> chokeToColor;
-		chokeToColor[NULL] = QColor(180, 180, 180);
+		chokeToColor[nullptr] = QColor(180, 180, 180);
 		int i = 0;
 		for (const auto& chokepoint : chokepoints) {
 			i = i % baseColors.size();
@@ -264,18 +261,18 @@ namespace BWTA {
 		// draw Chokepoint closest map
 		for (unsigned int x = 0; x < map.getWidth(); ++x) {
 			for (unsigned int y = 0; y < map.getHeight(); ++y) {
-				painter->setPen(QPen(chokeToColor[map[x][y]]));
-				painter->setBrush(QBrush(chokeToColor[map[x][y]]));
-				painter->drawEllipse(x, y, 1, 1);
+				painter.setPen(QPen(chokeToColor[map[x][y]]));
+				painter.setBrush(QBrush(chokeToColor[map[x][y]]));
+				painter.drawEllipse(x, y, 1, 1);
 			}
 		}
 
 		// draw Chokepoint origin
 		QColor color(0, 0, 0);
-		painter->setPen(QPen(color));
-		painter->setBrush(QBrush(color));
+		painter.setPen(QPen(color));
+		painter.setBrush(QBrush(color));
 		for (const auto& chokepoint : chokepoints) {
-			painter->drawEllipse(chokepoint->getCenter().x / 8, chokepoint->getCenter().y / 8, 12, 12);
+			painter.drawEllipse(chokepoint->getCenter().x / 8, chokepoint->getCenter().y / 8, 12, 12);
 		}
 	}
 
@@ -288,16 +285,16 @@ namespace BWTA {
 			if (it->color() == 1) {
 				QPen qp(QColor(255, 0, 0));
 				qp.setWidth(2);
-				painter->setPen(qp);
+				painter.setPen(qp);
 			} else {
 				QPen qp(QColor(0, 0, 255));
 				qp.setWidth(2);
-				painter->setPen(qp);
+				painter.setPen(qp);
 			}
 			if (!it->is_finite()) {
 // 				clip_infinite_edge(*it, &samples);
 			} else {
-				painter->drawLine(it->vertex0()->x(), it->vertex0()->y(), 
+				painter.drawLine(it->vertex0()->x(), it->vertex0()->y(), 
 					it->vertex1()->x(), it->vertex1()->y());
 // 				if (it->is_curved()) {
 // 					sample_curved_edge(*it, &samples);
@@ -310,7 +307,7 @@ namespace BWTA {
 	{
 		QPen qp(QColor(0, 0, 255));
 		qp.setWidth(2);
-		painter->setPen(qp);
+		painter.setPen(qp);
 
 		// container to mark visited nodes
 		std::vector<bool> visited;
@@ -333,14 +330,14 @@ namespace BWTA {
 
 			// draw point if it is an leaf node
 // 			if (graph.adjacencyList.at(v0).size() == 1) {
-// 				painter->drawEllipse(graph.nodes.at(v0).x - 6, graph.nodes.at(v0).y - 6, 12, 12);
+// 				painter.drawEllipse(graph.nodes.at(v0).x - 6, graph.nodes.at(v0).y - 6, 12, 12);
 // 				nodeID v1 = *graph.adjacencyList.at(v0).begin();
 // 				LOG("Leaf dist: " << graph.minDistToObstacle.at(v0) << " - parent: " << graph.minDistToObstacle.at(v1));
 // 			}
 
 			// draw all edges of node
 			for (const auto& v1 : graph.adjacencyList.at(v0)) {
-				painter->drawLine(graph.nodes.at(v0).x, graph.nodes.at(v0).y,
+				painter.drawLine(graph.nodes.at(v0).x, graph.nodes.at(v0).y,
 					graph.nodes.at(v1).x, graph.nodes.at(v1).y);
 
 				if (!visited.at(v1)) {
@@ -353,19 +350,19 @@ namespace BWTA {
 
 	void Painter::drawNodes(const RegionGraph& graph, const std::set<nodeID>& nodes, QColor color) 
 	{
-		painter->setPen(QPen(color));
-		painter->setBrush(QBrush(color));
+		painter.setPen(QPen(color));
+		painter.setBrush(QBrush(color));
 		for (const auto& v0 : nodes) {
-			painter->drawEllipse(graph.nodes.at(v0).x - 3, graph.nodes.at(v0).y - 3, 6, 6);
+			painter.drawEllipse(graph.nodes.at(v0).x - 3, graph.nodes.at(v0).y - 3, 6, 6);
 		}
 	}
 
 	void Painter::drawLines(std::map<nodeID, chokeSides_t> chokepointSides, QColor color)
 	{
-		painter->setPen(QPen(color));
-		painter->setBrush(QBrush(color));
+		painter.setPen(QPen(color));
+		painter.setBrush(QBrush(color));
 		for (const auto& chokeSides : chokepointSides) {
-			painter->drawLine(chokeSides.second.side1.x, chokeSides.second.side1.y,
+			painter.drawLine(chokeSides.second.side1.x, chokeSides.second.side1.y,
 				chokeSides.second.side2.x, chokeSides.second.side2.y);
 		}
 	}
@@ -373,17 +370,47 @@ namespace BWTA {
 	void Painter::drawLine(const BoostSegment& seg, QColor color) {
 		QPen qp(color);
 		qp.setWidth(2);
-		painter->setPen(qp);
-		painter->setBrush(QBrush(color));
-		painter->drawLine(seg.first.x(), seg.first.y(), seg.second.x(), seg.second.y());
+		painter.setPen(qp);
+		painter.setBrush(QBrush(color));
+		painter.drawLine(seg.first.x(), seg.first.y(), seg.second.x(), seg.second.y());
 	}
 
 	void Painter::drawText(int x, int y, std::string text) {
-		painter->setFont(QFont("Tahoma", 8));
-// 		painter->drawText(x, y, QString::fromStdString(text));
-		QRect rect = image->rect();
+		painter.setFont(QFont("Tahoma", 8));
+		QRect rect = image.rect();
 		rect.setLeft(5);
-		painter->drawText(rect, Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap, QString::fromStdString(text));
+		painter.drawText(rect, Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap, QString::fromStdString(text));
+	}
+
+	void Painter::drawBaseLocations(std::set<BaseLocation*> baseLocations) {
+		painter.setPen(QPen(Qt::blue));
+		painter.setBrush(Qt::NoBrush);
+		int baseWidth = 4*4;
+		int baseHeight = 3*4;
+		int minWidth = 2*4;
+		int minHeight = 1*4;
+		int vesWidth = 4*4;
+		int vesHeight = 3*4;
+
+		for (const auto& base : baseLocations) {
+			int x = base->getTilePosition().x * 4;
+			int y = base->getTilePosition().y * 4;
+			if (base->isStartLocation()) painter.fillRect(x, y, baseWidth, baseHeight, Qt::red);
+			painter.drawRect(x, y, baseWidth, baseHeight);
+			BaseLocationImpl* b = dynamic_cast<BaseLocationImpl*>(base);
+			for (const auto& r : b->resources) {
+				if (r.type == BWAPI::UnitTypes::Resource_Vespene_Geyser) {
+					painter.drawLine((base->getTilePosition().x * 4)+8, (base->getTilePosition().y * 4)+6,
+						(r.pos.x * 4)+8, (r.pos.y * 4)+6);
+					painter.fillRect(r.pos.x * 4, r.pos.y * 4, vesWidth, vesHeight, Qt::green);
+				} else {
+					painter.drawLine((base->getTilePosition().x * 4)+8, (base->getTilePosition().y * 4)+6,
+						(r.pos.x * 4)+4, (r.pos.y * 4)+2);
+					painter.fillRect(r.pos.x * 4, r.pos.y * 4, minWidth, minHeight, Qt::cyan);
+				}
+				
+			}
+		}
 	}
 }
 #endif

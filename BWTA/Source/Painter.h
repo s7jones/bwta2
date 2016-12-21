@@ -1,11 +1,8 @@
 #pragma once
 
 #ifdef DEBUG_DRAW
-#include <QtGui/QImage>
 #include <QtGui/QPainter>
 #include <QtGui/QColor>
-#include <QtGui/QPen>
-#include <QtSvg/QSvgGenerator>
 #include <QtGui/QGuiApplication>
 
 #include "MapData.h"
@@ -15,7 +12,7 @@ namespace BWTA {
 	class Painter {
 	public:
 		Painter();
-		~Painter();
+		~Painter() {};
 		void render(const std::string& label = std::string());
 		void drawMapBorder();
 		void drawPolygon(const Polygon& polygon, QColor color, double scale = 1.0);
@@ -24,7 +21,6 @@ namespace BWTA {
 		void drawPolygons(const std::vector<BoostPolygon>& polygons);
 		void drawRegions(std::vector<Region*> regions);
 		void drawRegions2(std::vector<Region*> regions);
-		QColor hsl2rgb(double h, double sl, double l);
 		void drawChokepoints(std::set<Chokepoint*> chokepoints);
 		void drawHeatMap(RectangleArray<int> map, float maxValue);
 		void drawClosestBaseLocationMap(RectangleArray<BaseLocation*> map, std::set<BaseLocation*> baseLocations);
@@ -35,14 +31,15 @@ namespace BWTA {
 		void drawLines(std::map<nodeID, chokeSides_t> chokepointSides, QColor color);
 		void drawLine(const BoostSegment& seg, QColor color);
 		void drawText(int x, int y, std::string text);
+		void drawBaseLocations(std::set<BaseLocation*> baseLocations);
 
 	private:
-		QPainter* painter;
-		QImage* image;
-		QSvgGenerator* svg;
+		QImage image;
+		QPainter painter;
 		int renderCounter;
 
-		void getHeatMapColor(float value, float &red, float &green, float &blue);
+		void getHeatMapColor(float value, int &red, int &green, int &blue) const;
+		static QColor hsl2rgb(double h, double sl, double l);
 	};
 }
 #endif

@@ -7,7 +7,7 @@ namespace BWTA
 	int MaxDegreeVertex(const std::vector<int>& color)
 	{
 		size_t max = 0;
-		int maxIndex;
+		int maxIndex = 0;
 		for (size_t i = 0; i < color.size(); ++i) {
 			if (color[i] == 0) {
 				int degree = BWTA_Result::regions.at(i)->getChokepoints().size();
@@ -59,7 +59,7 @@ namespace BWTA
 	// this function will find suitable y from NN
 	int findSuitableY(const std::vector<int>& color, int colorNumber, int& verticesInCommon, std::vector<size_t>& NN, size_t& NNSzie)
 	{
-		int temp, tmp_y, y;
+		int temp, tmp_y, y = 0;
 		// array scanned stores uncolored vertices
 		// except the vertex is being processing
 		std::vector<bool> scanned; scanned.resize(color.size());
@@ -77,7 +77,7 @@ namespace BWTA
 						if (color[k] == 0 && scanned[k] == 0) {
 							if (isAdjacent(x, k) && isAdjacent(tmp_y, k)) {
 								temp++;
-								scanned[k] = 1; // k is scanned
+								scanned[k] = true; // k is scanned
 							}
 						}
 					}
@@ -93,7 +93,7 @@ namespace BWTA
 
 	int MaxDegreeInNN(const std::vector<int>& color, std::vector<size_t>& NN, size_t& NNSzie)
 	{
-		int tmp_y; // the vertex has the current maximum degree
+		int tmp_y = NN[0]; // the vertex has the current maximum degree
 		int temp, max = 0;
 		for (size_t i = 0; i < NNSzie; ++i) {
 			temp = 0;
@@ -105,8 +105,7 @@ namespace BWTA
 				tmp_y = NN[i];
 			}
 		}
-		if (max == 0) return NN[0]; // so all the vertices have degree 0
-		else return tmp_y; // exist a maximum, return it
+		return tmp_y;
 	}
 
 	void regionColoring()
@@ -145,7 +144,7 @@ namespace BWTA
 
 		// save each color to each region
 		for (size_t i = 0; i < BWTA_Result::regions.size(); ++i) {
-			RegionImpl* reg = (RegionImpl*)BWTA_Result::regions.at(i);
+			RegionImpl* reg = dynamic_cast<RegionImpl*>(BWTA_Result::regions.at(i));
 			reg->_color = color.at(i);
 		}
 	}
@@ -187,7 +186,7 @@ namespace BWTA
 		}
 		// save each color to each region
 		for (size_t i = 0; i < BWTA_Result::regions.size(); ++i) {
-			RegionImpl* reg = (RegionImpl*)BWTA_Result::regions.at(i);
+			RegionImpl* reg = dynamic_cast<RegionImpl*>(BWTA_Result::regions.at(i));
 			reg->_hue = hueList.at(i);
 		}
 	}

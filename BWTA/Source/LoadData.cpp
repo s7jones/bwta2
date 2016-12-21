@@ -61,19 +61,19 @@ namespace BWTA
 		}
 
 		// load resources (minerals, gas) and start locations
-		MapData::resourcesWalkPositions.clear();
+//		MapData::resourcesWalkPositions.clear();
 		MapData::resources.clear();
 		for (auto mineral : BWAPI::Broodwar->getStaticMinerals()) {
 			if (mineral->getInitialResources() > 200) { //filter out all mineral patches under 200
-				BWAPI::WalkPosition unitWalkPosition(mineral->getPosition());
-				MapData::resourcesWalkPositions.push_back(std::make_pair(mineral->getType(), unitWalkPosition));
+//				BWAPI::WalkPosition unitWalkPosition(mineral->getPosition());
+//				MapData::resourcesWalkPositions.push_back(std::make_pair(mineral->getType(), unitWalkPosition));
 				MapData::resources.emplace_back(mineral->getType(), mineral->getTilePosition());
 			}
 		}
 
 		for (auto geyser : BWAPI::Broodwar->getStaticGeysers()) {
 			BWAPI::WalkPosition unitWalkPosition(geyser->getPosition());
-			MapData::resourcesWalkPositions.push_back(std::make_pair(geyser->getType(), unitWalkPosition));
+//			MapData::resourcesWalkPositions.push_back(std::make_pair(geyser->getType(), unitWalkPosition));
 			MapData::resources.emplace_back(geyser->getType(), geyser->getTilePosition());
 		}
 
@@ -224,12 +224,12 @@ namespace BWTA
 		BWTA_Result::getChokepointW.resize(MapData::mapWidthWalkRes, MapData::mapHeightWalkRes);
 		BWTA_Result::getBaseLocationW.resize(MapData::mapWidthWalkRes, MapData::mapHeightWalkRes);
 		BWTA_Result::getUnwalkablePolygon.resize(MapData::mapWidthTileRes, MapData::mapHeightTileRes);
-		BWTA_Result::getRegion.setTo(NULL);
-		BWTA_Result::getChokepoint.setTo(NULL);
-		BWTA_Result::getBaseLocation.setTo(NULL);
-		BWTA_Result::getChokepointW.setTo(NULL);
-		BWTA_Result::getBaseLocationW.setTo(NULL);
-		BWTA_Result::getUnwalkablePolygon.setTo(NULL);
+		BWTA_Result::getRegion.setTo(nullptr);
+		BWTA_Result::getChokepoint.setTo(nullptr);
+		BWTA_Result::getBaseLocation.setTo(nullptr);
+		BWTA_Result::getChokepointW.setTo(nullptr);
+		BWTA_Result::getBaseLocationW.setTo(nullptr);
+		BWTA_Result::getUnwalkablePolygon.setTo(nullptr);
 	}
 
 

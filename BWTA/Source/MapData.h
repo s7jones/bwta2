@@ -12,8 +12,8 @@ namespace BWTA
 	typedef std::map<Chokepoint*, ChokeCost> ChokepointGraph;
 
 	typedef std::pair<BWAPI::UnitType, BWAPI::Position> UnitTypePosition;
-	typedef std::pair<BWAPI::UnitType, BWAPI::WalkPosition> UnitTypeWalkPosition;
-	typedef std::pair<BWAPI::UnitType, BWAPI::TilePosition> UnitTypeTilePosition;
+//	typedef std::pair<BWAPI::UnitType, BWAPI::WalkPosition> UnitTypeWalkPosition;
+//	typedef std::pair<BWAPI::UnitType, BWAPI::TilePosition> UnitTypeTilePosition;
 
 	struct unitTypeTilePos_t {
 		BWAPI::UnitType type;
@@ -56,7 +56,7 @@ namespace BWTA
 		};
 		extern MiniTileMaps_type *MiniTileFlags;
 		extern std::vector<UnitTypePosition> staticNeutralBuildings;
-		extern std::vector<UnitTypeWalkPosition> resourcesWalkPositions;
+//		extern std::vector<UnitTypeWalkPosition> resourcesWalkPositions;
 
 		extern std::vector<unitTypeTilePos_t> resources;
 	}

@@ -26,11 +26,11 @@ namespace BWTA
 		
 		// offline map data
 		RectangleArray<bool> isWalkable;
-		TileID   *TileArray = NULL;
-		TileType *TileSet   = NULL;
-		MiniTileMaps_type *MiniTileFlags = NULL;
+		TileID   *TileArray = nullptr;
+		TileType *TileSet   = nullptr;
+		MiniTileMaps_type *MiniTileFlags = nullptr;
 		std::vector<UnitTypePosition> staticNeutralBuildings;
-		std::vector<UnitTypeWalkPosition> resourcesWalkPositions;
+//		std::vector<UnitTypeWalkPosition> resourcesWalkPositions;
 
 		std::vector<unitTypeTilePos_t> resources;
 	}

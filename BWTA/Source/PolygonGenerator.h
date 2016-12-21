@@ -3,7 +3,6 @@
 #include <BWTA/Polygon.h>
 
 #include "MapData.h"
-#include "Utils.h"
 
 namespace BWTA
 {

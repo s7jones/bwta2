@@ -1,13 +1,14 @@
 #include "PolygonGenerator.h"
 
 #include <boost/geometry/extensions/algorithms/dissolve.hpp>
+#include "Utils.h"
 
 namespace BWTA
 {
 	struct holeLabel_t {
 		Contour ring;
 		int labelID;
-		holeLabel_t(Contour _ring, int id) : labelID(id), ring(_ring) {}
+		holeLabel_t(Contour _ring, int id) : ring(_ring), labelID(id) {}
 	};
 
 	// To vectorize obstacles (unwalkable areas) we use the algorithm described in:

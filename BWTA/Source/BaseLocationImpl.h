@@ -1,6 +1,7 @@
 #pragma once
 
 #include <BWTA/BaseLocation.h>
+#include "../../OfflineExtractor/MapFileParser.h"
 
 namespace BWTA
 {
@@ -8,7 +9,7 @@ namespace BWTA
 	{
 	public:
 		BaseLocationImpl() {};
-		BaseLocationImpl(const BWAPI::TilePosition &tp);
+		BaseLocationImpl(const BWAPI::TilePosition &tp, std::vector<unitTypeTilePos_t> resources);
 
 		const BWAPI::Position getPosition() const override { return position; };
 		const BWAPI::TilePosition getTilePosition() const override { return tilePosition; };
@@ -41,5 +42,6 @@ namespace BWTA
 		BWAPI::Unitset currentMinerals;
 		std::map<BaseLocation*, double> groundDistances;
 		std::map<BaseLocation*, double> airDistances;
+		std::vector<unitTypeTilePos_t> resources;
 	};
 }

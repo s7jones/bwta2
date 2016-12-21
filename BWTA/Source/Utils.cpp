@@ -72,7 +72,7 @@ namespace BWTA
 		}
 	}
 
-	void scanLineFill(Contour polyCorners, const int& labelID, RectangleArray<int>& labelMap) 
+	void scanLineFill(const Contour &polyCorners, const int& labelID, RectangleArray<int>& labelMap) 
 	{
 		// find bounding box of polygon
 		size_t maxX, minX, maxY, minY;

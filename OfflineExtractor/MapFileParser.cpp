@@ -238,7 +238,6 @@ namespace BWTA
 
 				// TODO filter out all mineral patches under 200
 				if (unitType.isMineralField() || unitType == BWAPI::UnitTypes::Resource_Vespene_Geyser) {
-					MapData::resourcesWalkPositions.push_back(std::make_pair(unitType, unitWalkPosition));
 					MapData::resources.emplace_back(unitType, unitTilePosition);
 				}
 				if (unitType == BWAPI::UnitTypes::Special_Start_Location) {
