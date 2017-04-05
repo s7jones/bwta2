@@ -61,7 +61,9 @@ namespace BWTA
 		int argc = 1;
 		char* argv = "0";
 		QGuiApplication a(argc, &argv); // needed for print text (init fonts)
-		Painter painter;
+		const Painter::Scale imageScale = Painter::Scale::Walk;
+//		const Painter::Scale imageScale = Painter::Scale::Pixel;
+		Painter painter(imageScale);
 #endif
 		Timer timer;
 		timer.start();
@@ -79,7 +81,7 @@ namespace BWTA
 
 		LOG(" [Detected polygons in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
-		painter.drawPolygons(BWTA_Result::unwalkablePolygons);
+		painter.drawPolygons(BWTA_Result::unwalkablePolygons, Painter::Scale::Walk, imageScale);
 		painter.render("01-Polygons");
 		// Prints each polygon individually to debug 
 // 		for (auto tmpPol : polygons) {
@@ -95,8 +97,8 @@ namespace BWTA
 		
 		LOG(" [Computed Voronoi in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
-		painter.drawPolygons(BWTA_Result::unwalkablePolygons);
-		painter.drawGraph(graph);
+		painter.drawPolygons(BWTA_Result::unwalkablePolygons, Painter::Scale::Walk, imageScale);
+		painter.drawGraph(graph, Painter::Scale::Walk, imageScale);
 		painter.render("02-Voronoi");
 #endif
 		timer.start();
@@ -105,8 +107,8 @@ namespace BWTA
 
 		LOG(" [Pruned Voronoi in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
-		painter.drawPolygons(BWTA_Result::unwalkablePolygons);
-		painter.drawGraph(graph);
+		painter.drawPolygons(BWTA_Result::unwalkablePolygons, Painter::Scale::Walk, imageScale);
+		painter.drawGraph(graph, Painter::Scale::Walk, imageScale);
 		painter.render("03-VoronoiPruned");
 #endif
 		timer.start();
@@ -115,10 +117,10 @@ namespace BWTA
 
 		LOG(" [Identified region/chokepoints nodes in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
-		painter.drawPolygons(BWTA_Result::unwalkablePolygons);
-		painter.drawGraph(graph);
-		painter.drawNodes(graph, graph.regionNodes, Qt::blue);
-		painter.drawNodes(graph, graph.chokeNodes, Qt::red);
+		painter.drawPolygons(BWTA_Result::unwalkablePolygons, Painter::Scale::Walk, imageScale);
+		painter.drawGraph(graph, Painter::Scale::Walk, imageScale);
+		painter.drawNodes(graph, graph.regionNodes, Qt::blue, Painter::Scale::Walk, imageScale);
+		painter.drawNodes(graph, graph.chokeNodes, Qt::red, Painter::Scale::Walk, imageScale);
 		painter.render("05-NodesDetected");
 #endif
 		timer.start();
@@ -128,10 +130,10 @@ namespace BWTA
 
 		LOG(" [Simplified graph in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
-		painter.drawPolygons(BWTA_Result::unwalkablePolygons);
-		painter.drawGraph(graphSimplified);
-		painter.drawNodes(graphSimplified, graphSimplified.regionNodes, Qt::blue);
-		painter.drawNodes(graphSimplified, graphSimplified.chokeNodes, Qt::red);
+		painter.drawPolygons(BWTA_Result::unwalkablePolygons, Painter::Scale::Walk, imageScale);
+		painter.drawGraph(graphSimplified, Painter::Scale::Walk, imageScale);
+		painter.drawNodes(graphSimplified, graphSimplified.regionNodes, Qt::blue, Painter::Scale::Walk, imageScale);
+		painter.drawNodes(graphSimplified, graphSimplified.chokeNodes, Qt::red, Painter::Scale::Walk, imageScale);
 		painter.render("06-GraphPruned");
 #endif
 		timer.start();
@@ -140,10 +142,10 @@ namespace BWTA
 
 		LOG(" [Merged consecutive region nodes in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
-		painter.drawPolygons(BWTA_Result::unwalkablePolygons);
-		painter.drawGraph(graphSimplified);
-		painter.drawNodes(graphSimplified, graphSimplified.regionNodes, Qt::blue);
-		painter.drawNodes(graphSimplified, graphSimplified.chokeNodes, Qt::red);
+		painter.drawPolygons(BWTA_Result::unwalkablePolygons, Painter::Scale::Walk, imageScale);
+		painter.drawGraph(graphSimplified, Painter::Scale::Walk, imageScale);
+		painter.drawNodes(graphSimplified, graphSimplified.regionNodes, Qt::blue, Painter::Scale::Walk, imageScale);
+		painter.drawNodes(graphSimplified, graphSimplified.chokeNodes, Qt::red, Painter::Scale::Walk, imageScale);
 		painter.render("07-GraphMerged");
 #endif
 		timer.start();
@@ -153,10 +155,10 @@ namespace BWTA
 
 		LOG(" [Chokepoints sides computed in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
-		painter.drawPolygons(BWTA_Result::unwalkablePolygons);
-		painter.drawGraph(graphSimplified);
-		painter.drawNodes(graphSimplified, graphSimplified.regionNodes, Qt::blue);
-		painter.drawLines(chokepointSides, Qt::red);
+		painter.drawPolygons(BWTA_Result::unwalkablePolygons, Painter::Scale::Walk, imageScale);
+		painter.drawGraph(graphSimplified, Painter::Scale::Walk, imageScale);
+		painter.drawNodes(graphSimplified, graphSimplified.regionNodes, Qt::blue, Painter::Scale::Walk, imageScale);
+		painter.drawChokepointsSides(chokepointSides, Qt::red, Painter::Scale::Walk, imageScale);
 		painter.render("08-WallOffChokepoints");
 #endif
 		timer.start();
@@ -167,10 +169,9 @@ namespace BWTA
 
 		LOG(" [Created BWTA regions/chokepoints in " << timer.stopAndGetTime() << " seconds]");
 #ifdef DEBUG_DRAW
-		painter.drawPolygons(BWTA_Result::unwalkablePolygons);
-// 		painter.drawRegions(BWTA_Result::regions); // uses another graph coloring
-		painter.drawRegions2(BWTA_Result::regions);
-		painter.drawChokepoints(BWTA_Result::chokepoints);
+		painter.drawPolygons(BWTA_Result::unwalkablePolygons, Painter::Scale::Walk, imageScale);
+		painter.drawRegions(BWTA_Result::regions, Painter::Scale::Pixel, imageScale);
+		painter.drawChokepoints(BWTA_Result::chokepoints, imageScale);
 		painter.render("09-Regions");
 #endif
 		timer.start();
@@ -203,10 +204,10 @@ namespace BWTA
 //		painter.render("ClosestBaseLocationMap");
 //		painter.drawClosestChokepointMap(BWTA_Result::getChokepointW, BWTA_Result::chokepoints);
 //		painter.render("ClosestChokepointMap");
-		painter.drawPolygons(BWTA_Result::unwalkablePolygons);
-		painter.drawRegions2(BWTA_Result::regions);
-		painter.drawChokepoints(BWTA_Result::chokepoints);
-		painter.drawBaseLocations(BWTA_Result::baselocations);
+		painter.drawPolygons(BWTA_Result::unwalkablePolygons, Painter::Scale::Walk, imageScale);
+		painter.drawRegions(BWTA_Result::regions, Painter::Scale::Pixel, imageScale);
+		painter.drawChokepoints(BWTA_Result::chokepoints, imageScale);
+		painter.drawBaseLocations(BWTA_Result::baselocations, imageScale);
 		painter.render("10-Final");
 #endif
 

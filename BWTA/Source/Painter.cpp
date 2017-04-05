@@ -5,16 +5,24 @@
 
 namespace BWTA {
 
-	std::vector<QColor> baseColors = { QColor(0, 114, 189), QColor(217, 83, 25), QColor(237, 177, 32),
+	const std::vector<QColor> baseColors = { QColor(0, 114, 189), QColor(217, 83, 25), QColor(237, 177, 32),
 		QColor(126, 47, 142), QColor(119, 172, 48), QColor(77, 190, 238), QColor(162, 20, 47) };
 
-	std::vector<QColor> mapColors = { QColor(180, 180, 180), QColor(204, 193, 218), QColor(230, 185, 184),
+	const std::vector<QColor> mapColors = { QColor(180, 180, 180), QColor(204, 193, 218), QColor(230, 185, 184),
 		QColor(252, 216, 181), QColor(215, 228, 189), QColor(77, 190, 238), QColor(162, 20, 47) };
 
-	Painter::Painter() :
-		renderCounter(1)
+	Painter::Painter(Scale mapScale) :
+		renderCounter(1), _width(MapData::mapWidthPixelRes), _height(MapData::mapHeightPixelRes)
 	{
-		image = QImage(MapData::mapWidthWalkRes, MapData::mapHeightWalkRes, QImage::Format_ARGB32_Premultiplied);
+		if (mapScale == Scale::Walk) {
+			_width = MapData::mapWidthWalkRes;
+			_height = MapData::mapHeightWalkRes;
+		} else if (mapScale == Scale::Build) {
+			_width = MapData::mapWidthTileRes;
+			_height = MapData::mapHeightTileRes;
+		}
+
+		image = QImage(_width, _height, QImage::Format_ARGB32_Premultiplied);
 		painter.begin(&image);
 		painter.setRenderHint(QPainter::Antialiasing);
 	}
@@ -34,85 +42,77 @@ namespace BWTA {
 
 		// restart device
 		painter.end();
-		image = QImage(MapData::mapWidthWalkRes, MapData::mapHeightWalkRes, QImage::Format_ARGB32_Premultiplied);
+		image = QImage(_width, _height, QImage::Format_ARGB32_Premultiplied);
 		painter.begin(&image);
 		painter.setRenderHint(QPainter::Antialiasing);
 	}
 
-	void Painter::drawMapBorder() {
-		QPen qp(QColor(0, 0, 0));
+	void Painter::drawMapBorder(uint16_t width, uint16_t height) 
+	{
+		QPen qp(Qt::black);
 		qp.setWidth(2);
 		painter.setPen(qp);
-		painter.drawLine(0, 0, 0, MapData::walkability.getHeight() - 1);
-		painter.drawLine(0, MapData::walkability.getHeight() - 1, MapData::walkability.getWidth() - 1, MapData::walkability.getHeight() - 1);
-		painter.drawLine(MapData::walkability.getWidth() - 1, MapData::walkability.getHeight() - 1, MapData::walkability.getWidth() - 1, 0);
-		painter.drawLine(MapData::walkability.getWidth() - 1, 0, 0, 0);
+		painter.drawLine(0, 0, 0, height);
+		painter.drawLine(0, height, width, height);
+		painter.drawLine(width, height, width, 0);
+		painter.drawLine(width, 0, 0, 0);
 	}
 
-	void Painter::drawPolygon(const Polygon& polygon, QColor color, double scale) {
+	double Painter::getScale(Scale fromScale, Scale toScale)
+	{
+		if (fromScale == toScale) return 1.0;
+		else if (fromScale == Scale::Pixel) {
+			if (toScale == Scale::Walk) return 0.125;
+			else return 0.03125;
+		} else if (fromScale == Scale::Walk) {
+			if (toScale == Scale::Pixel) return 8.0;
+			else return 0.25;
+		} else { // from Build Tile
+			if (toScale == Scale::Walk) return 4.0;
+			else return 32.0;
+		}
+	}
+
+	void Painter::drawPolygon(const Polygon& polygon, QColor fillColor, Scale fromScale, Scale toScale)
+	{
+		double scale = getScale(fromScale, toScale);
+		drawPolygon(polygon, fillColor, scale);
+	}
+
+	void Painter::drawPolygon(const Polygon& polygon, QColor fillColor, double scale) 
+	{
 		QVector<QPointF> qp;
+		qp.reserve(polygon.size());
 		for (const auto &point : polygon) {
 			qp.push_back(QPointF(point.x * scale, point.y * scale));
 		}
-//		for (size_t i = 0; i < polygon.size(); ++i) {
-//			qp.push_back(QPointF(polygon[i].x * scale, polygon[i].y * scale));
-//		}
+
 		painter.setPen(QPen(Qt::black));
-		painter.setBrush(QBrush(color));
+		painter.setBrush(QBrush(fillColor));
 		painter.drawPolygon(QPolygonF(qp));
 	}
 
-	void Painter::drawPolygons(const std::vector<Polygon>& polygons) {
+	void Painter::drawPolygons(const std::vector<Polygon*>& polygons, Scale fromScale, Scale toScale) 
+	{
 		for (const auto& polygon : polygons) {
-			drawPolygon(polygon, QColor(180, 180, 180));
-			for (const auto& hole : polygon.getHoles()) {
-				drawPolygon(*hole, QColor(255, 100, 255));
-			}
-		}
-	}
-
-	void Painter::drawPolygons(const std::vector<Polygon*>& polygons) {
-		for (const auto& polygon : polygons) {
-			drawPolygon(*polygon, QColor(180, 180, 180));
+			drawPolygon(*polygon, QColor(180, 180, 180), fromScale, toScale);
 			for (const auto& hole : polygon->getHoles()) {
-				drawPolygon(*hole, QColor(255, 100, 255));
+				drawPolygon(*hole, QColor(255, 100, 255), fromScale, toScale);
 			}
 		}
 	}
 
-	void Painter::drawPolygons(const std::vector<BoostPolygon>& polygons) {
-		for (auto& polygon : polygons) {
-			QVector<QPointF> qp;
-
-			for (const auto& point : polygon.outer()) {
-				qp.push_back(QPointF(point.x(), point.y()));
-			}
-
-			painter.setPen(QPen(Qt::black));
-			painter.setBrush(QBrush(QColor(180, 180, 180)));
-			painter.drawPolygon(QPolygonF(qp));
-		}
-	}
-
-	void Painter::drawRegions(std::vector<Region*> regions) {
+	void Painter::drawRegions(const std::vector<Region*>& regions, Scale fromScale, Scale toScale) 
+	{
 		static bool colored = false;
 		if (!colored) {
-			regionColoring();
-			colored = true;
-		}
-		for (const auto& r : regions) {
-			drawPolygon(r->getPolygon(), mapColors.at(r->getColorLabel()), 0.125);
-		}
-	}
-
-	void Painter::drawRegions2(std::vector<Region*> regions) {
-		static bool colored = false;
-		if (!colored) {
+//			regionColoring();
 			regionColoringHUE();
 			colored = true;
 		}
 		for (const auto& r : regions) {
-			drawPolygon(r->getPolygon(), hsl2rgb(r->getHUE(), 1.0, 0.75), 0.125);
+//			drawPolygon(r->getPolygon(), mapColors.at(r->getColorLabel()), fromScale, toScale);
+			drawPolygon(r->getPolygon(), hsl2rgb(r->getHUE(), 1.0, 0.75), fromScale, toScale);
 		}
 	}
 
@@ -154,21 +154,27 @@ namespace BWTA {
 			case 5:
 				r = v; g = m; b = mid2;
 				break;
+			default: break;
 			}
 		}
 		return QColor(r*255.0, g*255.0, b*255.0);
 	}
 
-	void Painter::drawChokepoints(std::set<Chokepoint*> chokepoints) {
-		QPen qp(QColor(255, 0, 0));
-		qp.setWidth(3);
+	void Painter::drawChokepoints(const std::set<Chokepoint*>& chokepoints, Scale toScale) {
+		double lineScale = getScale(Scale::Walk, toScale);
+		QPen qp(Qt::red);
+		qp.setWidth(3 * lineScale);
 		painter.setPen(qp);
+		double scale = getScale(Scale::Pixel, toScale); // sides of chokepoints are stored at pixel resolution
 		for (const auto& c : chokepoints) {
-			auto &sides = c->getSides();
-			BWAPI::WalkPosition pos1(sides.first);
-			BWAPI::WalkPosition pos2(sides.second);
-			painter.drawLine(pos1.x, pos1.y, pos2.x, pos2.y);
+			const auto& sides = c->getSides();
+			drawLine(sides.first.x, sides.first.y, sides.second.x, sides.second.y, scale);
 		}
+	}
+
+	void Painter::drawLine(const int& x1, const int& y1, const int& x2, const int& y2, double scale)
+	{
+		painter.drawLine(x1 * scale, y1 * scale, x2 * scale, y2 * scale);
 	}
 
 	void Painter::getHeatMapColor(float value, int &red, int &green, int &blue) const
@@ -303,10 +309,11 @@ namespace BWTA {
 		}
 	}
 
-	void Painter::drawGraph(const RegionGraph& graph)
+	void Painter::drawGraph(const RegionGraph& graph, Scale fromScale, Scale toScale)
 	{
-		QPen qp(QColor(0, 0, 255));
-		qp.setWidth(2);
+		double scale = getScale(fromScale, toScale);
+		QPen qp(Qt::blue);
+		qp.setWidth(2 * scale);
 		painter.setPen(qp);
 
 		// container to mark visited nodes
@@ -337,8 +344,7 @@ namespace BWTA {
 
 			// draw all edges of node
 			for (const auto& v1 : graph.adjacencyList.at(v0)) {
-				painter.drawLine(graph.nodes.at(v0).x, graph.nodes.at(v0).y,
-					graph.nodes.at(v1).x, graph.nodes.at(v1).y);
+				drawLine(graph.nodes.at(v0).x, graph.nodes.at(v0).y, graph.nodes.at(v1).x, graph.nodes.at(v1).y, scale);
 
 				if (!visited.at(v1)) {
 					nodeToPrint.push(v1);
@@ -348,31 +354,26 @@ namespace BWTA {
 		}
 	}
 
-	void Painter::drawNodes(const RegionGraph& graph, const std::set<nodeID>& nodes, QColor color) 
+	void Painter::drawNodes(const RegionGraph& graph, const std::set<nodeID>& nodes, QColor color, Scale fromScale, Scale toScale) 
 	{
+		double scale = getScale(fromScale, toScale);
 		painter.setPen(QPen(color));
 		painter.setBrush(QBrush(color));
 		for (const auto& v0 : nodes) {
-			painter.drawEllipse(graph.nodes.at(v0).x - 3, graph.nodes.at(v0).y - 3, 6, 6);
+			painter.drawEllipse((graph.nodes.at(v0).x - 3)*scale, (graph.nodes.at(v0).y - 3)*scale, 6*scale, 6*scale);
 		}
 	}
 
-	void Painter::drawLines(std::map<nodeID, chokeSides_t> chokepointSides, QColor color)
+	void Painter::drawChokepointsSides(const std::map<nodeID, chokeSides_t>& chokepointSides, QColor color, Scale fromScale, Scale toScale)
 	{
+		double scale = getScale(fromScale, toScale);
 		painter.setPen(QPen(color));
 		painter.setBrush(QBrush(color));
 		for (const auto& chokeSides : chokepointSides) {
-			painter.drawLine(chokeSides.second.side1.x, chokeSides.second.side1.y,
-				chokeSides.second.side2.x, chokeSides.second.side2.y);
+			drawLine(chokeSides.second.side1.x, chokeSides.second.side1.y, 
+					 chokeSides.second.side2.x, chokeSides.second.side2.y,
+					 scale);
 		}
-	}
-
-	void Painter::drawLine(const BoostSegment& seg, QColor color) {
-		QPen qp(color);
-		qp.setWidth(2);
-		painter.setPen(qp);
-		painter.setBrush(QBrush(color));
-		painter.drawLine(seg.first.x(), seg.first.y(), seg.second.x(), seg.second.y());
 	}
 
 	void Painter::drawText(int x, int y, std::string text) {
@@ -382,31 +383,35 @@ namespace BWTA {
 		painter.drawText(rect, Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap, QString::fromStdString(text));
 	}
 
-	void Painter::drawBaseLocations(std::set<BaseLocation*> baseLocations) {
-		painter.setPen(QPen(Qt::blue));
+	void Painter::drawBaseLocations(const std::set<BaseLocation*>& baseLocations, Scale toScale) {
+		Scale fromScale = Scale::Build;
+		double scale = getScale(fromScale, toScale);
+		int baseWidth = 4*scale;
+		int baseHeight = 3*scale;
+		int mineralWidth = 2*scale;
+		int mineralHeight = 1*scale;
+		int vespeneWidth = 4*scale;
+		int vespeneHeight = 3*scale;
+
+		QPen qp(Qt::blue);
+		int penWidth = std::max(1, static_cast<int>(scale/4));
+		qp.setWidth(penWidth);
+		painter.setPen(qp);
 		painter.setBrush(Qt::NoBrush);
-		int baseWidth = 4*4;
-		int baseHeight = 3*4;
-		int minWidth = 2*4;
-		int minHeight = 1*4;
-		int vesWidth = 4*4;
-		int vesHeight = 3*4;
 
 		for (const auto& base : baseLocations) {
-			int x = base->getTilePosition().x * 4;
-			int y = base->getTilePosition().y * 4;
+			int x = base->getTilePosition().x * scale;
+			int y = base->getTilePosition().y * scale;
 			if (base->isStartLocation()) painter.fillRect(x, y, baseWidth, baseHeight, Qt::red);
 			painter.drawRect(x, y, baseWidth, baseHeight);
-			BaseLocationImpl* b = dynamic_cast<BaseLocationImpl*>(base);
+			BaseLocationImpl* b = static_cast<BaseLocationImpl*>(base);
 			for (const auto& r : b->resources) {
 				if (r.type == BWAPI::UnitTypes::Resource_Vespene_Geyser) {
-					painter.drawLine((base->getTilePosition().x * 4)+8, (base->getTilePosition().y * 4)+6,
-						(r.pos.x * 4)+8, (r.pos.y * 4)+6);
-					painter.fillRect(r.pos.x * 4, r.pos.y * 4, vesWidth, vesHeight, Qt::green);
+					painter.drawLine(x + (baseWidth/2), y + (baseHeight/2), r.pos.x*scale + vespeneWidth/2, r.pos.y*scale + vespeneHeight/2);
+					painter.fillRect(r.pos.x * scale, r.pos.y * scale, vespeneWidth, vespeneHeight, Qt::green);
 				} else {
-					painter.drawLine((base->getTilePosition().x * 4)+8, (base->getTilePosition().y * 4)+6,
-						(r.pos.x * 4)+4, (r.pos.y * 4)+2);
-					painter.fillRect(r.pos.x * 4, r.pos.y * 4, minWidth, minHeight, Qt::cyan);
+					painter.drawLine(x + (baseWidth/2), y + (baseHeight/2), r.pos.x*scale + mineralWidth/2, r.pos.y*scale + mineralHeight/2);
+					painter.fillRect(r.pos.x * scale, r.pos.y * scale, mineralWidth, mineralHeight, Qt::cyan);
 				}
 				
 			}

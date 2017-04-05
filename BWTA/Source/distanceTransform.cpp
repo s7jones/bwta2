@@ -84,9 +84,9 @@ namespace BWTA
 		maxDistanceOfRegion();
 
 #ifdef DEBUG_DRAW
-		Painter painter;
+		Painter painter(Painter::Scale::Build);
 		painter.drawHeatMap(MapData::distanceTransform, (float)MapData::maxDistanceTransform);
-		painter.drawMapBorder();
+		painter.drawBuildMapBorder();
 		painter.drawPolygons(BWTA_Result::unwalkablePolygons);
 		painter.render("DT");
 #endif
