@@ -354,13 +354,14 @@ namespace BWTA {
 		}
 	}
 
-	void Painter::drawNodes(const RegionGraph& graph, const std::set<nodeID>& nodes, QColor color, Scale fromScale, Scale toScale) 
+	void Painter::drawNodes(const RegionGraph& graph, const std::set<nodeID>& nodes, QColor color, Scale fromScale, Scale toScale, int size) 
 	{
 		double scale = getScale(fromScale, toScale);
 		painter.setPen(QPen(color));
 		painter.setBrush(QBrush(color));
+		int middle = size / 2;
 		for (const auto& v0 : nodes) {
-			painter.drawEllipse((graph.nodes.at(v0).x - 3)*scale, (graph.nodes.at(v0).y - 3)*scale, 6*scale, 6*scale);
+			painter.drawEllipse((graph.nodes.at(v0).x - middle)*scale, (graph.nodes.at(v0).y - middle)*scale, size*scale, size*scale);
 		}
 	}
 
@@ -377,7 +378,8 @@ namespace BWTA {
 	}
 
 	void Painter::drawText(int x, int y, std::string text) {
-		painter.setFont(QFont("Tahoma", 8));
+		painter.setFont(QFont("Tahoma", 8, QFont::Bold));
+		painter.setPen(QPen(Qt::darkGreen));
 		QRect rect = image.rect();
 		rect.setLeft(5);
 		painter.drawText(rect, Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap, QString::fromStdString(text));

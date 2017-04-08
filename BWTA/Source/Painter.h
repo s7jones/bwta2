@@ -32,7 +32,8 @@ namespace BWTA {
 
 		void drawEdges(std::vector<boost::polygon::voronoi_edge<double>> edges);
 		void drawGraph(const RegionGraph& graph, Scale fromScale = Scale::Pixel, Scale toScale = Scale::Pixel);
-		void drawNodes(const RegionGraph& graph, const std::set<nodeID>& nodes, QColor color, Scale fromScale = Scale::Pixel, Scale toScale = Scale::Pixel);
+		void drawNodes(const RegionGraph& graph, const std::set<nodeID>& nodes, QColor color, 
+			Scale fromScale = Scale::Pixel, Scale toScale = Scale::Pixel, int size = 6);
 		
 		void drawText(int x, int y, std::string text);
 		void drawBaseLocations(const std::set<BaseLocation*>& baseLocations, Scale toScale = Scale::Pixel);

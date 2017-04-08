@@ -62,7 +62,6 @@ namespace BWTA
 		char* argv = "0";
 		QGuiApplication a(argc, &argv); // needed for print text (init fonts)
 		const Painter::Scale imageScale = Painter::Scale::Walk;
-//		const Painter::Scale imageScale = Painter::Scale::Pixel;
 		Painter painter(imageScale);
 #endif
 		Timer timer;

@@ -1,6 +1,6 @@
 #include "MapFileParser.h"
 
-// TODO: support for folder  or patterns
+// TODO: support for folder or patterns
 // TODO: be able to change output folder
 // TODO: set different levels of "verbose" (text logs, images, ...)
 // TODO: include resources needed inside the EXE (tileset folder)

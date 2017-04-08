@@ -6,18 +6,32 @@
 
 namespace BWTA
 {
-	static const int SKIP_NEAR_BORDER = 3;
-	static const double DIFF_COEFICIENT = 0.21; // relative difference to consider a change between region<->chokepoint
-	static const int MIN_REG_DIST = 7; // minimum distance between nodes
+//	static const int SKIP_NEAR_BORDER = 3;
+	static const double DIFF_COEFICIENT = 0.31; // relative difference to consider a change between region<->chokepoint
+	static const int MIN_NODE_DIST = 7; // minimum distance between nodes
+	static const double MIN_REGION_OBST_DIST = 9.7; // minimum distance to object to be considered as a region
 // 	#define DEBUG_NODE_DETECTION  // uncomment to print node detection process
 
 	bool enoughDifference(const double& A, const double& B)
 	{
 		double diff = std::abs(A - B);
 		double largest = std::max(A, B);
+		double minDiff = std::max(2.0, largest * DIFF_COEFICIENT);
 
-		if (diff > largest * DIFF_COEFICIENT) return true;
+		if (diff > minDiff) return true;
 		return false;
+	}
+
+	std::string getDifference(const double& A, const double& B)
+	{
+		double diff = std::abs(A - B);
+		double largest = std::max(A, B);
+		double minDiff = std::max(2.0, largest * DIFF_COEFICIENT);
+
+		std::stringstream stream;
+		stream << A << " - " << B << " > " << largest << " * "<< DIFF_COEFICIENT << "\n";
+		stream << diff			  << " > " << minDiff;
+		return stream.str();
 	}
 
 	void addVerticalBorder(std::vector<VoronoiSegment>& segments, std::vector<BoostSegmentI>& rtreeSegments, size_t& idPoint, 
@@ -269,18 +283,17 @@ namespace BWTA
 
 			nodeID v1 = *graph.adjacencyList[v0].begin();
 			// remove node if it's too close to an obstacle, or parent is farther to an obstacle
-			if (graph.minDistToObstacle[v0] < 6.0 
+			if (graph.minDistToObstacle[v0] < MIN_REGION_OBST_DIST
 				|| graph.minDistToObstacle[v0] - 0.9 <= graph.minDistToObstacle[v1]) 
 			{
 				graph.adjacencyList[v0].clear();
 				graph.adjacencyList[v1].erase(v0);
-				if (graph.adjacencyList[v1].size() == 1) {
-					nodeToPrune.push(v1);
-				}
-				// TODO make 6.0 const
-				if (graph.adjacencyList[v1].empty() && graph.minDistToObstacle[v1] > 6.0) {
-// 					LOG("Found isolated point");
+
+				if (graph.adjacencyList[v1].empty() && graph.minDistToObstacle[v1] > MIN_REGION_OBST_DIST) { 
+					// isolated node
 					graph.markNodeAsRegion(v1);
+				} else if (graph.adjacencyList[v1].size() == 1) { // keep pruning if only one child
+					nodeToPrune.push(v1);
 				}
 			}
 		}
@@ -288,7 +301,6 @@ namespace BWTA
 
 	void detectNodes(RegionGraph& graph, const std::vector<Polygon*>& polygons)
 	{
-//		const double MIN_RADII_DIFF = 4.5;
 		struct parentNode_t {
 			nodeID id;
 			bool isMaximal;
@@ -297,10 +309,10 @@ namespace BWTA
 		};
 
 		// container to mark visited nodes, and parent list
-		std::vector<bool> visited;
-		visited.resize(graph.nodes.size());
-		std::vector<parentNode_t> parentNodes;
-		parentNodes.resize(graph.nodes.size());
+		std::vector<bool> visited(graph.nodes.size());
+		std::vector<parentNode_t> parentNodes(graph.nodes.size());
+		std::vector<nodeID> lastValid(graph.nodes.size());
+
 
 		std::stack<nodeID> nodeToVisit;
 		// find a leaf node to start
@@ -323,10 +335,10 @@ namespace BWTA
 
 #if defined(DEBUG_DRAW) && defined(DEBUG_NODE_DETECTION)
 		LOG("We are drawing each node detection step, it might take awhile...");
-		Painter painter;
+		const Painter::Scale imageScale = Painter::Scale::Walk;
+		Painter painter(imageScale);
 		std::string drawDebugMessage;
-		int nodesDetected = 0;
-		int oldNodesDetected = 0;
+		bool drawImage = false;
 #endif
 
 		while (!nodeToVisit.empty()) {
@@ -335,22 +347,34 @@ namespace BWTA
 			nodeToVisit.pop();
 			// get parent
 			parentNode_t parentNode = parentNodes[v0];
+#if defined(DEBUG_DRAW) && defined(DEBUG_NODE_DETECTION)
+			graph.gateNodesB.clear(); // save parent node to print on debug
+			graph.gateNodesB.insert(parentNode.id);
+#endif
 
-			if (graph.adjacencyList[v0].size() != 2) {
-				// if parent chokepoint too close, delete parent
-				if (graph.nodeType[parentNode.id] == RegionGraph::CHOKEPOINT
-					&& graph.nodes[v0].getApproxDistance(graph.nodes[parentNode.id]) < MIN_REG_DIST) {
-					graph.unmarkChokeNode(parentNode.id);
+			if (graph.adjacencyList[v0].size() != 2) { // We found a leaf or intersection (region node)
+				// if parent chokepoint and too close, delete parent
+				if (graph.nodeType[parentNode.id] == RegionGraph::CHOKEPOINT && 
+					graph.nodes[v0].getApproxDistance(graph.nodes[parentNode.id]) < MIN_NODE_DIST) {
 #if defined(DEBUG_DRAW) && defined(DEBUG_NODE_DETECTION)
 					drawDebugMessage += "Parent chokepoint deleted, too close\n";
+					drawDebugMessage += "Distance: " + std::to_string(graph.nodes[v0].getApproxDistance(graph.nodes[parentNode.id])) + 
+						" >= " + std::to_string(MIN_NODE_DIST) + "\n";
 #endif
+					graph.unmarkChokeNode(parentNode.id);
 				}
-				graph.markNodeAsRegion(v0);
-				parentNode.id = v0; parentNode.isMaximal = true;
 #if defined(DEBUG_DRAW) && defined(DEBUG_NODE_DETECTION)
-				drawDebugMessage += "Leaf or intersection";
-				nodesDetected++;
+				if (graph.adjacencyList[v0].size() == 1) drawDebugMessage += "Added region (leaf)";
+				else drawDebugMessage += "Added region (intersection)";
+				drawImage = true;
 #endif
+				graph.markNodeAsRegion(v0);
+				// don't update next parent if current parent is a bigger region
+				if (graph.nodeType[parentNode.id] == RegionGraph::CHOKEPOINT || 
+					graph.minDistToObstacle[v0] > graph.minDistToObstacle[parentNode.id]) {
+					parentNode.id = v0; parentNode.isMaximal = true; // updating next parent
+				}
+
 			} else {
 				// look if the node is a local minimal (chokepoint node)
 				bool localMinimal = true;
@@ -361,49 +385,38 @@ namespace BWTA
 					}
 				}
 				if (localMinimal) {
-					if (!parentNode.isMaximal) {
-						// we have two consecutive minimals, keep the min
+					if (!parentNode.isMaximal) { // (choke TO choke)
+						// keep the min
 						if (graph.minDistToObstacle[v0] < graph.minDistToObstacle[parentNode.id]) {
-							graph.unmarkChokeNode(parentNode.id);
-							graph.markNodeAsChoke(v0);
-							parentNode.id = v0; parentNode.isMaximal = false;
 #if defined(DEBUG_DRAW) && defined(DEBUG_NODE_DETECTION)
 							drawDebugMessage += "Better consecutive chokepoint";
-							nodesDetected++;
+							drawImage = true;
 #endif
+							lastValid[v0] = parentNode.id;
+							graph.unmarkChokeNode(parentNode.id);
+							graph.markNodeAsChoke(v0);
+							parentNode.id = v0; parentNode.isMaximal = false; // updating next parent
+
 						}
-					} else { // parent is maximal
-						if (graph.adjacencyList[parentNode.id].size() > 2 
-							&& graph.nodes[v0].getApproxDistance(graph.nodes[parentNode.id]) >= MIN_REG_DIST
-							) {
+					} else { // parent is maximal (region TO choke)
+						int approxDistance = graph.nodes[v0].getApproxDistance(graph.nodes[parentNode.id]);
+						bool enoughDistance = approxDistance >= MIN_NODE_DIST && approxDistance > graph.minDistToObstacle[parentNode.id];
+						if (enoughDifference(graph.minDistToObstacle[v0], graph.minDistToObstacle[parentNode.id]) || enoughDistance) {
+#if defined(DEBUG_DRAW) && defined(DEBUG_NODE_DETECTION)
+							drawDebugMessage += "Added choke: Enough difference\n";
+							drawDebugMessage += getDifference(graph.minDistToObstacle[v0], graph.minDistToObstacle[parentNode.id]);
+							drawDebugMessage += "\nDistance: " + std::to_string(approxDistance) + " >= " + std::to_string(MIN_NODE_DIST);
+							drawImage = true;
+#endif
 							graph.markNodeAsChoke(v0);
 							parentNode.id = v0; parentNode.isMaximal = false;
-#if defined(DEBUG_DRAW) && defined(DEBUG_NODE_DETECTION)
-							drawDebugMessage += "Parent is intersection";
-							nodesDetected++;
-#endif
-						} else if (enoughDifference(graph.minDistToObstacle[v0], graph.minDistToObstacle[parentNode.id])) {
-								graph.markNodeAsChoke(v0);
-								parentNode.id = v0; parentNode.isMaximal = false;
-#if defined(DEBUG_DRAW) && defined(DEBUG_NODE_DETECTION)
-								drawDebugMessage += "Enough difference";
-								nodesDetected++;
-#endif
-						} else {
-							// the radius difference is too small
+						} else { // the radius difference is too small
 #if defined(DEBUG_DRAW) && defined(DEBUG_NODE_DETECTION)
 							graph.gateNodesA.insert(v0);
-// 							graph.nodeType[v0] = RegionGraph::CHOKEGATEA;
-							double A = graph.minDistToObstacle[v0];
-							double B = graph.minDistToObstacle[parentNode.id];
-							double diff = std::abs(A - B);
-							double largest = (B > A) ? B : A;
-							std::stringstream stream;
-							stream << "Chokepoint omitted, not enough difference\n";
-							stream << diff << " < " << largest * DIFF_COEFICIENT << " (" << largest << " * "<< DIFF_COEFICIENT <<")";
-
-							drawDebugMessage += stream.str();
-							nodesDetected++;
+							drawDebugMessage += "Choke omitted, not enough difference or distance\n";
+							drawDebugMessage += getDifference(graph.minDistToObstacle[v0], graph.minDistToObstacle[parentNode.id]);
+							drawDebugMessage += "\nDistance: " + std::to_string(approxDistance) + " >= " + std::to_string(MIN_NODE_DIST);
+							drawImage = true;
 #endif
 						}
 					}
@@ -417,44 +430,46 @@ namespace BWTA
 						}
 					}
 					if (localMaximal) {
-						if (parentNode.isMaximal) {
-							// we have two consecutive maximals, keep the max
+						if (graph.minDistToObstacle[v0] < MIN_REGION_OBST_DIST) {
+#if defined(DEBUG_DRAW) && defined(DEBUG_NODE_DETECTION)
+							graph.gateNodesA.insert(v0);
+							drawDebugMessage += "Region omitted, too small\n";
+							drawDebugMessage += "Distance: " + std::to_string(graph.minDistToObstacle[v0]) + " >= " + std::to_string(MIN_REGION_OBST_DIST);
+							drawImage = true;
+#endif							
+						} else if (parentNode.isMaximal) { // (region TO region)
+							// keep the max
 							if (graph.minDistToObstacle[v0] > graph.minDistToObstacle[parentNode.id]) {
 // 								LOG("REGION (better consecutive) " << graph.nodes[v0] << " radius: " << graph.minDistToObstacle[v0] << " parent: " << graph.minDistToObstacle[parentNode.id]);
-								// only delete parent if size == 2
+								// only delete parent if it isn't an intersection (size == 2)
 								if (graph.adjacencyList[parentNode.id].size() == 2) {
 									graph.unmarkRegionNode(parentNode.id);
 								}
-								graph.markNodeAsRegion(v0);
-								parentNode.id = v0; parentNode.isMaximal = true;
 #if defined(DEBUG_DRAW) && defined(DEBUG_NODE_DETECTION)
-								drawDebugMessage += "Better consecutive region node";
-								nodesDetected++;
+								drawDebugMessage += "Better consecutive region node\n";
+								drawDebugMessage += "Parent: " + std::to_string(graph.minDistToObstacle[parentNode.id]) + 
+									" Current: " + std::to_string(graph.minDistToObstacle[v0]);
+								drawImage = true;
 #endif
+								graph.markNodeAsRegion(v0);
+								parentNode.id = v0; parentNode.isMaximal = true; // updating next parent
 							}
-						} else { // parent is minimal
+						} else { // parent is minimal (choke TO region)
 							if (enoughDifference(graph.minDistToObstacle[v0], graph.minDistToObstacle[parentNode.id])) {
-								graph.markNodeAsRegion(v0);
-								parentNode.id = v0; parentNode.isMaximal = true;
 #if defined(DEBUG_DRAW) && defined(DEBUG_NODE_DETECTION)
-								drawDebugMessage += "Enough difference";
-								nodesDetected++;
+								drawDebugMessage += "Added region: Enough difference\n";
+								drawDebugMessage += getDifference(graph.minDistToObstacle[v0], graph.minDistToObstacle[parentNode.id]);
+								drawImage = true;
 #endif
+								graph.markNodeAsRegion(v0);
+								parentNode.id = v0; parentNode.isMaximal = true; // updating next parent
 							} else {
 								// the radius difference is too small
 #if defined(DEBUG_DRAW) && defined(DEBUG_NODE_DETECTION)
 								graph.gateNodesA.insert(v0);
-// 								graph.nodeType[v0] = RegionGraph::CHOKEGATEA;
-								double A = graph.minDistToObstacle[v0];
-								double B = graph.minDistToObstacle[parentNode.id];
-								double diff = std::abs(A - B);
-								double largest = (B > A) ? B : A;
-								std::stringstream stream;
-								stream << "Region omitted, not enough difference\n";
-								stream << diff << " < " << largest * DIFF_COEFICIENT << " (" << largest << " * "<< DIFF_COEFICIENT <<")";
-
-								drawDebugMessage += stream.str();
-								nodesDetected++;
+								drawDebugMessage += "Region omitted, not enough difference\n";
+								drawDebugMessage += getDifference(graph.minDistToObstacle[v0], graph.minDistToObstacle[parentNode.id]);
+								drawImage = true;
 #endif
 							}
 						}
@@ -464,6 +479,7 @@ namespace BWTA
 
 			// keep exploring unvisited neighbors
 			for (const auto& v1 : graph.adjacencyList[v0]) {
+				if (v1 == v0) LOG(" - Node in its adjacency list...");
 				if (!visited[v1]) {
 					nodeToVisit.push(v1);
 					visited[v1] = true;
@@ -490,15 +506,21 @@ namespace BWTA
 
 					// if the connected path between choke-region nodes is too close, remove choke
 					if (isMaximal0 != isMaximal1 && 
-						graph.nodes[v0Parent].getApproxDistance(graph.nodes[v1Parent]) < MIN_REG_DIST) {
+						graph.nodes[v0Parent].getApproxDistance(graph.nodes[v1Parent]) < MIN_NODE_DIST) {
 						nodeID nodeToDelete = v0Parent;
 						if (isMaximal0)  nodeToDelete = v1Parent;
 						graph.unmarkChokeNode(nodeToDelete);
 #if defined(DEBUG_DRAW) && defined(DEBUG_NODE_DETECTION)
 						graph.gateNodesA.insert(nodeToDelete);
 						drawDebugMessage += "\nChoke too close to region (path)";
-						nodesDetected++;
+						drawImage = true;
 #endif
+						if (lastValid[nodeToDelete] != 0) {
+#if defined(DEBUG_DRAW) && defined(DEBUG_NODE_DETECTION)
+							drawDebugMessage += "\nAdded previous valid choke)";
+#endif
+							graph.markNodeAsChoke(lastValid[nodeToDelete]);
+						}
 					} else 
 						// if two consecutive minimals, keep the min
 						if (!isMaximal0 && isMaximal0 == isMaximal1 && v0Parent != v1Parent) {
@@ -509,8 +531,13 @@ namespace BWTA
 						graph.unmarkChokeNode(nodeToDelete);
 #if defined(DEBUG_DRAW) && defined(DEBUG_NODE_DETECTION)
 						graph.gateNodesA.insert(nodeToDelete);
-						drawDebugMessage += "\nTwo consecutive choke, removed max (path)";
-						nodesDetected++;
+						graph.gateNodesB.clear(); // save parent node to print on debug
+						graph.gateNodesB.insert(v0Parent);
+						graph.gateNodesB.insert(v1Parent);
+						drawDebugMessage += "\nTwo consecutive choke, removed max (path)\n";
+						drawDebugMessage += "V0: " + std::to_string(graph.minDistToObstacle[v0Parent]) + 
+							" V1: " + std::to_string(graph.minDistToObstacle[v1Parent]);
+						drawImage = true;
 #endif
 					}
 				}
@@ -518,19 +545,20 @@ namespace BWTA
 
 #if defined(DEBUG_DRAW) && defined(DEBUG_NODE_DETECTION)
 			// iterative drawing of nodes detected
-			if (oldNodesDetected != nodesDetected) {
-				painter.drawPolygons(polygons);
-				painter.drawGraph(graph);
-				painter.drawNodes(graph, graph.regionNodes, Qt::blue);
-				painter.drawNodes(graph, graph.chokeNodes, Qt::red);
-				painter.drawNodes(graph, graph.gateNodesA, Qt::green);
-				painter.drawNodes(graph, graph.gateNodesB, Qt::darkGreen);
+			if (drawImage) {
+				painter.drawPolygons(polygons, Painter::Scale::Walk, imageScale);
+				painter.drawGraph(graph, Painter::Scale::Walk, imageScale);
+				painter.drawNodes(graph, graph.gateNodesB, Qt::darkGreen, Painter::Scale::Walk, imageScale, 10);
+				painter.drawNodes(graph, graph.regionNodes, Qt::blue, Painter::Scale::Walk, imageScale);
+				painter.drawNodes(graph, graph.chokeNodes, Qt::red, Painter::Scale::Walk, imageScale);
+				painter.drawNodes(graph, graph.gateNodesA, Qt::green, Painter::Scale::Walk, imageScale);
 				if (!drawDebugMessage.empty()) {
 					painter.drawText(5, 12, drawDebugMessage);
 					drawDebugMessage.clear();
 				}
 				painter.render();
-				oldNodesDetected = nodesDetected;
+				drawImage = false;
+				graph.gateNodesA.clear();
 			}
 #endif
 		}
