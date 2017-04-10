@@ -14,7 +14,7 @@ namespace BWTA
         * @param width Width of the new array.
         * @param height Height of the new array.
         */
-       RectangleArray(unsigned int width = 1, unsigned int height = 1, Type* data = NULL);
+       RectangleArray(unsigned int width = 1, unsigned int height = 1, Type* data = nullptr);
        /** Copy constructor */
        RectangleArray(const RectangleArray<Type>& rectangleArray);
 	   /** Assignment operator */
@@ -49,8 +49,8 @@ namespace BWTA
         */
        void setItem(unsigned int x, unsigned int y, Type *item);
        void resize(unsigned int width, unsigned int height);
-	   void saveToFile(const std::string& fileName);
-	   void saveToFile(std::ofstream& out);
+	   void saveToFile(const std::string& fileName, char del = '\0');
+	   void saveToFile(std::ofstream& out, char del = '\0');
        /** Sets all fields of the array to the specified value */
        void setTo(const Type& value);
        void setBorderTo(const Type& value);
@@ -76,13 +76,13 @@ namespace BWTA
         * index.
         * @param index index of the line.
         */
-       Type *getColumn(unsigned int index);
+       Type* getColumn(unsigned int index);
        /**
         * Gets the pointer in data to the beginning of line with the specified
         * index.
         * @param index index of the line.
         */
-       const Type *getColumn(unsigned int index) const;
+       const Type* getColumn(unsigned int index) const;
        /**
         * Sets the width of the array.
         * @param width New width of the array.
@@ -100,7 +100,7 @@ namespace BWTA
   {
     this->setWidth(width);
     this->setHeight(height);
-    this->owner = (data == NULL);
+    this->owner = (data == nullptr);
     if (this->owner)
       this->data = new Type[this->getWidth()*this->getHeight()];
     else
@@ -231,21 +231,22 @@ namespace BWTA
   }
   //---------------------------------------------- SAVE TO FILE ----------------------------------------------
   template <class Type>
-  void RectangleArray<Type>::saveToFile(const std::string& fileName)
+  void RectangleArray<Type>::saveToFile(const std::string& fileName, char del)
   {
 	  std::ofstream outputFile(fileName);
 	  if (!outputFile)
 		  exit(1);
 
-	  saveToFile(outputFile);
+	  saveToFile(outputFile, del);
 	  outputFile.close();
   }
   template <class Type>
-  void RectangleArray<Type>::saveToFile(std::ofstream& out)
+  void RectangleArray<Type>::saveToFile(std::ofstream& out, char del)
   {
 	  for (unsigned int y = 0; y < this->getHeight(); ++y) {
 		  for (unsigned int x = 0; x < this->getWidth(); ++x) {
 			  out << this->getColumn(x)[y];
+			  if (del != '\0') out << del;
 		  }
 		  out << std::endl;
 	  }
