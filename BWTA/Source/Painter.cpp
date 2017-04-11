@@ -393,7 +393,7 @@ namespace BWTA {
 		int mineralWidth = 2*scale;
 		int mineralHeight = 1*scale;
 		int vespeneWidth = 4*scale;
-		int vespeneHeight = 3*scale;
+		int vespeneHeight = 2*scale;
 
 		QPen qp(Qt::blue);
 		int penWidth = std::max(1, static_cast<int>(scale/4));
@@ -412,8 +412,16 @@ namespace BWTA {
 					painter.drawLine(x + (baseWidth/2), y + (baseHeight/2), r.pos.x*scale + vespeneWidth/2, r.pos.y*scale + vespeneHeight/2);
 					painter.fillRect(r.pos.x * scale, r.pos.y * scale, vespeneWidth, vespeneHeight, Qt::green);
 				} else {
+					if (r.isBlocking) {
+						qp.setColor(Qt::red);
+						painter.setPen(qp);
+					}
 					painter.drawLine(x + (baseWidth/2), y + (baseHeight/2), r.pos.x*scale + mineralWidth/2, r.pos.y*scale + mineralHeight/2);
 					painter.fillRect(r.pos.x * scale, r.pos.y * scale, mineralWidth, mineralHeight, Qt::cyan);
+					if (r.isBlocking) {
+						qp.setColor(Qt::blue);
+						painter.setPen(qp);
+					}
 				}
 				
 			}

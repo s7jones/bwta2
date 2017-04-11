@@ -15,11 +15,13 @@ namespace BWTA
 //	typedef std::pair<BWAPI::UnitType, BWAPI::WalkPosition> UnitTypeWalkPosition;
 //	typedef std::pair<BWAPI::UnitType, BWAPI::TilePosition> UnitTypeTilePosition;
 
-	struct unitTypeTilePos_t {
+	struct resource_t {
 		BWAPI::UnitType type;
 		BWAPI::TilePosition pos;
+		unsigned int amount;
+		bool isBlocking;
 
-		unitTypeTilePos_t(BWAPI::UnitType t, BWAPI::TilePosition p): type(t), pos(p) {};
+		resource_t(BWAPI::UnitType t, BWAPI::TilePosition p, unsigned int a): type(t), pos(p), amount(a), isBlocking(false) {};
 	};
 
 	namespace MapData
@@ -58,7 +60,7 @@ namespace BWTA
 		extern std::vector<UnitTypePosition> staticNeutralBuildings;
 //		extern std::vector<UnitTypeWalkPosition> resourcesWalkPositions;
 
-		extern std::vector<unitTypeTilePos_t> resources;
+		extern std::vector<resource_t> resources;
 	}
 }
 

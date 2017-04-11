@@ -6,9 +6,9 @@
 
 namespace BWTA
 {
-	const int MIN_CLUSTER_DIST = 6; // minerals less than this distance will be grouped into the same cluster
+	const int MIN_CLUSTER_DIST = 8; // minerals less than this distance will be grouped into the same cluster
 	const size_t MIN_RESOURCES = 3; // a cluster with less than this will be discarded
-	const int MAX_INFLUENCE_DISTANCE_RADIUS = 12; // max radius distance from a resource to place a base
+	const int MAX_INFLUENCE_DISTANCE_RADIUS = 10; // max radius distance from a resource to place a base
 
 	// TODO review this method, probably we can optimize it
 	void calculate_walk_distances_area(const BWAPI::Position& start, int width, int height, int max_distance, 
@@ -52,7 +52,7 @@ namespace BWTA
 		}
 	}
 
-	std::vector<int> findNeighbors(const std::vector<unitTypeTilePos_t>& resources, const unitTypeTilePos_t& resource)
+	std::vector<int> findNeighbors(const std::vector<resource_t>& resources, const resource_t& resource)
 	{
 		std::vector<int> retIndexes;
 		for (size_t i = 0; i < resources.size(); ++i) {
@@ -70,7 +70,7 @@ namespace BWTA
 		// 1) cluster resources using DBSCAN algorithm
 		// ===========================================================================
 
-		std::vector<std::vector<unitTypeTilePos_t>> clusters;
+		std::vector<std::vector<resource_t>> clusters;
 		std::vector<bool> clustered(MapData::resources.size());
 		std::vector<bool> visited(MapData::resources.size());
 		int clusterID = -1;
@@ -82,7 +82,7 @@ namespace BWTA
 				std::vector<int> neighbors = findNeighbors(MapData::resources, MapData::resources[i]);
 				if (neighbors.size() >= MIN_RESOURCES) {
 					// add resource to a new cluster
-					clusters.emplace_back(std::vector<unitTypeTilePos_t> {MapData::resources[i]});
+					clusters.emplace_back(std::vector<resource_t> {MapData::resources[i]});
 					++clusterID;
 					clustered[i] = true;
 
@@ -93,6 +93,9 @@ namespace BWTA
 							std::vector<int> neighbors2 = findNeighbors(MapData::resources, MapData::resources[neighborID]);
 							if (neighbors2.size() >= MIN_RESOURCES) {
 								neighbors.insert(neighbors.end(), neighbors2.begin(), neighbors2.end());
+							} else {
+//								LOG("Resource " << neighborID << ":" << MapData::resources[neighborID].type << 
+//									" only has " << neighbors2.size() << " neighbors");
 							}
 						}
 						// if neighbor is not yet a member of any cluster
@@ -102,6 +105,9 @@ namespace BWTA
 							clustered[neighborID] = true;
 						}
 					}
+				} else {
+//					LOG("Resource " << i << ":" << MapData::resources[i].type << 
+//						" only has " << neighbors.size() << " neighbors");
 				}
 			}
 		}
@@ -141,13 +147,17 @@ namespace BWTA
 			}
 		}
 		// Set build tiles too close to resources in any cluster to false in baseBuildMap
-		for (const auto& cluster : clusters) {
-			for (const auto& resource : cluster) {
-				int x1 = resource.pos.x - 6;
-				int y1 = resource.pos.y - 5;
-				int x2 = resource.pos.x + resource.type.tileWidth() + 2;
-				int y2 = resource.pos.y + resource.type.tileHeight() + 2;
-				baseBuildMap.setRectangleTo(x1, y1, x2, y2, false);
+		for (auto& cluster : clusters) {
+			for (auto& resource : cluster) {
+				if (resource.amount > 200) {
+					int x1 = resource.pos.x - 6; // base (4-1) + starcraft rule (3)
+					int y1 = resource.pos.y - 5; // base (3-1) + starcraft rule (3)
+					int x2 = resource.pos.x + resource.type.tileWidth() + 2;
+					int y2 = resource.pos.y + resource.type.tileHeight() + 2;
+					baseBuildMap.setRectangleTo(x1, y1, x2, y2, false);
+				} else {
+					resource.isBlocking = true;
+				}
 			}
 		}
 		LOG(" - baseBuildMap computed in " << timer.stopAndGetTime() << " seconds");
@@ -170,22 +180,40 @@ namespace BWTA
 			int clusterMinX = maxWidth;
 			int clusterMaxY = 0;
 			int clusterMinY = maxHeight;
+			BWAPI::WalkPosition clusterWalkPos(cluster.front().pos);
+			int clusterRegionLabel = BWTA_Result::regionLabelMap[clusterWalkPos.x][clusterWalkPos.y];
+
 			for (const auto& resource : cluster) {
 				// TODO add methods to update bounding boxes
-				// bounding box of current resource
-				int minX = std::max(resource.pos.x - MAX_INFLUENCE_DISTANCE_RADIUS, 0);
-				int maxX = std::min(resource.pos.x + MAX_INFLUENCE_DISTANCE_RADIUS, maxWidth);
-				int minY = std::max(resource.pos.y - MAX_INFLUENCE_DISTANCE_RADIUS, 0);
-				int maxY = std::min(resource.pos.y + MAX_INFLUENCE_DISTANCE_RADIUS, maxHeight);
+				// bounding box of current resource influence
+				BWAPI::TilePosition topLeft(resource.pos);
+				BWAPI::TilePosition bottomRight(resource.pos.x + resource.type.tileWidth()-1, resource.pos.y + resource.type.tileHeight()-1);
+
+				// bounding box of current resource influence
+				int minX = std::max(topLeft.x	  - MAX_INFLUENCE_DISTANCE_RADIUS, 0);
+				int maxX = std::min(bottomRight.x + MAX_INFLUENCE_DISTANCE_RADIUS, maxWidth);
+				int minY = std::max(topLeft.y	  - MAX_INFLUENCE_DISTANCE_RADIUS, 0);
+				int maxY = std::min(bottomRight.y + MAX_INFLUENCE_DISTANCE_RADIUS, maxHeight);
+
+//				tileScores.setRectangleTo(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y, -1);
+//				if (resource.type != BWAPI::UnitTypes::Resource_Vespene_Geyser) continue;
 
 				// a geyser has more "weight" than minerals
 				int scoreScale = resource.type == BWAPI::UnitTypes::Resource_Vespene_Geyser? 3 : 1;
+
 				// updating score inside the bounding box
 				for (int x = minX; x < maxX; ++x) {
 					for (int y = minY; y < maxY; ++y) {
-						if (baseBuildMap[x][y]) {
-							int dx = resource.pos.x - x;
-							int dy = resource.pos.y - y;
+//						if (baseBuildMap[x][y] && clusterRegionLabel == BWTA_Result::regionLabelMap[x*4][y*4]) {
+						if (clusterRegionLabel == BWTA_Result::regionLabelMap[x*4][y*4]) {
+							int dx = 0;
+							// check if x is outside resource bounding box
+							if (x+3 < topLeft.x) dx = topLeft.x - (x+3);
+							else if (x > bottomRight.x) dx = x - bottomRight.x;
+							int dy = 0;
+							// check if y is outside resource boudning box
+							if (y+2 < topLeft.y) dy = topLeft.y - (y+2);
+							else if (y > bottomRight.y) dy = y - bottomRight.y;
 							// since we only need to compare distances the squareDistance is enough
 							int squareDistance = dx*dx + dy*dy; 
 							tileScores[x][y] += (maxSquareDistance - squareDistance) * scoreScale;
@@ -199,22 +227,26 @@ namespace BWTA
 				clusterMaxY = std::max(maxY, clusterMaxY);
 				clusterMinY = std::min(minY, clusterMinY);
 			}
-			BWAPI::TilePosition bestTile(-1, -1);
+
+			BWAPI::TilePosition bestTile = BWAPI::TilePositions::None;
 			int maxScore = 0;
 			for (int x = clusterMinX; x < clusterMaxX; ++x)
 			for (int y = clusterMinY; y < clusterMaxY; ++y) {
-				if (tileScores[x][y] > maxScore) {
-					maxScore = tileScores[x][y];
-					bestTile = BWAPI::TilePosition(x, y);
+				if (baseBuildMap[x][y]) {
+					if (tileScores[x][y] > maxScore) {
+						maxScore = tileScores[x][y];
+						bestTile = BWAPI::TilePosition(x, y);
+					}
 				}
 			}
+
 			if (maxScore > 0) {
 				BaseLocationImpl* b = new BaseLocationImpl(bestTile, cluster);
 				baseLocations.insert(b);
 				// check if it is a start location
 				for (auto it = startLocations.begin(); it != startLocations.end(); ++it) {
 					int distance = it->getApproxDistance(bestTile);
-					if (distance < 10) {
+					if (distance < MAX_INFLUENCE_DISTANCE_RADIUS) {
 						b->_isStartLocation = true;
 						BWTA_Result::startlocations.insert(b);
 						startLocations.erase(it);
@@ -284,16 +316,6 @@ namespace BWTA
 					baseI->airDistances[base2] = baseTile.getDistance(base2Tile);
 				}
 			}
-
-			// look if this base location is a start location
-//			for (const auto& startLocation : MapData::startLocations) {
-//				int distance = startLocation.getApproxDistance(base->getTilePosition());
-//				if (distance < 10) {
-//					baseI->_isStartLocation = true;
-//					BWTA_Result::startlocations.insert(base);
-//					break;
-//				}
-//			}
 
 			// find what region this base location is in and tell that region about the base location
 			BWAPI::WalkPosition baseWalkPos(base->getPosition());

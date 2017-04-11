@@ -2,7 +2,7 @@
 
 namespace BWTA
 {
-	BaseLocationImpl::BaseLocationImpl(const BWAPI::TilePosition &tp, std::vector<unitTypeTilePos_t> r)
+	BaseLocationImpl::BaseLocationImpl(const BWAPI::TilePosition &tp, std::vector<resource_t> r)
 		: region(nullptr)
 		, _isIsland(true)	// by default isIsland unless we can walk from this BaseLocation to another BaseLocation
 		, _isStartLocation(false)

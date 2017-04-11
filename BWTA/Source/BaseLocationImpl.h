@@ -9,7 +9,7 @@ namespace BWTA
 	{
 	public:
 		BaseLocationImpl() {};
-		BaseLocationImpl(const BWAPI::TilePosition &tp, std::vector<unitTypeTilePos_t> resources);
+		BaseLocationImpl(const BWAPI::TilePosition &tp, std::vector<resource_t> resources);
 
 		const BWAPI::Position getPosition() const override { return position; };
 		const BWAPI::TilePosition getTilePosition() const override { return tilePosition; };
@@ -42,6 +42,6 @@ namespace BWTA
 		BWAPI::Unitset currentMinerals;
 		std::map<BaseLocation*, double> groundDistances;
 		std::map<BaseLocation*, double> airDistances;
-		std::vector<unitTypeTilePos_t> resources;
+		std::vector<resource_t> resources;
 	};
 }

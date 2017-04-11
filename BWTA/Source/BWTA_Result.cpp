@@ -19,6 +19,6 @@ namespace BWTA
 
 		RectangleArray<int> obstacleLabelMap;
 		RectangleArray<int> closestObstacleLabelMap;
-		RectangleArray<int> regionLabelMap;
+		RectangleArray<int> regionLabelMap;	// stores the region ID in walk resolution
 	};
 }

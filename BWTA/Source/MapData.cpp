@@ -32,6 +32,6 @@ namespace BWTA
 		std::vector<UnitTypePosition> staticNeutralBuildings;
 //		std::vector<UnitTypeWalkPosition> resourcesWalkPositions;
 
-		std::vector<unitTypeTilePos_t> resources;
+		std::vector<resource_t> resources;
 	}
 }
