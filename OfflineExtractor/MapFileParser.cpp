@@ -13,6 +13,7 @@
 
 namespace BWTA
 {
+	const bool VERBOSE = false;
 
 	void printError(const char* archive, const char* message, const char* file, DWORD errorMessageID) {
 		char cCurrentPath[FILENAME_MAX];
@@ -151,28 +152,48 @@ namespace BWTA
 			chunkName[3] = CHKdata[position++];
 			chunkName[4] = 0;
 			DWORD chunkLength = decode4ByteUnsigned(CHKdata, position);
-//			position += 4;
 
-			std::cout << "Chunk '" << chunkName << "', size: " << chunkLength << "\n";
+			std::cout << "Chunk '" << chunkName << "', size: " << chunkLength << " ";
 
+			std::string chunkNameStr(reinterpret_cast<char*>(chunkName));
+			if (chunkNameStr == "VER ") {
+				if (chunkLength == 2 || chunkNameStr == "ERA ") std::cout << " OK";
+				else std::cout << " ERROR size should be 2";
+			} else if (chunkNameStr == "OWNR" || chunkNameStr == "SIDE") {
+				if (chunkLength == 12) std::cout << " OK";
+				else std::cout << " ERROR size should be 12";
+			}else if (chunkNameStr == "DIM " || chunkNameStr == "SPRP") {
+				if (chunkLength == 4) std::cout << " OK";
+				else std::cout << " ERROR size should be 4";
+			}else if (chunkNameStr == "MTXM") {
+				if (chunkLength <= 131072) std::cout << " OK";
+				else std::cout << " ERROR size should be less or equal than 131072";
+			} else if (chunkNameStr == "PUNI") {
+				if (chunkLength == 5700) std::cout << " OK";
+				else std::cout << " ERROR size should be 5700";
+			} else if (chunkNameStr == "UPGR") {
+				if (chunkLength == 1748) std::cout << " OK";
+				else std::cout << " ERROR size should be 1748";
+			} else if (chunkNameStr == "PTEC") {
+				if (chunkLength == 912) std::cout << " OK";
+				else std::cout << " ERROR size should be 912";
+			} else if (chunkNameStr == "UNIT") {
+				if (chunkLength % 36 == 0) std::cout << " OK";
+				else std::cout << " ERROR size should be multiple of 36";
+			} else if (chunkNameStr == "THG2") {
+				if (chunkLength % 10 == 0) std::cout << " OK";
+				else std::cout << " ERROR size should be multiple of 10";
+			} else if (chunkNameStr == "STR ") {
+				if (chunkLength > 0) std::cout << " OK";
+				else std::cout << " ERROR size should be at least 1";
+			} else if (chunkNameStr == "UPRP") {
+				if (chunkLength == 1280) std::cout << " OK";
+				else std::cout << " ERROR size should be 1280";
+			}
+
+			std::cout << '\n';
 			position += chunkLength;
 		}
-
-		// search duplicates
-//		position = 0;
-//		while (position < size) {
-//			char chunkName[5];
-//			chunkName[0] = CHKdata[position];
-//			chunkName[1] = CHKdata[position+1];
-//			chunkName[2] = CHKdata[position+2];
-//			chunkName[3] = CHKdata[position+3];
-//			chunkName[4] = 0;
-//
-//			if (strcmp("UNIT", reinterpret_cast<char*>(chunkName)) == 0) {
-//				std::cout << "Chunk 'UNIT' found\n";
-//			}
-//			++position;
-//		}
 	}
 
 
@@ -190,7 +211,6 @@ namespace BWTA
 			chunkName[3] = CHKdata[position++];
 			chunkName[4] = 0;
 			DWORD chunkLength = decode4ByteUnsigned(CHKdata, position);
-//			position += 4;
 
 			if (strcmp(desiredChunk, reinterpret_cast<char*>(chunkName)) == 0) {
 				*desiredChunkLength = chunkLength;
@@ -253,17 +273,16 @@ namespace BWTA
 //				BWAPI::Position unitPosition(x, y); // x/y coordinates are the center of the sprite of the unit in pixels
 //				BWAPI::WalkPosition unitWalkPosition(unitPosition);
 				BWAPI::TilePosition unitTilePosition((x - unitType.dimensionLeft()) / TILE_SIZE, (y - unitType.dimensionUp()) / TILE_SIZE);
-//				if (unitType == BWAPI::UnitTypes::Resource_Vespene_Geyser) {
-// 					std::cout << "Unit(" << unitClass << ") type=" << unitType << " at " << x << "," << y << " player " << player << "\n";
-// 					std::cout << unitType.c_str() << " Tile " << unitTilePosition.x << "," << unitTilePosition.y << std::endl;
-//				}
+				if (VERBOSE) {
+ 					std::cout << "Unit " << unitType << " at " << x << "," << y << " player " << player << "\n";
+				}
 
 				if (unitType.isMineralField() || unitType == BWAPI::UnitTypes::Resource_Vespene_Geyser) {
 					MapData::resources.emplace_back(unitType, unitTilePosition, resourceAmount);
 				} else if (unitType == BWAPI::UnitTypes::Special_Start_Location) {
 					MapData::startLocations.push_back(unitTilePosition);
 				} else {
-					std::cout << "Ignored unit: " << unitType << std::endl;
+					if (VERBOSE) std::cout << "Ignored unit: " << unitType << " at " << x << "," << y << std::endl;
 				}
 			}
 
@@ -279,29 +298,26 @@ namespace BWTA
 		unsigned char* UNITdata = getChunkPointer("THG2", CHKdata, size, &chunkSize);
 
 		if (UNITdata != nullptr) {
-			int bytesPerUnit = 8;
-
+			const int bytesPerUnit = 10;
 			int nDoodads = chunkSize / bytesPerUnit;
 			std::cout << "THG2 chunk successfully found, with information about " << nDoodads << " doodads\n";
-			for (int i = 0; i<nDoodads; i++) {
+
+			for (int i = 0; i < nDoodads; ++i) {
 				DWORD position = i*bytesPerUnit;
 				unsigned long unitNumber = decode2ByteUnsigned(UNITdata, position);
-				if (unitNumber > 227) continue; // ignore units out of range
 				unsigned int x = decode2ByteUnsigned(UNITdata, position);
 				unsigned int y = decode2ByteUnsigned(UNITdata, position);
-//				unsigned int ID = decode2ByteUnsigned(UNITdata, position);
-//				int player = UNITdata[position];
-				
-				BWAPI::UnitType unitType(unitNumber);
-				//std::cout << "Doodad (" << unitNumber << ":" << unitType.c_str() << ") at " << x << "," << y << " player " << player << "\n";
-				
-				if (unitType.isBuilding()) {
-//					std::cout << "Doodad " << unitType << " at " << x << "," << y << std::endl;
-					BWAPI::Position unitPosition(x, y);
-					UnitTypePosition unitTypePosition = std::make_pair(unitType, unitPosition);
-					MapData::staticNeutralBuildings.push_back(unitTypePosition);
+				int player = UNITdata[position]; position += 1;
+				position += 2; // unused
+				unsigned int flags = decode2ByteUnsigned(UNITdata, position);
+				bool isSprite = flags >> 4 & 1;
+
+				if (!isSprite) {  // if it is a sprite, the terrain tile info should take care of walkability
+					BWAPI::UnitType unitType(unitNumber);
+					MapData::staticNeutralBuildings.emplace_back(unitType, BWAPI::Position(x, y));
+					if (VERBOSE) std::cout << "Doodad " << unitType << " at " << x << "," << y << std::endl;
 				} else {
-//					std::cout << "Ignored Doodad " << unitType << " at " << x << "," << y << std::endl;
+					if (VERBOSE) std::cout << "Ignored Sprite " << unitNumber << " at " << x << "," << y <<  std::endl;
 				}
 			}
 
@@ -379,11 +395,15 @@ namespace BWTA
 	void setOfflineBuildability(RectangleArray<bool> &buildability)
 	{
 		for (unsigned int y = 0; y < MapData::mapHeightTileRes; ++y)
-			for (unsigned int x = 0; x < MapData::mapWidthTileRes; ++x) {
+		for (unsigned int x = 0; x < MapData::mapWidthTileRes; ++x) {
 			TileID tileID = getTile(x, y);
+//			TileID id = tileID >> 4  & 0x7FF;
+//			if (id > 1024) {
+//				std::cout << "Doodad " << id << " found at " << x << "," << y << "\n";
+//			}
 			TileType* tile = TileSet::getTileType(tileID);
 			buildability[x][y] = (tile->buildability & (1 << 7)) == 0;
-			}
+		}
 	}
 	//-------------------------------------------- SET WALKABILITY ---------------------------------------------
 	void setOfflineWalkability(RectangleArray<bool> &walkability)
