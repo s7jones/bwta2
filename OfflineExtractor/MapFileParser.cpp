@@ -33,20 +33,20 @@ namespace BWTA
 	/*
 	Check whether the string 'fullString' ends with the string 'ending'
 	*/
-	bool hasEnding(const char* fullString, const char* ending)
-	{
-		size_t l1 = strlen(fullString);
-		size_t l2 = strlen(ending);
-		if (l1 >= l2) {
-			int start = l1 - l2;
-			for (size_t idx = 0; idx<l2; idx++) {
-				if (fullString[start + idx] != ending[idx]) return false;
-			}
-			return true;
-		} else {
-			return false;
-		}
-	}
+//	bool hasEnding(const char* fullString, const char* ending)
+//	{
+//		size_t l1 = strlen(fullString);
+//		size_t l2 = strlen(ending);
+//		if (l1 >= l2) {
+//			int start = l1 - l2;
+//			for (size_t idx = 0; idx<l2; idx++) {
+//				if (fullString[start + idx] != ending[idx]) return false;
+//			}
+//			return true;
+//		} else {
+//			return false;
+//		}
+//	}
 
 
 	/*
@@ -56,52 +56,31 @@ namespace BWTA
 	*/
 	unsigned char* extractCHKfile(const char* archive, DWORD* dataSize)
 	{
-		HANDLE hMpq = nullptr;            // Open archive handle
-		HANDLE hFileFind;       // Archived file handle
-		SFILE_FIND_DATA SFileFindData; // Data of the archived file
-		bool chkFilefound = false;     // Whether the chk file was found in the archive
-		unsigned char* CHKdata = nullptr;
-
-		// Open an archive
+		// Open MPQ
+		HANDLE hMpq;
 		if (!SFileOpenArchive(archive, 0, SFILE_OPEN_FROM_MPQ, &hMpq)) {
 			printError(archive, "Cannot open archive", archive, GetLastError());
 			return nullptr;
 		}
 
-		// List all files in archive
-		hFileFind = SFileFindFirstFile(hMpq, "*", &SFileFindData, nullptr);
-		while (hFileFind) {
-			std::cout << SFileFindData.cFileName << "\n";
-			if (hasEnding(SFileFindData.cFileName, ".chk")) {
-				chkFilefound = true;
-				break;
-			}
-			if (!SFileFindNextFile(hFileFind, &SFileFindData))
-				break;
+		// Open .CHK file. It always has the same name
+		HANDLE hFile;
+		if (!SFileOpenFileEx(hMpq, "staredit\\scenario.chk", 0, &hFile)) {
+			printError(archive, "Cannot extract CHK file", archive, GetLastError());
+			return nullptr;
 		}
+		DWORD dwSize = SFileGetFileSize(hFile, nullptr);
+		std::cout << "CHK file found, size: " << dwSize << "\n";
 
-		if (chkFilefound) {
-// 			 std::cout << "CHK file found: " << SFileFindData.cFileName << ", size: " << SFileFindData.dwFileSize << "\n";
-
-			// Closing previous file handle
-			if (hFileFind !=  INVALID_HANDLE_VALUE) SFileFindClose(hFileFind);
-
-			// Open (extract) CHK file
-			if (!SFileOpenFileEx(hMpq, SFileFindData.cFileName, 0, &hFileFind)) {
-				printError(archive, "Cannot extract CHK file", archive, GetLastError());
-				return nullptr;
-			}
-
-			// Read CHK
-			CHKdata = new unsigned char[SFileFindData.dwFileSize];
-			DWORD dwBytes = 0;
-			SFileReadFile(hFileFind, CHKdata, SFileFindData.dwFileSize, &dwBytes, nullptr);
-			// std::cout << "Read " << dwBytes << " of " << SFileFindData.dwFileSize << " bytes\n";
-			*dataSize = SFileFindData.dwFileSize;
-		}
+		// Read CHK
+		unsigned char* CHKdata = new unsigned char[dwSize];
+		DWORD dwBytes = 0;
+		SFileReadFile(hFile, CHKdata, dwSize, &dwBytes, nullptr);
+		std::cout << "Read " << dwBytes << " of " << dwSize << " bytes\n";
+		*dataSize = dwSize;
 
 		// Closing handles
-		if (hFileFind != INVALID_HANDLE_VALUE) SFileFindClose(hFileFind);
+		if (hFile != INVALID_HANDLE_VALUE) SFileFindClose(hFile);
 		if (hMpq != INVALID_HANDLE_VALUE) SFileCloseArchive(hMpq);
 
 		return CHKdata;
