@@ -24,30 +24,9 @@ namespace BWTA
 			nullptr, errorMessageID, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), reinterpret_cast<LPSTR>(&messageBuffer), 0, nullptr);
 
 		std::string errorMessage(messageBuffer, size);
-
 		LocalFree(messageBuffer); // free the buffer
-
 		std::cout << archive << ": Error: " << message << " \"" << cCurrentPath << "\\" << file << "\": " << errorMessage << "\n";
 	}
-
-	/*
-	Check whether the string 'fullString' ends with the string 'ending'
-	*/
-//	bool hasEnding(const char* fullString, const char* ending)
-//	{
-//		size_t l1 = strlen(fullString);
-//		size_t l2 = strlen(ending);
-//		if (l1 >= l2) {
-//			int start = l1 - l2;
-//			for (size_t idx = 0; idx<l2; idx++) {
-//				if (fullString[start + idx] != ending[idx]) return false;
-//			}
-//			return true;
-//		} else {
-//			return false;
-//		}
-//	}
-
 
 	/*
 	Looks for a file with the .chk extension inside of a .scx map, decompresses it, and returns:
@@ -70,14 +49,14 @@ namespace BWTA
 			return nullptr;
 		}
 		DWORD dwSize = SFileGetFileSize(hFile, nullptr);
-		std::cout << "CHK file found, size: " << dwSize << "\n";
+//		std::cout << "CHK file found, size: " << dwSize << "\n";
 
 		// Read CHK
 		unsigned char* CHKdata = new unsigned char[dwSize];
 		DWORD dwBytes = 0;
 		SFileReadFile(hFile, CHKdata, dwSize, &dwBytes, nullptr);
-		std::cout << "Read " << dwBytes << " of " << dwSize << " bytes\n";
 		*dataSize = dwSize;
+//		std::cout << "Read " << dwBytes << " of " << dwSize << " bytes\n";
 
 		// Closing handles
 		if (hFile != INVALID_HANDLE_VALUE) SFileFindClose(hFile);
@@ -132,45 +111,7 @@ namespace BWTA
 			chunkName[4] = 0;
 			DWORD chunkLength = decode4ByteUnsigned(CHKdata, position);
 
-			std::cout << "Chunk '" << chunkName << "', size: " << chunkLength << " ";
-
-			std::string chunkNameStr(reinterpret_cast<char*>(chunkName));
-			if (chunkNameStr == "VER ") {
-				if (chunkLength == 2 || chunkNameStr == "ERA ") std::cout << " OK";
-				else std::cout << " ERROR size should be 2";
-			} else if (chunkNameStr == "OWNR" || chunkNameStr == "SIDE") {
-				if (chunkLength == 12) std::cout << " OK";
-				else std::cout << " ERROR size should be 12";
-			}else if (chunkNameStr == "DIM " || chunkNameStr == "SPRP") {
-				if (chunkLength == 4) std::cout << " OK";
-				else std::cout << " ERROR size should be 4";
-			}else if (chunkNameStr == "MTXM") {
-				if (chunkLength <= 131072) std::cout << " OK";
-				else std::cout << " ERROR size should be less or equal than 131072";
-			} else if (chunkNameStr == "PUNI") {
-				if (chunkLength == 5700) std::cout << " OK";
-				else std::cout << " ERROR size should be 5700";
-			} else if (chunkNameStr == "UPGR") {
-				if (chunkLength == 1748) std::cout << " OK";
-				else std::cout << " ERROR size should be 1748";
-			} else if (chunkNameStr == "PTEC") {
-				if (chunkLength == 912) std::cout << " OK";
-				else std::cout << " ERROR size should be 912";
-			} else if (chunkNameStr == "UNIT") {
-				if (chunkLength % 36 == 0) std::cout << " OK";
-				else std::cout << " ERROR size should be multiple of 36";
-			} else if (chunkNameStr == "THG2") {
-				if (chunkLength % 10 == 0) std::cout << " OK";
-				else std::cout << " ERROR size should be multiple of 10";
-			} else if (chunkNameStr == "STR ") {
-				if (chunkLength > 0) std::cout << " OK";
-				else std::cout << " ERROR size should be at least 1";
-			} else if (chunkNameStr == "UPRP") {
-				if (chunkLength == 1280) std::cout << " OK";
-				else std::cout << " ERROR size should be 1280";
-			}
-
-			std::cout << '\n';
+			std::cout << "Chunk '" << chunkName << "', size: " << chunkLength << '\n';
 			position += chunkLength;
 		}
 	}
@@ -198,6 +139,46 @@ namespace BWTA
 			position += chunkLength;
 		}
 		return nullptr;
+	}
+
+	struct Section
+	{
+		uint32_t name;
+		uint32_t size;
+	};
+
+	unsigned char* newMTXM(unsigned char* CHKdata, DWORD size, uint32_t width, uint32_t height, DWORD& chunkSize) {
+		DWORD position = 0;
+		uint32_t expectedSize = width * height * 2;
+		unsigned char* chunkData = nullptr;
+
+		while (position < size) {
+			Section* section = reinterpret_cast<Section*>(CHKdata+position);
+			position += sizeof(Section);
+
+			// copy the name to end it with 0
+			char chunkName[5] = {0};
+			memcpy(chunkName,&section[0].name,4);
+//			std::cout << "Section: " << chunkName << " size: " << section[0].size << '\n';
+
+			if (strcmp("MTXM", chunkName) == 0) {
+				chunkSize = section[0].size;
+				std::cout << "Found MTXM with size " << chunkSize << " (" << expectedSize << " expected)";
+				if (chunkSize == expectedSize) {
+					chunkData = new unsigned char[chunkSize];
+					memcpy(chunkData, CHKdata+position, chunkSize);
+				} else if (chunkData && chunkSize < expectedSize) {
+					memcpy(chunkData, CHKdata+position, chunkSize); // overwrite from the begining
+					std::cout << " overwrite to previous one from the begining";
+				} else {
+					std::cout << " omitted";
+				}
+				std::cout << '\n';
+			}
+
+			position += section[0].size;
+		}
+		return chunkData;
 	}
 
 
@@ -486,32 +467,28 @@ namespace BWTA
 		std::string cv5FileName = "tileset/" + tileSetName[tileset] + ".cv5";
 		MapData::TileSet = reinterpret_cast<TileType*>(getFileBuffer(cv5FileName.c_str()));
 
-
 		// Load MiniTileFlags file (tileSetName[tileset].vf4) into MapData::MiniTileFlags
 		std::string vf4FileName = "tileset/" + tileSetName[tileset] + ".vf4";
 		MapData::MiniTileFlags = reinterpret_cast<MapData::MiniTileMaps_type*>(getFileBuffer(vf4FileName.c_str()));
 
-
 		// Load Map Tiles
 		DWORD chunkSize = 0;
-		MapData::TileArray = reinterpret_cast<TileID*>(getChunkPointer("MTXM", CHKdata, dataSize, &chunkSize));
-
+		unsigned char* mtxm = newMTXM(CHKdata, dataSize, width, height, chunkSize);
+		MapData::TileArray = reinterpret_cast<TileID*>(mtxm);
 
 		// Set walkability
 		MapData::rawWalkability.resize(MapData::mapWidthWalkRes, MapData::mapHeightWalkRes);
 		setOfflineWalkability(MapData::rawWalkability);
-		// Test walkability data
-		MapData::rawWalkability.saveToFile("logs/rawWalkability.txt");
-
+//		MapData::rawWalkability.saveToFile("logs/rawWalkability.txt");
 
 		// Set buildability
 		MapData::buildability.resize(MapData::mapWidthTileRes, MapData::mapHeightTileRes);
 		setOfflineBuildability(MapData::buildability);
-		// Test buildability data
-		MapData::buildability.saveToFile("logs/buildable.txt");
+//		MapData::buildability.saveToFile("logs/buildable.txt");
 
 
 		delete CHKdata;
+		delete mtxm;
 		std::cout << "END PARSING FILE" << std::endl;
 		return true;
 	}
