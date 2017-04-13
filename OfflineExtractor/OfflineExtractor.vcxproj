@@ -143,6 +143,7 @@
     <ClCompile Include="sha1.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ChkDataTypes.h" />
     <ClInclude Include="MapFileParser.h" />
     <ClInclude Include="MiniTileFlags.h" />
     <ClInclude Include="TileSet.h" />

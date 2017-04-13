@@ -30,5 +30,8 @@
     <ClInclude Include="sha1.h">
       <Filter>Offline</Filter>
     </ClInclude>
+    <ClInclude Include="ChkDataTypes.h">
+      <Filter>Offline</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
