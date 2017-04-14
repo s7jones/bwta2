@@ -18,7 +18,6 @@
 #include <BWAPI.h>
 
 // BOOST
-#include <boost/filesystem.hpp>
 #pragma warning(disable: 4244) // known precision conversion warning with algorithms::buffer http://lists.boost.org/boost-users/2015/05/84281.php
 #include <boost/geometry.hpp>
 #pragma warning(default: 4244) 
@@ -27,11 +26,8 @@
 #include <boost/polygon/polygon.hpp>
 namespace bgi = boost::geometry::index;
 
-#include <boost/geometry.hpp>
-#include <boost/geometry/geometries/point_xy.hpp>
-
-using BoostPoint = boost::geometry::model::d2::point_xy < double > ;
-using BoostPolygon = boost::geometry::model::polygon < BoostPoint > ;
+using BoostPoint = boost::geometry::model::d2::point_xy<double>;
+using BoostPolygon = boost::geometry::model::polygon<BoostPoint>;
 
 #define PI 3.1415926
 

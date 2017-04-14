@@ -1,8 +1,6 @@
 #pragma once
 
-#include <windows.h>
 #include "../BWTA/Source/MapData.h"
-
 
 namespace BWTA
 {

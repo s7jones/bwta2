@@ -1,4 +1,5 @@
 #include "Utils.h"
+#include "filesystem/path.h"
 
 namespace BWTA
 {
@@ -122,7 +123,8 @@ namespace BWTA
 
 	bool isFileVersionCorrect(std::string filename)
 	{
-		if (boost::filesystem::exists(filename)) {
+		filesystem::path filePath(filesystem::path::get_cwd() / filename);
+		if (filePath.exists()) {
 			// get file version
 			std::ifstream file_in;
 			file_in.open(filename.c_str());

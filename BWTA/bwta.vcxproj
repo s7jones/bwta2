@@ -306,6 +306,10 @@
     <ClInclude Include="Source\ChokepointImpl.h" />
     <ClInclude Include="Source\ClosestObjectMap.h" />
     <ClInclude Include="Source\BaseLocationGenerator.h" />
+    <ClInclude Include="Source\filesystem\fwd.h" />
+    <ClInclude Include="Source\filesystem\path.h" />
+    <ClInclude Include="Source\filesystem\path_impl.h" />
+    <ClInclude Include="Source\filesystem\resolver.h" />
     <ClInclude Include="Source\GraphColoring.h" />
     <ClInclude Include="Source\LoadData.h" />
     <ClInclude Include="Source\MapData.h" />

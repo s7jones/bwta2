@@ -19,6 +19,9 @@
     <Filter Include="Interface Implementation">
       <UniqueIdentifier>{c14715b4-7aaf-48c3-b447-c47697b7ab90}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Utils\filesystem">
+      <UniqueIdentifier>{b3d626d2-34e2-4233-8244-0c633d2135b8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\BalanceMetrics.cpp">
@@ -149,6 +152,18 @@
     </ClInclude>
     <ClInclude Include="Source\PolygonImpl.h">
       <Filter>Interface Implementation</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\filesystem\fwd.h">
+      <Filter>Utils\filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\filesystem\path.h">
+      <Filter>Utils\filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\filesystem\path_impl.h">
+      <Filter>Utils\filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\filesystem\resolver.h">
+      <Filter>Utils\filesystem</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

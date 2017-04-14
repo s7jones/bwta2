@@ -8,6 +8,7 @@
 #include "PolygonGenerator.h"
 #include "RegionGenerator.h"
 #include "ClosestObjectMap.h"
+#include "filesystem/path.h"
 
 namespace BWTA
 {
@@ -26,10 +27,8 @@ namespace BWTA
 
 		// Verify if "BWTA2" directory exists, and create it if it doesn't.
 		std::string bwtaPath(BWTA_PATH);
-		if (!boost::filesystem::exists(bwtaPath)) {
-			boost::filesystem::path dir(bwtaPath);
-			boost::filesystem::create_directories(dir);
-		}
+		filesystem::path bwtaFolder(filesystem::path::get_cwd() / bwtaPath);
+		if (!bwtaFolder.exists()) bwtaFolder.mkdirp();
 
 		std::string filename = bwtaPath + MapData::hash + ".bwta";
 

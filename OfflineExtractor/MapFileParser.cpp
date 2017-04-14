@@ -1,12 +1,9 @@
 #include "MapFileParser.h"
 
-#include <direct.h>
-#include <bitset>
-#include <StormLib.h>
-#include <iostream>
 #include <fstream>
-#include <boost/filesystem.hpp>
-#include "../BWTA/Source/TileType.h"
+#include <direct.h>
+#include <StormLib.h>
+#include "../BWTA/Source/filesystem/path.h"
 #include "sha1.h"
 #include "TileSet.h"
 #include "MiniTileFlags.h"
@@ -330,11 +327,9 @@ namespace BWTA
 
 	bool parseMapFile(const char* mapFilePath)
 	{
-		// check if logs folder exists
-		if (!boost::filesystem::exists("logs")) {
-			boost::filesystem::path dir("logs");
-			boost::filesystem::create_directories(dir);
-		}
+		// make sure log folder exists
+		filesystem::path logFolder(filesystem::path::get_cwd() / "logs");
+		if (!logFolder.exists()) logFolder.mkdirp();
 
 		// Save map name
 		std::string strName = mapFilePath;
