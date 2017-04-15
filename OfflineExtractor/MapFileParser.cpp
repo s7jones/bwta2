@@ -67,10 +67,10 @@ namespace BWTA
 	Goes over the CHK data printing the different chunk types and their lengths
 	(this function is for debugging only)
 	*/
-	void printCHKchunks(unsigned char *CHKdata, DWORD size) {
+	void printCHKchunks(unsigned char *CHKdata, DWORD CHKdataSize) {
 		DWORD position = 0;
 
-		while (position<size) {
+		while (position < CHKdataSize) {
 			ChkSection* section = reinterpret_cast<ChkSection*>(CHKdata+position);
 			position += sizeof(ChkSection);
 			// copy the name to end it with 0
@@ -85,53 +85,48 @@ namespace BWTA
 	/*
 	Finds a given chunk inside CHK data and returns a pointer to it, and its length (in 'desiredChunkLength')
 	*/
-	unsigned char* getChunkPointer(const char* desiredChunk, unsigned char* CHKdata, DWORD size, DWORD* chunkSize) {
-		DWORD position = 0;
-
-		while (position < size) {
-			ChkSection* section = reinterpret_cast<ChkSection*>(CHKdata+position);
-			position += sizeof(ChkSection);
+	unsigned char* getChunkPointer(const char* desiredChunk, DWORD& chunkSize, unsigned char* CHKdata, DWORD CHKdataSize, DWORD& offset) {
+		while (offset < CHKdataSize) {
+			ChkSection* section = reinterpret_cast<ChkSection*>(CHKdata+offset);
+			offset += sizeof(ChkSection);
 			// copy the name to end it with 0
 			char chunkName[5] = {0};
 			memcpy(chunkName,&section[0].name,4);
 
 			if (strcmp(desiredChunk, reinterpret_cast<char*>(chunkName)) == 0) {
-				*chunkSize = section[0].size;
-				return CHKdata + position;
+				unsigned char* chunkData = CHKdata + offset;
+				chunkSize = section[0].size;
+				offset += section[0].size;
+				return chunkData;
 			}
-			position += section[0].size;
+			offset += section[0].size;
 		}
 		return nullptr;
 	}
 
-	unsigned char* newMTXM(unsigned char* CHKdata, DWORD size, uint32_t width, uint32_t height, DWORD& chunkSize) {
-		DWORD position = 0;
+	unsigned char* newMTXM(unsigned char* CHKdata, DWORD CHKdataSize, uint32_t width, uint32_t height) {
 		uint32_t expectedSize = width * height * 2;
 		unsigned char* chunkData = nullptr;
 
-		while (position < size) {
-			ChkSection* section = reinterpret_cast<ChkSection*>(CHKdata+position);
-			position += sizeof(ChkSection);
-			// copy the name to end it with 0
-			char chunkName[5] = {0};
-			memcpy(chunkName,&section[0].name,4);
+		DWORD chunkSize = 0;
+		DWORD offset = 0;
+		unsigned char* MTXMdata = getChunkPointer("MTXM", chunkSize, CHKdata, CHKdataSize, offset);
 
-			if (strcmp("MTXM", chunkName) == 0) {
-				chunkSize = section[0].size;
-				std::cout << "MTXM found with size " << chunkSize << " (" << expectedSize << " expected)";
-				if (chunkSize == expectedSize) {
-					chunkData = new unsigned char[chunkSize];
-					memcpy(chunkData, CHKdata+position, chunkSize);
-				} else if (chunkData && chunkSize < expectedSize) {
-					memcpy(chunkData, CHKdata+position, chunkSize); // overwrite from the begining
-					std::cout << " overwrite to previous one from the begining";
-				} else {
-					std::cout << " omitted";
-				}
-				std::cout << '\n';
+		while (MTXMdata) {
+			std::cout << "MTXM found with size " << chunkSize << " (" << expectedSize << " expected)";
+			if (chunkSize == expectedSize) {
+				chunkData = new unsigned char[chunkSize];
+				memcpy(chunkData, MTXMdata, chunkSize);
+			} else if (chunkData && chunkSize < expectedSize) {
+				memcpy(chunkData, MTXMdata, chunkSize); // overwrite from the begining
+				std::cout << " overwrite to previous one from the begining";
+			} else {
+				std::cout << " omitted";
 			}
+			std::cout << '\n';
 
-			position += section[0].size;
+			// search if there is another MTXM chunk
+			MTXMdata = getChunkPointer("MTXM", chunkSize, CHKdata, CHKdataSize, offset);
 		}
 		return chunkData;
 	}
@@ -140,14 +135,17 @@ namespace BWTA
 	/*
 	This function gets the dimensions of a StarCraft map from the CHKdata, and returns them in 'width', and 'height'
 	*/
-	void getDimensions(unsigned char* CHKdata, DWORD size, unsigned int& width, unsigned int& height) {
+	void getDimensions(unsigned char* CHKdata, DWORD CHKdataSize, unsigned int& width, unsigned int& height) {
 		DWORD chunkSize = 0;
-		unsigned char* DIMdata = getChunkPointer("DIM ", CHKdata, size, &chunkSize);
+		DWORD offset = 0;
+		unsigned char* DIMdata = getChunkPointer("DIM ", chunkSize, CHKdata, CHKdataSize, offset);
 
-		if (DIMdata != nullptr) {
+		if (DIMdata) {
 			ChkDim* dim = reinterpret_cast<ChkDim*>(DIMdata);
 			width = dim[0].width;
 			height = dim[0].height;
+		} else {
+			std::cout << "[ERROR] Map dimensions not found\n";
 		}
 	}
 
@@ -156,12 +154,12 @@ namespace BWTA
 	This function will decode the unit information from a CHK map, and return a list of all the units with their
 	types, players and coordinates.
 	*/
-	void getUnits(unsigned char* CHKdata, DWORD size) {
-		// TODO we can have multiple UNIT chunks
+	void getUnits(unsigned char* CHKdata, DWORD CHKdataSize) {
 		DWORD chunkSize = 0;
-		unsigned char* UNITdata = getChunkPointer("UNIT", CHKdata, size, &chunkSize);
+		DWORD offset = 0;
+		unsigned char* UNITdata = getChunkPointer("UNIT", chunkSize, CHKdata, CHKdataSize, offset);
 
-		if (UNITdata != nullptr) {
+		while (UNITdata) {
 			int nUnits = chunkSize / sizeof(ChkUnit);
 			std::cout << "UNIT found with " << nUnits << " units\n";
 
@@ -171,9 +169,8 @@ namespace BWTA
 				BWAPI::Position pos(chkUnit[i].x, chkUnit[i].y);
 //				BWAPI::WalkPosition unitWalkPosition(unitPosition);
 				BWAPI::TilePosition unitTilePosition((pos.x - unitType.dimensionLeft()) / TILE_SIZE, (pos.y - unitType.dimensionUp()) / TILE_SIZE);
-				if (VERBOSE) {
+				if (VERBOSE)
 					std::cout << "Unit " << unitType << " at " << pos.x << "," << pos.y << "\n";
-				}
 
 				if (unitType.isMineralField() || unitType == BWAPI::UnitTypes::Resource_Vespene_Geyser) {
 					MapData::resources.emplace_back(unitType, unitTilePosition, chkUnit[i].resourceAmount);
@@ -183,6 +180,9 @@ namespace BWTA
 					if (VERBOSE) std::cout << "Ignored unit: " << unitType << " at " << pos.x << "," << pos.y << std::endl;
 				}
 			}
+
+			// search if there is another UNIT chunk
+			UNITdata = getChunkPointer("UNIT", chunkSize, CHKdata, CHKdataSize, offset);
 		}
 	}
 
@@ -190,16 +190,16 @@ namespace BWTA
 	This function decode the doodads information from a CHK map, 
 	and store the neutral buildings positions in MapData::staticNeutralBuildings
 	*/
-	void getDoodads(unsigned char* CHKdata, DWORD size) {
-		// TODO we can have multiple THG2 chunks
+	void getDoodads(unsigned char* CHKdata, DWORD CHKdataSize) {
 		DWORD chunkSize = 0;
-		unsigned char* UNITdata = getChunkPointer("THG2", CHKdata, size, &chunkSize);
+		DWORD offset = 0;
+		unsigned char* THG2data = getChunkPointer("THG2", chunkSize, CHKdata, CHKdataSize, offset);
 
-		if (UNITdata != nullptr) {
+		while (THG2data) {
 			int nDoodads = chunkSize / sizeof(ChkDoodad);
 			std::cout << "THG2 found with " << nDoodads << " doodads\n";
 
-			ChkDoodad* chkDoodad = reinterpret_cast<ChkDoodad*>(UNITdata);
+			ChkDoodad* chkDoodad = reinterpret_cast<ChkDoodad*>(THG2data);
 			for (int i = 0; i < nDoodads; ++i) {
 				bool isSprite = chkDoodad[i].flags >> 12 & 1;
 
@@ -213,6 +213,9 @@ namespace BWTA
 						std::cout << "Ignored Sprite " << chkDoodad[i].ID << " at " << chkDoodad[i].x << "," << chkDoodad[i].y <<  std::endl;
 				}
 			}
+
+			// search if there is another THG2 chunk
+			THG2data = getChunkPointer("THG2", chunkSize, CHKdata, CHKdataSize, offset);
 		}
 	}
 
@@ -221,7 +224,8 @@ namespace BWTA
 	*/
 	unsigned int getTileset(unsigned char* CHKdata, DWORD size) {
 		DWORD chunkSize = 0;
-		unsigned char* ERAdata = getChunkPointer("ERA ", CHKdata, size, &chunkSize);
+		DWORD offset = 0;
+		unsigned char* ERAdata = getChunkPointer("ERA ", chunkSize, CHKdata, size, offset);
 
 		if (ERAdata != nullptr) {
 			// StarCraft masks the tileset indicator's bit value, 
@@ -290,9 +294,7 @@ namespace BWTA
 		for (unsigned int x = 0; x < MapData::mapWidthTileRes; ++x) {
 			TileID tileID = getTile(x, y);
 //			TileID id = tileID >> 4  & 0x7FF;
-//			if (id > 1024) {
-//				std::cout << "Doodad " << id << " found at " << x << "," << y << "\n";
-//			}
+//			if (id > 1024) std::cout << "Doodad " << id << " found at " << x << "," << y << "\n";
 			TileType* tile = TileSet::getTileType(tileID);
 			buildability[x][y] = (tile->buildability & (1 << 7)) == 0;
 		}
@@ -402,8 +404,7 @@ namespace BWTA
 		MapData::MiniTileFlags = reinterpret_cast<MapData::MiniTileMaps_type*>(getFileBuffer(vf4FileName.c_str()));
 
 		// Load Map Tiles
-		DWORD chunkSize = 0;
-		unsigned char* mtxm = newMTXM(CHKdata, dataSize, width, height, chunkSize);
+		unsigned char* mtxm = newMTXM(CHKdata, dataSize, width, height);
 		MapData::TileArray = reinterpret_cast<TileID*>(mtxm);
 
 		// Set walkability
