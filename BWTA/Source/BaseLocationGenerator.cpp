@@ -62,6 +62,20 @@ namespace BWTA
 		return retIndexes;
 	}
 
+	BWAPI::TilePosition getBestTile(const RectangleArray<int>& tileScores, int minX, int maxX, int minY, int maxY) 
+	{
+		BWAPI::TilePosition bestTile = BWAPI::TilePositions::None;
+		int maxScore = 0;
+		for (int x = minX; x < maxX; ++x)
+		for (int y = minY; y < maxY; ++y) {
+			if (tileScores[x][y] > maxScore) {
+				maxScore = tileScores[x][y];
+				bestTile = BWAPI::TilePosition(x, y);
+			}
+		}
+		return bestTile;
+	}
+
 	void detectBaseLocations(std::set<BaseLocation*>& baseLocations)
 	{
 		Timer timer;
@@ -176,14 +190,37 @@ namespace BWTA
 		std::deque<BWAPI::TilePosition> startLocations = MapData::startLocations;
 
 		for (const auto& cluster : clusters) {
+			// if all resources are empty, they are blocking a path
+			bool allEmpty = true;
+			for (const auto& r : cluster) {
+				if (r.amount > 200) {
+					allEmpty = false;
+					break;
+				}
+			}
+			if (allEmpty) {
+				// TODO update blocking path
+				LOG(" - [WARNING] Skipped 'empty' cluster, probably mineral blocking path");
+				continue;
+			}
 			int clusterMaxX = 0;
 			int clusterMinX = maxWidth;
 			int clusterMaxY = 0;
 			int clusterMinY = maxHeight;
+			// get the region label from the first resource
 			BWAPI::WalkPosition clusterWalkPos(cluster.front().pos);
-			int clusterRegionLabel = BWTA_Result::regionLabelMap[clusterWalkPos.x][clusterWalkPos.y];
+			// hotfix to avoid top row (since it's always marked as unwalkable) TODO check why
+			int tmpY = std::max (1,clusterWalkPos.y);
+			int clusterRegionLabel = BWTA_Result::regionLabelMap[clusterWalkPos.x][tmpY];
+//			LOG("Cluster RegionLabelID: " << clusterRegionLabel << " at Tile:" << cluster.front().pos << " walk:" << clusterWalkPos);
+			if (clusterRegionLabel == 0) {
+				LOG(" - [ERROR] Cluster in an unwalkable region");
+				continue;
+			}
 
 			for (const auto& resource : cluster) {
+//				LOG(" - " << resource.type << " at " << resource.pos << " amount resources: " << resource.amount);
+				if (resource.amount <= 200) continue;
 				// TODO add methods to update bounding boxes
 				// bounding box of current resource influence
 				BWAPI::TilePosition topLeft(resource.pos);
@@ -204,8 +241,8 @@ namespace BWTA
 				// updating score inside the bounding box
 				for (int x = minX; x < maxX; ++x) {
 					for (int y = minY; y < maxY; ++y) {
-//						if (baseBuildMap[x][y] && clusterRegionLabel == BWTA_Result::regionLabelMap[x*4][y*4]) {
-						if (clusterRegionLabel == BWTA_Result::regionLabelMap[x*4][y*4]) {
+						if (baseBuildMap[x][y] && clusterRegionLabel == BWTA_Result::regionLabelMap[x*4][y*4]) {
+//						if (clusterRegionLabel == BWTA_Result::regionLabelMap[x*4][y*4]) {
 							int dx = 0;
 							// check if x is outside resource bounding box
 							if (x+3 < topLeft.x) dx = topLeft.x - (x+3);
@@ -228,35 +265,44 @@ namespace BWTA
 				clusterMinY = std::min(minY, clusterMinY);
 			}
 
-			BWAPI::TilePosition bestTile = BWAPI::TilePositions::None;
-			int maxScore = 0;
-			for (int x = clusterMinX; x < clusterMaxX; ++x)
-			for (int y = clusterMinY; y < clusterMaxY; ++y) {
-				if (baseBuildMap[x][y]) {
-					if (tileScores[x][y] > maxScore) {
-						maxScore = tileScores[x][y];
-						bestTile = BWAPI::TilePosition(x, y);
+			BWAPI::TilePosition bestTile = getBestTile(tileScores, clusterMinX, clusterMaxX, clusterMinY, clusterMaxY);
+
+			if (bestTile != BWAPI::TilePositions::None) {
+				// if there is already a baseLoctaion too close, merge them
+				bool baseLocationMerged = false;
+				for (auto& b : baseLocations) {
+					if (b->getTilePosition().getApproxDistance(bestTile) < 5) {
+						BaseLocationImpl* bi = static_cast<BaseLocationImpl*>(b);
+						int minX = std::min(bestTile.x, b->getTilePosition().x);
+						int maxX = std::max(bestTile.x, b->getTilePosition().x);
+						int minY = std::min(bestTile.y, b->getTilePosition().y);
+						int maxY = std::max(bestTile.y, b->getTilePosition().y);
+						bi->setTile(getBestTile(tileScores, minX-5, maxX+5, minY-5, maxY+5));
+						bi->resources.insert(bi->resources.end(), cluster.begin(), cluster.end());
+						baseLocationMerged = true;
+//						LOG(" - Two baseLocation merged");
+						break;
 					}
 				}
-			}
-
-			if (maxScore > 0) {
-				BaseLocationImpl* b = new BaseLocationImpl(bestTile, cluster);
-				baseLocations.insert(b);
-				// check if it is a start location
-				for (auto it = startLocations.begin(); it != startLocations.end(); ++it) {
-					int distance = it->getApproxDistance(bestTile);
-					if (distance < MAX_INFLUENCE_DISTANCE_RADIUS) {
-						b->_isStartLocation = true;
-						BWTA_Result::startlocations.insert(b);
-						startLocations.erase(it);
-						break;
+				if (!baseLocationMerged) {
+					BaseLocationImpl* b = new BaseLocationImpl(bestTile, cluster);
+					baseLocations.insert(b);
+					// check if it is a start location
+					for (auto it = startLocations.begin(); it != startLocations.end(); ++it) {
+						int distance = it->getApproxDistance(bestTile);
+						if (distance < MAX_INFLUENCE_DISTANCE_RADIUS) {
+							b->_isStartLocation = true;
+							BWTA_Result::startlocations.insert(b);
+							startLocations.erase(it);
+							break;
+						}
 					}
 				}
 			} else {
 				LOG(" - [ERROR] No BaseLocation found for a cluster");
 			}
 		}
+//		BWTA_Result::regionLabelMap.saveToFile("logs/regionLabelMap.txt", ',');
 //		tileScores.saveToFile("logs/tileScores.txt", ',');
 		if (!startLocations.empty()) LOG(" - [ERROR] " << startLocations.size() << " start locations not found.");
 

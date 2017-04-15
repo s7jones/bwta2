@@ -49,4 +49,10 @@ namespace BWTA
 		if (it == airDistances.end()) return -1;
 		return (*it).second;
 	}
+
+	void BaseLocationImpl::setTile(BWAPI::TilePosition tilePos)
+	{
+		tilePosition = tilePos;
+		position = BWAPI::Position(tilePosition);
+	}
 }
