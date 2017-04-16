@@ -2,9 +2,10 @@
 
 #include <fstream>
 #include <direct.h>
-#include <StormLib.h>
+#define __STORMLIB_SELF__
+#include "StormLib/StormLib.h"
 #include "../BWTA/Source/filesystem/path.h"
-#include "sha1.h"
+#include "sha1Lib.h"
 #include "TileSet.h"
 #include "MiniTileFlags.h"
 #include "ChkDataTypes.h"
@@ -33,10 +34,12 @@ namespace BWTA
 	*/
 	unsigned char* extractCHKfile(const char* archive, DWORD* dataSize)
 	{
+		DWORD dwFlags = STREAM_PROVIDER_FLAT | BASE_PROVIDER_MAP | STREAM_FLAG_READ_ONLY;
 		// Open MPQ
 		HANDLE hMpq;
-		if (!SFileOpenArchive(archive, 0, SFILE_OPEN_FROM_MPQ, &hMpq)) {
+		if (!SFileOpenArchive(archive, 0, dwFlags, &hMpq)) {
 			printError(archive, "Cannot open archive", archive, GetLastError());
+//			std::cout << "Error number: " << GetLastError() << '\n';
 			return nullptr;
 		}
 

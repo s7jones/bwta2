@@ -8,13 +8,796 @@
     <ClCompile Include="TileSet.cpp">
       <Filter>Offline</Filter>
     </ClCompile>
-    <ClCompile Include="sha1.cpp">
+    <ClCompile Include="StormLib\FileStream.cpp">
+      <Filter>StormLib</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\SBaseCommon.cpp">
+      <Filter>StormLib</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\SBaseDumpData.cpp">
+      <Filter>StormLib</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\SBaseFileTable.cpp">
+      <Filter>StormLib</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\SBaseSubTypes.cpp">
+      <Filter>StormLib</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\SCompression.cpp">
+      <Filter>StormLib</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\SFileAddFile.cpp">
+      <Filter>StormLib</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\SFileAttributes.cpp">
+      <Filter>StormLib</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\SFileCompactArchive.cpp">
+      <Filter>StormLib</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\SFileCreateArchive.cpp">
+      <Filter>StormLib</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\SFileExtractFile.cpp">
+      <Filter>StormLib</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\SFileFindFile.cpp">
+      <Filter>StormLib</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\SFileGetFileInfo.cpp">
+      <Filter>StormLib</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\SFileListFile.cpp">
+      <Filter>StormLib</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\SFileOpenArchive.cpp">
+      <Filter>StormLib</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\SFileOpenFileEx.cpp">
+      <Filter>StormLib</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\SFilePatchArchives.cpp">
+      <Filter>StormLib</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\SFileReadFile.cpp">
+      <Filter>StormLib</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\SFileVerify.cpp">
+      <Filter>StormLib</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\adpcm\adpcm.cpp">
+      <Filter>StormLib\adpcm</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\bzip2\blocksort.c">
+      <Filter>StormLib\bzip2</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\bzip2\bzlib.c">
+      <Filter>StormLib\bzip2</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\bzip2\compress.c">
+      <Filter>StormLib\bzip2</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\bzip2\crctable.c">
+      <Filter>StormLib\bzip2</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\bzip2\decompress.c">
+      <Filter>StormLib\bzip2</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\bzip2\huffman.c">
+      <Filter>StormLib\bzip2</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\bzip2\randtable.c">
+      <Filter>StormLib\bzip2</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\huffman\huff.cpp">
+      <Filter>StormLib\huffman</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\jenkins\lookup3.c">
+      <Filter>StormLib\jenkins</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\hashes\hash_memory.c">
+      <Filter>StormLib\libtomcrypt\hashes</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\hashes\md5.c">
+      <Filter>StormLib\libtomcrypt\hashes</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\hashes\sha1.c">
+      <Filter>StormLib\libtomcrypt\hashes</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\math\ltm_desc.c">
+      <Filter>StormLib\libtomcrypt\math</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\math\multi.c">
+      <Filter>StormLib\libtomcrypt\math</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\math\rand_prime.c">
+      <Filter>StormLib\libtomcrypt\math</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\misc\base64_decode.c">
+      <Filter>StormLib\libtomcrypt\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\misc\crypt_argchk.c">
+      <Filter>StormLib\libtomcrypt\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\misc\crypt_find_hash.c">
+      <Filter>StormLib\libtomcrypt\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\misc\crypt_find_prng.c">
+      <Filter>StormLib\libtomcrypt\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\misc\crypt_hash_descriptor.c">
+      <Filter>StormLib\libtomcrypt\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\misc\crypt_hash_is_valid.c">
+      <Filter>StormLib\libtomcrypt\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\misc\crypt_libc.c">
+      <Filter>StormLib\libtomcrypt\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\misc\crypt_ltc_mp_descriptor.c">
+      <Filter>StormLib\libtomcrypt\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\misc\crypt_prng_descriptor.c">
+      <Filter>StormLib\libtomcrypt\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\misc\crypt_prng_is_valid.c">
+      <Filter>StormLib\libtomcrypt\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\misc\crypt_register_hash.c">
+      <Filter>StormLib\libtomcrypt\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\misc\crypt_register_prng.c">
+      <Filter>StormLib\libtomcrypt\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\misc\zeromem.c">
+      <Filter>StormLib\libtomcrypt\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_decode_bit_string.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_decode_boolean.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_decode_choice.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_decode_ia5_string.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_decode_integer.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_decode_object_identifier.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_decode_octet_string.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_decode_printable_string.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_decode_sequence_ex.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_decode_sequence_flexi.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_decode_sequence_multi.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_decode_short_integer.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_decode_utctime.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_decode_utf8_string.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_encode_bit_string.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_encode_boolean.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_encode_ia5_string.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_encode_integer.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_encode_object_identifier.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_encode_octet_string.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_encode_printable_string.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_encode_sequence_ex.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_encode_sequence_multi.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_encode_set.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_encode_setof.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_encode_short_integer.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_encode_utctime.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_encode_utf8_string.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_length_bit_string.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_length_boolean.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_length_ia5_string.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_length_integer.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_length_object_identifier.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_length_octet_string.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_length_printable_string.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_length_sequence.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_length_short_integer.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_length_utctime.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_length_utf8_string.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\asn1\der_sequence_free.c">
+      <Filter>StormLib\libtomcrypt\pk\asn1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\ecc\ltc_ecc_map.c">
+      <Filter>StormLib\libtomcrypt\pk\ecc</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\ecc\ltc_ecc_mul2add.c">
+      <Filter>StormLib\libtomcrypt\pk\ecc</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\ecc\ltc_ecc_mulmod.c">
+      <Filter>StormLib\libtomcrypt\pk\ecc</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\ecc\ltc_ecc_points.c">
+      <Filter>StormLib\libtomcrypt\pk\ecc</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\ecc\ltc_ecc_projective_add_point.c">
+      <Filter>StormLib\libtomcrypt\pk\ecc</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\ecc\ltc_ecc_projective_dbl_point.c">
+      <Filter>StormLib\libtomcrypt\pk\ecc</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\pkcs1\pkcs_1_mgf1.c">
+      <Filter>StormLib\libtomcrypt\pk\pkcs1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\pkcs1\pkcs_1_oaep_decode.c">
+      <Filter>StormLib\libtomcrypt\pk\pkcs1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\pkcs1\pkcs_1_pss_decode.c">
+      <Filter>StormLib\libtomcrypt\pk\pkcs1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\pkcs1\pkcs_1_pss_encode.c">
+      <Filter>StormLib\libtomcrypt\pk\pkcs1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\pkcs1\pkcs_1_v1_5_decode.c">
+      <Filter>StormLib\libtomcrypt\pk\pkcs1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\pkcs1\pkcs_1_v1_5_encode.c">
+      <Filter>StormLib\libtomcrypt\pk\pkcs1</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\rsa\rsa_exptmod.c">
+      <Filter>StormLib\libtomcrypt\pk\rsa</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\rsa\rsa_free.c">
+      <Filter>StormLib\libtomcrypt\pk\rsa</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\rsa\rsa_import.c">
+      <Filter>StormLib\libtomcrypt\pk\rsa</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\rsa\rsa_make_key.c">
+      <Filter>StormLib\libtomcrypt\pk\rsa</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\rsa\rsa_sign_hash.c">
+      <Filter>StormLib\libtomcrypt\pk\rsa</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\rsa\rsa_verify_hash.c">
+      <Filter>StormLib\libtomcrypt\pk\rsa</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtomcrypt\src\pk\rsa\rsa_verify_simple.c">
+      <Filter>StormLib\libtomcrypt\pk\rsa</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_fast_mp_invmod.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_fast_mp_montgomery_reduce.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_fast_s_mp_mul_digs.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_fast_s_mp_mul_high_digs.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_fast_s_mp_sqr.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_2expt.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_abs.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_add.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_add_d.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_addmod.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_and.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_clamp.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_clear.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_clear_multi.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_cmp.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_cmp_d.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_cmp_mag.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_cnt_lsb.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_copy.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_count_bits.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_div.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_div_2.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_div_2d.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_div_3.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_div_d.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_dr_is_modulus.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_dr_reduce.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_dr_setup.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_exch.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_expt_d.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_exptmod.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_exptmod_fast.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_exteuclid.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_fread.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_fwrite.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_gcd.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_get_int.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_grow.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_init.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_init_copy.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_init_multi.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_init_set.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_init_set_int.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_init_size.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_invmod.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_invmod_slow.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_is_square.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_jacobi.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_karatsuba_mul.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_karatsuba_sqr.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_lcm.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_lshd.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_mod.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_mod_2d.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_mod_d.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_montgomery_calc_normalization.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_montgomery_reduce.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_montgomery_setup.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_mul.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_mul_2.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_mul_2d.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_mul_d.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_mulmod.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_n_root.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_neg.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_or.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_prime_fermat.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_prime_is_divisible.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_prime_is_prime.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_prime_miller_rabin.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_prime_next_prime.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_prime_rabin_miller_trials.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_prime_random_ex.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_radix_size.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_radix_smap.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_rand.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_read_radix.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_read_signed_bin.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_read_unsigned_bin.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_reduce.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_reduce_2k.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_reduce_2k_l.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_reduce_2k_setup.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_reduce_2k_setup_l.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_reduce_is_2k.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_reduce_is_2k_l.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_reduce_setup.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_rshd.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_set.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_set_int.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_shrink.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_signed_bin_size.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_sqr.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_sqrmod.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_sqrt.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_sub.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_sub_d.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_submod.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_to_signed_bin.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_to_signed_bin_n.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_to_unsigned_bin.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_to_unsigned_bin_n.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_toom_mul.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_toom_sqr.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_toradix.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_toradix_n.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_unsigned_bin_size.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_xor.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_mp_zero.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_prime_tab.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_reverse.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_s_mp_add.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_s_mp_exptmod.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_s_mp_mul_digs.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_s_mp_mul_high_digs.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_s_mp_sqr.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bn_s_mp_sub.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\libtommath\bncore.c">
+      <Filter>StormLib\libtommath</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\lzma\C\LzFind.c">
+      <Filter>StormLib\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\lzma\C\LzFindMt.c">
+      <Filter>StormLib\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\lzma\C\LzmaDec.c">
+      <Filter>StormLib\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\lzma\C\LzmaEnc.c">
+      <Filter>StormLib\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\lzma\C\Threads.c">
+      <Filter>StormLib\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\zlib\adler32.c">
+      <Filter>StormLib\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\zlib\compress_zlib.c">
+      <Filter>StormLib\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\zlib\crc32.c">
+      <Filter>StormLib\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\zlib\deflate.c">
+      <Filter>StormLib\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\zlib\inffast.c">
+      <Filter>StormLib\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\zlib\inflate.c">
+      <Filter>StormLib\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\zlib\inftrees.c">
+      <Filter>StormLib\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\zlib\trees.c">
+      <Filter>StormLib\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\zlib\zutil.c">
+      <Filter>StormLib\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\sparse\sparse.cpp">
+      <Filter>StormLib\sparse</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\pklib\explode.c">
+      <Filter>StormLib\pklib</Filter>
+    </ClCompile>
+    <ClCompile Include="StormLib\pklib\implode.c">
+      <Filter>StormLib\pklib</Filter>
+    </ClCompile>
+    <ClCompile Include="sha1Lib.cpp">
       <Filter>Offline</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Offline">
       <UniqueIdentifier>{bccb24db-27d6-47ed-97e3-def48edef5cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="StormLib">
+      <UniqueIdentifier>{4111067c-843e-4f6e-8b6b-964b09e722d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="StormLib\adpcm">
+      <UniqueIdentifier>{2e6377e7-fe9f-4432-9183-162597c2b64b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="StormLib\bzip2">
+      <UniqueIdentifier>{69d0631c-7b97-45f6-b8d7-cf265bbe4d0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="StormLib\huffman">
+      <UniqueIdentifier>{cba14166-c22a-4dfc-85c2-b1937b2367db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="StormLib\jenkins">
+      <UniqueIdentifier>{96e65bfb-41c6-48f6-8a1e-762355f4dac6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="StormLib\libtomcrypt">
+      <UniqueIdentifier>{868b8584-009f-4bf8-a89a-fbd299cf313c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="StormLib\libtommath">
+      <UniqueIdentifier>{795b15b4-027e-48df-bc0c-b05365b717ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="StormLib\lzma">
+      <UniqueIdentifier>{24dc3acf-fb27-44da-a4ee-85694dcdffb2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="StormLib\pklib">
+      <UniqueIdentifier>{761fb379-a755-4b49-9a13-4f9a9ae6ec28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="StormLib\sparse">
+      <UniqueIdentifier>{a5fc7d50-6869-4388-b1fc-fc500406b642}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="StormLib\zlib">
+      <UniqueIdentifier>{dd63e194-480d-4ddb-9a6c-d4db3a5b2880}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="StormLib\libtomcrypt\hashes">
+      <UniqueIdentifier>{ce9ae188-b8f3-4e14-b9d0-b7fd56e4f349}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="StormLib\libtomcrypt\math">
+      <UniqueIdentifier>{e4e37d91-3a21-4e92-927e-ebbd7f821e7c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="StormLib\libtomcrypt\misc">
+      <UniqueIdentifier>{bd5abc4f-8a3f-48d9-96e0-edf5e21a5a33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="StormLib\libtomcrypt\pk">
+      <UniqueIdentifier>{b2ad67d6-e44b-462f-84a8-10c0f929c7e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="StormLib\libtomcrypt\pk\asn1">
+      <UniqueIdentifier>{3fd4de60-1aa7-46de-bf86-1fc5fddac590}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="StormLib\libtomcrypt\pk\ecc">
+      <UniqueIdentifier>{879c6bb1-1ad7-45e7-bae4-f26e2b55a409}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="StormLib\libtomcrypt\pk\pkcs1">
+      <UniqueIdentifier>{b7242bef-ae2a-4419-b068-d02282ea41e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="StormLib\libtomcrypt\pk\rsa">
+      <UniqueIdentifier>{766dc02c-9154-4380-a84d-095e70da0bdd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -27,10 +810,73 @@
     <ClInclude Include="TileSet.h">
       <Filter>Offline</Filter>
     </ClInclude>
-    <ClInclude Include="sha1.h">
+    <ClInclude Include="ChkDataTypes.h">
       <Filter>Offline</Filter>
     </ClInclude>
-    <ClInclude Include="ChkDataTypes.h">
+    <ClInclude Include="StormLib\FileStream.h">
+      <Filter>StormLib</Filter>
+    </ClInclude>
+    <ClInclude Include="StormLib\StormCommon.h">
+      <Filter>StormLib</Filter>
+    </ClInclude>
+    <ClInclude Include="StormLib\StormLib.h">
+      <Filter>StormLib</Filter>
+    </ClInclude>
+    <ClInclude Include="StormLib\StormPort.h">
+      <Filter>StormLib</Filter>
+    </ClInclude>
+    <ClInclude Include="StormLib\adpcm\adpcm.h">
+      <Filter>StormLib\adpcm</Filter>
+    </ClInclude>
+    <ClInclude Include="StormLib\bzip2\bzlib.h">
+      <Filter>StormLib\bzip2</Filter>
+    </ClInclude>
+    <ClInclude Include="StormLib\bzip2\bzlib_private.h">
+      <Filter>StormLib\bzip2</Filter>
+    </ClInclude>
+    <ClInclude Include="StormLib\huffman\huff.h">
+      <Filter>StormLib\huffman</Filter>
+    </ClInclude>
+    <ClInclude Include="StormLib\jenkins\lookup.h">
+      <Filter>StormLib\jenkins</Filter>
+    </ClInclude>
+    <ClInclude Include="StormLib\libtommath\tommath.h">
+      <Filter>StormLib\libtommath</Filter>
+    </ClInclude>
+    <ClInclude Include="StormLib\libtommath\tommath_class.h">
+      <Filter>StormLib\libtommath</Filter>
+    </ClInclude>
+    <ClInclude Include="StormLib\libtommath\tommath_superclass.h">
+      <Filter>StormLib\libtommath</Filter>
+    </ClInclude>
+    <ClInclude Include="StormLib\lzma\C\LzFind.h">
+      <Filter>StormLib\lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="StormLib\lzma\C\LzFindMt.h">
+      <Filter>StormLib\lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="StormLib\lzma\C\LzHash.h">
+      <Filter>StormLib\lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="StormLib\lzma\C\LzmaDec.h">
+      <Filter>StormLib\lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="StormLib\lzma\C\LzmaEnc.h">
+      <Filter>StormLib\lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="StormLib\lzma\C\Threads.h">
+      <Filter>StormLib\lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="StormLib\lzma\C\Types.h">
+      <Filter>StormLib\lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="StormLib\sparse\sparse.h">
+      <Filter>StormLib\sparse</Filter>
+    </ClInclude>
+    <ClInclude Include="StormLib\pklib\pklib.h">
+      <Filter>StormLib\pklib</Filter>
+    </ClInclude>
+    <ClInclude Include="sha1Lib.h">
       <Filter>Offline</Filter>
     </ClInclude>
   </ItemGroup>
