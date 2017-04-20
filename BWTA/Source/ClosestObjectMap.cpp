@@ -1,4 +1,6 @@
 #include "ClosestObjectMap.h"
+#include "Utils.h"
+#include "BWTA_Result.h"
 
 namespace BWTA
 {

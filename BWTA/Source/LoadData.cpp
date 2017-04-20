@@ -159,12 +159,6 @@ namespace BWTA
 		}
 
 		// smooth borders
-//		for (size_t x = 1; x < maxWidth1; ++x) {
-//			if (!MapData::walkability[x - 1][0] && MapData::walkability[x][0] && 
-//				(!MapData::walkability[x + 1][0] || !MapData::walkability[x][1])) {
-//				MapData::walkability[x][0] = false;
-//			}
-//		}
 		for (size_t x = 1; x < maxWidth1; ++x) {
 			if (!MapData::walkability[x][0]) {
 				MapData::walkability[x][3] = false;

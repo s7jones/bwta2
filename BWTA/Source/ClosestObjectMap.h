@@ -1,5 +1,5 @@
-#include "Utils.h"
-#include "BWTA_Result.h"
+#pragma once
+
 #include "MapData.h"
 
 namespace BWTA
@@ -15,9 +15,9 @@ namespace BWTA
 			: x(xTmp), y(yTmp), objectRef(ref), distance(dis) {};
 	};
 
-	using baseDistance_t = objectDistance_t < BaseLocation* > ;
-	using chokeDistance_t = objectDistance_t < Chokepoint* > ;
-	using labelDistance_t = objectDistance_t < int > ;
+	using baseDistance_t = objectDistance_t<BaseLocation*> ;
+	using chokeDistance_t = objectDistance_t<Chokepoint*> ;
+	using labelDistance_t = objectDistance_t<int> ;
 
 	void computeAllClosestObjectMaps();
 }

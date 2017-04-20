@@ -116,6 +116,30 @@ namespace BWTA {
 		}
 	}
 
+	void Painter::drawCoverPoints(const std::vector<Region*>& regions, Scale toScale) 
+	{
+		int size = 6;
+		int middle = size / 2;
+		Scale fromScale = Painter::Scale::Walk;
+		double scale = getScale(fromScale, toScale);
+
+		painter.setPen(QPen(Qt::blue));
+		painter.setBrush(QBrush(Qt::blue));
+		
+		for (const auto& r : regions) {
+			for (const auto& p : r->getCoverPoints()) {
+				painter.drawEllipse((p.x - middle)*scale, (p.y - middle)*scale, size*scale, size*scale);
+			}
+		}
+
+		painter.setPen(QPen(Qt::red));
+		painter.setBrush(QBrush(Qt::red));
+		for (const auto& r : regions) {
+			BWAPI::WalkPosition p(r->getOpennessPosition());
+			painter.drawEllipse((p.x - middle)*scale, (p.y - middle)*scale, size*scale, size*scale);
+		}
+	}
+
 	QColor Painter::hsl2rgb(double h, double sl, double l)
 	{
 		double v;

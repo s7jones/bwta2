@@ -208,6 +208,84 @@ namespace BWTA
 		painter.drawBaseLocations(BWTA_Result::baselocations, imageScale);
 		painter.render("10-Final");
 #endif
+		timer.start();
+
+		// compute coverage points of each region
+		// TODO tile res should be enough
+		const int SIGHT_RANGE = 7 * 2 * 4; // SCV = 7 tiles * 2, transformed into walk tiles
+		for (auto region : BWTA_Result::regions) {
+			RegionImpl* r = dynamic_cast<RegionImpl*>(region);
+			// first coverage point is openness point
+			BWAPI::WalkPosition pos(r->_opennessPoint);
+			r->_coveragePositions.push_back(pos);
+			int regionID = BWTA_Result::regionLabelMap[pos.x][pos.y];
+
+			// compute max lenght of the bounding box
+			int minX = std::numeric_limits<int>::max();
+			int minY = std::numeric_limits<int>::max();
+			int maxX = 0;
+			int maxY = 0;
+			for (const auto& p : r->_polygon) {
+				minX = std::min(minX, p.x);
+				minY = std::min(minY, p.y);
+				maxX = std::max(maxX, p.x);
+				maxY = std::max(maxY, p.y);
+			}
+			int maxBoundingBoxLength = std::max(maxX-minX, maxY-minY);
+			maxBoundingBoxLength /= 16; // lenght is in pixel, translate to walkTiles
+			maxBoundingBoxLength *= 2;
+
+			//searches outward in a spiral.
+			int x      = pos.x;
+			int y      = pos.y;
+			int length = 1;
+			int j      = 0;
+			bool first = true;
+			int dx     = 0;
+			int dy     = 1;	
+			while (length < maxBoundingBoxLength) {
+				// if valid position
+				if (x >= 0 && x < BWTA_Result::regionLabelMap.getWidth() && 
+					y >= 0 && y < BWTA_Result::regionLabelMap.getHeight() &&
+					regionID == BWTA_Result::regionLabelMap[x][y]) {
+						// check if we are far enough
+						int minDistance = std::numeric_limits<int>::max();
+						for (const auto& coverPos : r->_coveragePositions) {
+							minDistance = std::min(minDistance, std::abs(coverPos.x-x)+std::abs(coverPos.y-y) );
+						}
+						if (minDistance > SIGHT_RANGE) r->_coveragePositions.emplace_back(x,y);
+				}
+
+				//otherwise, move to another position
+				x = x + dx;
+				y = y + dy;
+				//count how many steps we take in this direction
+				j++;
+				if (j == length) { //if we've reached the end, its time to turn
+					j = 0;
+					if (!first) length++;
+					first =! first;
+					//turn counter clockwise 90 degrees:
+					if (dx == 0) {
+						dx = dy;
+						dy = 0;
+					} else {
+						dy = -dx;
+						dx = 0;
+					}
+				}
+				//Spiral out. Keep going.
+			}
+		}
+
+		LOG(" [Calculated region coverage positions in " << timer.stopAndGetTime() << " seconds]");
+#ifdef DEBUG_DRAW
+		painter.drawPolygons(BWTA_Result::unwalkablePolygons, Painter::Scale::Walk, imageScale);
+		painter.drawRegions(BWTA_Result::regions, Painter::Scale::Pixel, imageScale);
+		painter.drawChokepoints(BWTA_Result::chokepoints, imageScale);
+		painter.drawCoverPoints(BWTA_Result::regions, imageScale);
+		painter.render("11-CoverPoints");
+#endif
 
 	}
 

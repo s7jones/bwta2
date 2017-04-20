@@ -25,6 +25,7 @@ namespace BWTA {
 		void drawPolygon(const Polygon& polygon, QColor fillColor, Scale fromScale = Scale::Pixel, Scale toScale = Scale::Pixel);
 		void drawPolygons(const std::vector<Polygon*>& polygons, Scale fromScale = Scale::Pixel, Scale toScale = Scale::Pixel);
 		void drawRegions(const std::vector<Region*>& regions, Scale fromScale = Scale::Pixel, Scale toScale = Scale::Pixel);
+		void drawCoverPoints(const std::vector<Region*>& regions, Scale toScale = Scale::Pixel);
 
 		void drawChokepoints(const std::set<Chokepoint*>& chokepoints, Scale toScale = Scale::Pixel);
 		void drawLine(const int& x1, const int& y1, const int& x2, const int& y2, double scale);

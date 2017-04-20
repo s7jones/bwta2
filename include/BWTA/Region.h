@@ -21,5 +21,6 @@ namespace BWTA
 		virtual const int getLabel() const = 0;
 		virtual const BWAPI::Position& getOpennessPosition() const = 0;
 		virtual const double getOpennessDistance() const = 0;
+		virtual const std::vector<BWAPI::WalkPosition>& getCoverPoints() const = 0;
 	};
 }
