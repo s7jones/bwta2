@@ -160,7 +160,8 @@ namespace BWTA
 
 		// smooth borders
 		for (size_t x = 1; x < maxWidth1; ++x) {
-			if (!MapData::walkability[x - 1][0] && MapData::walkability[x][0] && !MapData::walkability[x + 1][0]) {
+			if (!MapData::walkability[x - 1][0] && MapData::walkability[x][0] && 
+				(!MapData::walkability[x + 1][0] || !MapData::walkability[x][1])) {
 				MapData::walkability[x][0] = false;
 			}
 		}
@@ -170,9 +171,15 @@ namespace BWTA
 				MapData::walkability[x+1][0] = false;
 			}
 		}
-		for (size_t y = 1; y < maxHeight1; ++y) {
-			if (!MapData::walkability[0][y - 1] && MapData::walkability[0][y] && !MapData::walkability[0][y + 1]) {
-				MapData::walkability[0][y] = false;
+		for (size_t y = 0; y < maxHeight1; ++y) {
+			if (!MapData::walkability[0][y]) {
+				MapData::walkability[3][y] = false;
+				MapData::walkability[2][y] = false;
+				MapData::walkability[1][y] = false;
+			} else {
+				MapData::walkability[2][y] &= MapData::walkability[3][y];
+				MapData::walkability[1][y] &= MapData::walkability[2][y];
+				MapData::walkability[0][y] &= MapData::walkability[1][y];
 			}
 		}
 		for (size_t y = 1; y < maxHeight1; ++y) {
@@ -184,16 +191,14 @@ namespace BWTA
 		}
 
 		// set walkability to false on static buildings
-		int x1, y1, x2, y2;
-		BWAPI::UnitType unitType;
-		for (auto unit : MapData::staticNeutralBuildings) {
-			unitType = unit.first;
+		for (const auto& unit : MapData::staticNeutralBuildings) {
+			BWAPI::UnitType unitType = unit.first;
 			// get build area (the position is in the middle of the unit)
 			// we also expand the square by 2 walk tiles to make sure it touches any map border (like in (2)Heartbreak_Ridge.scx)
-			x1 = (unit.second.x / 8) - (unitType.tileWidth() * 2);
-			y1 = (unit.second.y / 8) - (unitType.tileHeight() * 2);
-			x2 = x1 + (unitType.tileWidth() * 4);
-			y2 = y1 + (unitType.tileHeight() * 4);
+			int x1 = (unit.second.x / 8) - (unitType.tileWidth() * 2);
+			int y1 = (unit.second.y / 8) - (unitType.tileHeight() * 2);
+			int x2 = x1 + (unitType.tileWidth() * 4);
+			int y2 = y1 + (unitType.tileHeight() * 4);
 			// sanitize
 			if (x1 < 0) x1 = 0;
 			if (y1 < 0) y1 = 0;

@@ -35,9 +35,9 @@ namespace BWTA
 	}
 
 	void addVerticalBorder(std::vector<VoronoiSegment>& segments, std::vector<BoostSegmentI>& rtreeSegments, size_t& idPoint, 
-		const std::set<int>& border, int x, int maxY)
+		const std::set<int>& border, int x, int maxY, bool verbose = false)
 	{
-// 		for (const auto& val : border) LOG(val);
+ 		if (verbose) for (const auto& val : border) LOG(val);
 
 		auto it = border.begin();
 		if (*it == 0) ++it;
@@ -47,7 +47,7 @@ namespace BWTA
 			if (it != border.end()) {
 				point2.y(*it); ++it;
 			}
-// 			LOG("(" << point1.x() << "," << point1.y() << ") - (" << point2.x() << "," << point2.y() << ")");
+			if (verbose) LOG("(" << point1.x() << "," << point1.y() << ") - (" << point2.x() << "," << point2.y() << ")");
 			segments.emplace_back(point1, point2);
 			rtreeSegments.push_back(std::make_pair(BoostSegment(BoostPoint(point1.x(), point1.y()), BoostPoint(point2.x(), point2.y())), idPoint++));
 
@@ -59,7 +59,7 @@ namespace BWTA
 			if (it != border.end()) {
 				point2.y(*it); ++it;
 			}
-// 			LOG("(" << point1.x() << "," << point1.y() << ") - (" << point2.x() << "," << point2.y() << ")");
+			if (verbose) LOG("(" << point1.x() << "," << point1.y() << ") - (" << point2.x() << "," << point2.y() << ")");
 			segments.emplace_back(point1, point2);
 			rtreeSegments.push_back(std::make_pair(BoostSegment(BoostPoint(point1.x(), point1.y()), BoostPoint(point2.x(), point2.y())), idPoint++));
 		}
@@ -175,9 +175,15 @@ namespace BWTA
 			BWAPI::WalkPosition p1(static_cast<int>(v1->x()), static_cast<int>(v1->y()));
 
 			// skip edge if ...
-			// ... is outside map or near border
-// 			if (p0.x < SKIP_NEAR_BORDER || p0.x > maxXborder || p0.y < SKIP_NEAR_BORDER || p0.y >maxYborder
-// 				|| p1.x < SKIP_NEAR_BORDER || p1.x >maxXborder || p1.y < SKIP_NEAR_BORDER || p1.y >maxYborder) continue;
+			// ... is outside map
+			if (p0.x < 0 || p0.x > maxX || p0.y < 0 || p0.y > maxY || 
+				p1.x < 0 || p1.x > maxX || p1.y < 0 || p1.y > maxY) {
+					LOG(" - [WARNING] Voronoi vertex found outside map. Probably wrong border segment generation!");
+					continue;
+			}
+			//... is outside map or near border
+// 			if (p0.x < SKIP_NEAR_BORDER || p0.x > maxXborder || p0.y < SKIP_NEAR_BORDER || p0.y >maxYborder || 
+//				p1.x < SKIP_NEAR_BORDER || p1.x >maxXborder || p1.y < SKIP_NEAR_BORDER || p1.y >maxYborder) continue;
 
 			// ... any of its endpoints is inside an obstacle
 			if (labelMap[p0.x][p0.y] > 0 || labelMap[p1.x][p1.y] > 0) continue;

@@ -111,7 +111,7 @@ namespace BWTA
 						// if polygon isn't too small, add it to the result
 						if (boost::geometry::area(polygon) > MIN_ARE_POLYGON) {
 							// TODO a polygon can have walkable polygons as "holes", save them
-							LOG(" - Found big HOLE");
+							LOG(" - [WARNING] Found big walkable HOLE");
 						} else {
 							// "remove" the hole filling it with the polygon label
 							holesToLabel.emplace_back(hole, labelId);
@@ -195,47 +195,51 @@ namespace BWTA
 			bool touchingMapBroder = isTouchingMapBorder(contour, maxX, maxY);
 			auto polArea = boost::geometry::area(polygon);
 			// if polygon isn't too small, add it to the result
-			if ((touchingMapBroder && polArea > MIN_ARE_POLYGON) || (
-				!touchingMapBroder && polArea > MIN_ARE_INNER_POLYGON)) {
-				// Uses Douglas-Peucker algorithm to simplify points in the polygon
-				// https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm
-				boost::geometry::simplify(polygon, simPolygon, 2.0);
-// 				LOG(" - Simplified polygon " << boost::geometry::dsv(simPolygon));
+			if ((touchingMapBroder && polArea > MIN_ARE_POLYGON) || 
+				(!touchingMapBroder && polArea > MIN_ARE_INNER_POLYGON)) {
+
+//				const auto& pLabel = polygon.outer().at(0);
+//				int labelID = labelMap[(int)pLabel.x()][(int)pLabel.y()];
+//				if (labelID == 3) LOG(" - polygon " << boost::geometry::dsv(polygon));
 
 				// If the starting-ending points are co-linear, this is a special case that is not simplified
 				// http://boost-geometry.203548.n3.nabble.com/Simplifying-polygons-with-co-linear-points-td3415757.html
 				// To avoid problems with borders, if the initial point is in the border, we rotate the points
 				// until we find one that it is not in the border (or all points explored)
 				// Notice that we may still have co-linear points, but hopefully not in the border.
-				const auto& p0 = simPolygon.outer().at(0);
+				const auto& p0 = polygon.outer().at(0);
 				if (p0.x() <= 0 || p0.x() >= maxX || p0.y() <= 0 || p0.y() >= maxY) {
 					// find index of not border point
 					size_t index = 0;
-					for (size_t i = 1; i < simPolygon.outer().size(); ++i) {
-						const auto& p1 = simPolygon.outer().at(i);
-						if (p1.x() > 0 && p1.x() < maxX && p1.y() > 0 && p1.y() < maxY) {
+					for (size_t i = 1; i < polygon.outer().size(); ++i) {
+						const auto& p1 = polygon.outer().at(i);
+						if (p1.x() > ANCHOR_MARGIN*2 && p1.x() < maxX && p1.y() > ANCHOR_MARGIN*2 && p1.y() < maxY) {
 							// not border point found
 							index = i;
 							break;
 						}
 					}
 					if (index != 0) {
-						auto& outerRing = simPolygon.outer();
+						auto& outerRing = polygon.outer();
 						std::rotate(outerRing.begin(), outerRing.begin() + index, outerRing.end());
 						outerRing.push_back(outerRing.at(0));
 					}
 // 					LOG(" - Rotated polygon " << boost::geometry::dsv(simPolygon));
 				}
 
+				// Uses Douglas-Peucker algorithm to simplify points in the polygon
+				// https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm
+				boost::geometry::simplify(polygon, simPolygon, 2.0);
+//				if (labelID == 3) LOG(" - Simplified polygon " << boost::geometry::dsv(simPolygon));
+
 				anchorToBorder(simPolygon, maxX, maxY, maxMarginX, maxMarginY);
-// 				LOG(" -   Anchored polygon " << boost::geometry::dsv(simPolygon));
+//				if (labelID == 3) LOG(" -   Anchored polygon " << boost::geometry::dsv(simPolygon));
 
 				if (!boost::geometry::is_simple(simPolygon)) {
-					LOG("Error, polygon not simple!!!!!!!!!!!!!!");
+					LOG("[Error] polygon not simple!!!!!!!!!!!!!!");
 				}
-				std::string message;
-				if (!boost::geometry::is_valid(simPolygon)) {
-					LOG("Error, polygon not valid!!!!!!!!!!!!!! => " << message);
+				if (!boost::geometry::is_valid(simPolygon)) { // TODO new Boost version has message
+					LOG("[Error] polygon not valid!!!!!!!!!!!!!!");
 				}
 				polygons.push_back(simPolygon);
 			} else {
