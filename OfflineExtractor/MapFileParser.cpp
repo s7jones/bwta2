@@ -117,9 +117,9 @@ namespace BWTA
 
 		while (MTXMdata) {
 			std::cout << "MTXM found with size " << chunkSize << " (" << expectedSize << " expected)";
-			if (chunkSize == expectedSize) {
-				chunkData = new unsigned char[chunkSize];
-				memcpy(chunkData, MTXMdata, chunkSize);
+			if (chunkSize >= expectedSize) {
+				if (!chunkData) chunkData = new unsigned char[expectedSize];
+				memcpy(chunkData, MTXMdata, expectedSize);
 			} else if (chunkData && chunkSize < expectedSize) {
 				memcpy(chunkData, MTXMdata, chunkSize); // overwrite from the begining
 				std::cout << " overwrite to previous one from the begining";
