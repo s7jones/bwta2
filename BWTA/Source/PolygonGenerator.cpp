@@ -194,12 +194,14 @@ namespace BWTA
 			boost::geometry::assign_points(polygon, contour);
 			bool touchingMapBroder = isTouchingMapBorder(contour, maxX, maxY);
 			auto polArea = boost::geometry::area(polygon);
+
+			const auto& pLabel = polygon.outer().at(0);
+			int labelID = labelMap[static_cast<int>(pLabel.x())][static_cast<int>(pLabel.y())];
+
 			// if polygon isn't too small, add it to the result
 			if ((touchingMapBroder && polArea > MIN_ARE_POLYGON) || 
 				(!touchingMapBroder && polArea > MIN_ARE_INNER_POLYGON)) {
 
-//				const auto& pLabel = polygon.outer().at(0);
-//				int labelID = labelMap[(int)pLabel.x()][(int)pLabel.y()];
 //				if (labelID == 3) LOG(" - polygon " << boost::geometry::dsv(polygon));
 
 				// If the starting-ending points are co-linear, this is a special case that is not simplified
@@ -236,16 +238,14 @@ namespace BWTA
 //				if (labelID == 3) LOG(" -   Anchored polygon " << boost::geometry::dsv(simPolygon));
 
 				if (!boost::geometry::is_simple(simPolygon)) {
-					LOG("[Error] polygon not simple!!!!!!!!!!!!!!");
+					LOG("[Error] polygon " << labelID << " not simple!!!!!!!!!!!!!!");
 				}
 				if (!boost::geometry::is_valid(simPolygon)) { // TODO new Boost version has message
-					LOG("[Error] polygon not valid!!!!!!!!!!!!!!");
+					LOG("[Error] polygon " << labelID << " not valid!!!!!!!!!!!!!!");
 				}
 				polygons.push_back(simPolygon);
 			} else {
 				// region discarded, relabel
-// 				const auto& p0 = polygon.outer().at(0);
-// 				int labelID = labelMap[(int)p0.x()][(int)p0.y()];
 // 				LOG("Discarded obstacle with label : " << labelID << " and area: " << polArea);
 				scanLineFill(contour, 0, labelMap, nodeMap, true);
 			}

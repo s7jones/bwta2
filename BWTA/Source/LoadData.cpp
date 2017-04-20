@@ -159,10 +159,21 @@ namespace BWTA
 		}
 
 		// smooth borders
+//		for (size_t x = 1; x < maxWidth1; ++x) {
+//			if (!MapData::walkability[x - 1][0] && MapData::walkability[x][0] && 
+//				(!MapData::walkability[x + 1][0] || !MapData::walkability[x][1])) {
+//				MapData::walkability[x][0] = false;
+//			}
+//		}
 		for (size_t x = 1; x < maxWidth1; ++x) {
-			if (!MapData::walkability[x - 1][0] && MapData::walkability[x][0] && 
-				(!MapData::walkability[x + 1][0] || !MapData::walkability[x][1])) {
-				MapData::walkability[x][0] = false;
+			if (!MapData::walkability[x][0]) {
+				MapData::walkability[x][3] = false;
+				MapData::walkability[x][2] = false;
+				MapData::walkability[x][1] = false;
+			} else {
+				MapData::walkability[x][2] &= MapData::walkability[x][3];
+				MapData::walkability[x][1] &= MapData::walkability[x][2];
+				MapData::walkability[x][0] &= MapData::walkability[x][1];
 			}
 		}
 		for (size_t x = 1; x < maxWidth2; ++x) {
