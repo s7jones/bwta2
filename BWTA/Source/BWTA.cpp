@@ -53,17 +53,16 @@ namespace BWTA
 		return getNearestBaseLocation(player->getStartLocation());
 	}
 
-	Region* getRegion(int x, int y) 
-	{ 
-		return BWTA_Result::getRegion.getItemSafe(x, y);
-	}
-	Region* getRegion(BWAPI::TilePosition tileposition) {
-		return BWTA_Result::getRegion.getItemSafe(tileposition.x, tileposition.y);
-	}
-
-	Region* getRegion(BWAPI::Position position)
+	Region* getRegion(int x, int y) { return getRegion(BWAPI::TilePosition(x, y)); }
+	Region* getRegion(BWAPI::Position pos) { return getRegion(BWAPI::WalkPosition(pos)); }
+	Region* getRegion(BWAPI::TilePosition tilePos) { return getRegion(BWAPI::WalkPosition(tilePos)); }
+	Region* getRegion(BWAPI::WalkPosition walkPos)
 	{
-		BWAPI::WalkPosition walkPos(position);
+		if (walkPos.x<0 || walkPos.y<0 || 
+			walkPos.x>=BWTA_Result::regionLabelMap.getWidth() || walkPos.y>=BWTA_Result::regionLabelMap.getHeight()) {
+				LOG("WARNING getRegion called with wrong WalkPosition " << walkPos);
+				return nullptr;
+		}
 		int regionLabel = BWTA_Result::regionLabelMap[walkPos.x][walkPos.y];
 		for (const auto& r : BWTA_Result::regions) {
 			if (r->getLabel() == regionLabel) { // TODO I need a vector to map labelId to Region*
@@ -110,15 +109,14 @@ namespace BWTA
 
 	bool isConnected(int x1, int y1, int x2, int y2)
 	{
-		if (getRegion(x1, y1) == NULL) return false;
-		if (getRegion(x2, y2) == NULL) return false;
-		return getRegion(x1, y1)->isReachable(getRegion(x2, y2));
+		return isConnected(BWAPI::TilePosition(x1, y1), BWAPI::TilePosition(x2, y2));
 	}
 	bool isConnected(BWAPI::TilePosition a, BWAPI::TilePosition b)
 	{
-		if (getRegion(a) == NULL) return false;
-		if (getRegion(b) == NULL) return false;
-		return getRegion(a.x, a.y)->isReachable(getRegion(b.x, b.y));
+		Region* r1 = getRegion(a);
+		Region* r2 = getRegion(b);
+		if (r1 == nullptr || r2 == nullptr) return false;
+		return r1->isReachable(r2);
 	}
 	std::pair<BWAPI::TilePosition, double> getNearestTilePosition(BWAPI::TilePosition start, const std::set<BWAPI::TilePosition>& targets)
 	{

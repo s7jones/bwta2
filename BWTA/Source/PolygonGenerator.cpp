@@ -174,7 +174,7 @@ namespace BWTA
 
 		std::vector<Contour> contours;
 		connectedComponentLabeling(contours, MapData::walkability, labelMap);
-// 		labelMap.saveToFile("logs/labelMap.txt");
+// 		labelMap.saveToFile(std::string(BWTA_PATH)+"labelMap.txt");
 
 		LOG(" - Component-Labeling Map and Contours extracted in " << timer.stopAndGetTime() << " seconds");
 		timer.start();
@@ -251,7 +251,7 @@ namespace BWTA
 			}
 		}
 
-		labelMap.saveToFile("logs/labelMap.txt");
+//		labelMap.saveToFile(std::string(BWTA_PATH)+"labelMap.txt");
 
 		LOG(" - Vectorized areas in " << timer.stopAndGetTime() << " seconds");
 

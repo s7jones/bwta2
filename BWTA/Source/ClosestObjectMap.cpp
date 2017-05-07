@@ -64,7 +64,7 @@ namespace BWTA
 			for (const auto& pos : *pol) seedLabels.emplace(pos.x, pos.y, labelId);
 		}
 		computeClosestObjectMap(seedLabels, BWTA_Result::closestObstacleLabelMap);
-		BWTA_Result::closestObstacleLabelMap.saveToFile("logs/closestObstacleMap.txt");
+//		BWTA_Result::closestObstacleLabelMap.saveToFile(std::string(BWTA_PATH)+"closestObstacleMap.txt");
 		
 		LOG(" - Closest UnwalkablePolygonMap computed in " << timer.stopAndGetTime() << " seconds");
 		timer.start();

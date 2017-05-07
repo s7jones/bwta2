@@ -32,13 +32,13 @@ namespace BWTA
 
 		std::string filename = bwtaPath + MapData::hash + ".bwta";
 
-		if (isFileVersionCorrect(filename)) {
-			LOG("Recognized map, loading map data...");
-
-			timer.start();
-			load_data(filename);
-			LOG("Loaded map data in " << timer.stopAndGetTime() << " seconds");
-		} else {
+//		if (isFileVersionCorrect(filename)) {
+//			LOG("Recognized map, loading map data...");
+//
+//			timer.start();
+//			load_data(filename);
+//			LOG("Loaded map data in " << timer.stopAndGetTime() << " seconds");
+//		} else {
 			LOG("Analyzing new map...");
 
 			timer.start();
@@ -47,7 +47,7 @@ namespace BWTA
 
 // 			save_data(filename);
 // 			LOG("Saved map data.");
-		}
+//		}
 
 #ifndef OFFLINE
 		attachResourcePointersToBaseLocations(BWTA_Result::baselocations);
@@ -61,6 +61,7 @@ namespace BWTA
 		char* argv = "0";
 		QGuiApplication a(argc, &argv); // needed for print text (init fonts)
 		const Painter::Scale imageScale = Painter::Scale::Walk;
+//		const Painter::Scale imageScale = Painter::Scale::Pixel;
 		Painter painter(imageScale);
 #endif
 		Timer timer;

@@ -23,9 +23,10 @@ namespace BWTA
 
   BaseLocation* getStartLocation(BWAPI::Player player);
 
-  Region* getRegion(int x, int y);
-  Region* getRegion(BWAPI::TilePosition tileposition);
-  Region* getRegion(BWAPI::Position position);
+  Region* getRegion(int x, int y); // in TilePosition
+  Region* getRegion(BWAPI::Position pos);
+  Region* getRegion(BWAPI::WalkPosition walkPos);
+  Region* getRegion(BWAPI::TilePosition tilePos);
 
   Chokepoint* getNearestChokepoint(int x, int y);
   Chokepoint* getNearestChokepoint(BWAPI::TilePosition tileposition);
@@ -39,7 +40,7 @@ namespace BWTA
   Polygon* getNearestUnwalkablePolygon(BWAPI::TilePosition tileposition);
   BWAPI::Position getNearestUnwalkablePosition(BWAPI::Position position);
 
-  bool isConnected(int x1, int y1, int x2, int y2);
+  bool isConnected(int x1, int y1, int x2, int y2); // in TilePosition
   bool isConnected(BWAPI::TilePosition a, BWAPI::TilePosition b);
 
   double getGroundDistance(BWAPI::TilePosition start, BWAPI::TilePosition end);

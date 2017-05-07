@@ -413,12 +413,12 @@ namespace BWTA
 		// Set walkability
 		MapData::rawWalkability.resize(MapData::mapWidthWalkRes, MapData::mapHeightWalkRes);
 		setOfflineWalkability(MapData::rawWalkability);
-//		MapData::rawWalkability.saveToFile("logs/rawWalkability.txt");
+//		MapData::rawWalkability.saveToFile(std::string(BWTA_PATH)+"rawWalkability.txt");
 
 		// Set buildability
 		MapData::buildability.resize(MapData::mapWidthTileRes, MapData::mapHeightTileRes);
 		setOfflineBuildability(MapData::buildability);
-//		MapData::buildability.saveToFile("logs/buildable.txt");
+//		MapData::buildability.saveToFile(std::string(BWTA_PATH)+"buildable.txt");
 
 
 		delete CHKdata;

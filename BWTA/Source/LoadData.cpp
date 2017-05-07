@@ -47,17 +47,17 @@ namespace BWTA
 		// load static buildings
 		MapData::staticNeutralBuildings.clear();
 		for (auto unit : BWAPI::Broodwar->getStaticNeutralUnits()) {
-			// checks if it is a resource container
 			auto unitType = unit->getType();
+			// checks if it is a resource container
 			if (unitType == BWAPI::UnitTypes::Resource_Vespene_Geyser || unitType.isMineralField()) continue;
 
-            // Ignores also the various creature types that can move around or are destructible
-            if (unitType.canMove() || !unitType.isInvincible()) {
-                continue;
-            }
+//			LOG("Doodad " << unitType << " at " << unit->getPosition() << " can move? " << unitType.canMove() <<
+//				" is invincible? " << unitType.isInvincible());
+            // Ignores also the various creature types that can move around
+			// WARNING unitType.isInvincible() returns FALSE with some doodas like Special_Power_Generator
+            if (unitType.canMove())  continue;
 
-		    auto unitTypePosition = std::make_pair(unitType, unit->getPosition());
-			MapData::staticNeutralBuildings.push_back(unitTypePosition);
+			MapData::staticNeutralBuildings.emplace_back(unitType, unit->getPosition());
 		}
 
 		// load resources (minerals, gas) and start locations
@@ -224,8 +224,8 @@ namespace BWTA
 		}
 
 #ifdef OFFLINE
-		BWTA::MapData::walkability.saveToFile("logs/walkability.txt");
-		BWTA::MapData::lowResWalkability.saveToFile("logs/lowResWalkability.txt");
+//		BWTA::MapData::walkability.saveToFile(std::string(BWTA_PATH)+"walkability.txt");
+//		BWTA::MapData::lowResWalkability.saveToFile(std::string(BWTA_PATH)+"lowResWalkability.txt");
 #endif
 
 		BWTA_Result::getRegion.resize(MapData::mapWidthTileRes, MapData::mapHeightTileRes);

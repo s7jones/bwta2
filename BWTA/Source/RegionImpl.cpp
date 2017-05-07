@@ -9,6 +9,7 @@ namespace BWTA
 	  _color(0),
 	  _hue(0.0)
   {
+	  // TODO review this (wrong position)
 	  this->_center = _polygon.getCenter();
   }
 
@@ -18,6 +19,7 @@ namespace BWTA
 	  _color(0),
 	  _hue(0.0)
   {
+	  // TODO review this (wrong position)
 	  this->_center = _polygon.getCenter();
   }
 

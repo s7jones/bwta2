@@ -302,8 +302,8 @@ namespace BWTA
 				LOG(" - [ERROR] No BaseLocation found for a cluster");
 			}
 		}
-//		BWTA_Result::regionLabelMap.saveToFile("logs/regionLabelMap.txt", ',');
-//		tileScores.saveToFile("logs/tileScores.txt", ',');
+//		BWTA_Result::regionLabelMap.saveToFile(std::string(BWTA_PATH)+"regionLabelMap.txt", ',');
+//		tileScores.saveToFile(std::string(BWTA_PATH)+"tileScores.txt", ',');
 		if (!startLocations.empty()) LOG(" - [ERROR] " << startLocations.size() << " start locations not found.");
 
 

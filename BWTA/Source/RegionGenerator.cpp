@@ -890,7 +890,7 @@ namespace BWTA
 			labelToPolygon[regionLabelId] = &poly;
 			regionLabelId++;
 		}
-// 		BWTA_Result::regionLabelMap.saveToFile("logs/regionLabel.txt");
+// 		BWTA_Result::regionLabelMap.saveToFile(std::string(BWTA_PATH)+"regionLabel.txt");
 
 		LOG(" - Label region map computed in " << timer.stopAndGetTime() << " seconds");
 		timer.start();

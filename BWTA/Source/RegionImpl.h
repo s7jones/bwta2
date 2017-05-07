@@ -15,7 +15,8 @@ namespace BWTA
 	RegionImpl(const BoostPolygon& boostPoly, const int& scale = 1);
 
 	const Polygon& getPolygon() const override							{ return _polygon; }
-	const BWAPI::Position& getCenter() const override					{ return this->_center; }
+//	const BWAPI::Position& getCenter() const override					{ return this->_center; }
+	const BWAPI::Position& getCenter() const override					{ return this->_opennessPoint; }
 	const std::set<Chokepoint*>& getChokepoints() const override		{ return this->_chokepoints; }
 	const std::set<BaseLocation*>& getBaseLocations() const override	{ return this->baseLocations; }
 	const std::set<Region*>& getReachableRegions() const override		{ return this->reachableRegions; }

@@ -245,7 +245,7 @@ namespace BWTA
   {
 	  for (unsigned int y = 0; y < this->getHeight(); ++y) {
 		  for (unsigned int x = 0; x < this->getWidth(); ++x) {
-			  out << this->getColumn(x)[y];
+			  out << std::to_string(this->getColumn(x)[y]);
 			  if (del != '\0') out << del;
 		  }
 		  out << std::endl;
