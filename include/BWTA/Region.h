@@ -1,6 +1,8 @@
 #pragma once
 #include <BWAPI.h>
 
+#include <set>
+
 namespace BWTA
 {
 	class Chokepoint;
