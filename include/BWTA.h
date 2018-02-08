@@ -5,6 +5,9 @@
 #include <BWTA/Region.h>
 #include <BWTA/BaseLocation.h>
 #include <BWTA/RectangleArray.h>
+
+#include <set>
+
 namespace BWTA
 {
   void analyze(); // will check if we can load cache file or we need to analyze the map
