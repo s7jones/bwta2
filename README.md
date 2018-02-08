@@ -1,11 +1,14 @@
 # BWTA2 (s7jones fork) #
 
 **This is a fork of** [BWTA2](https://bitbucket.org/auriarte/bwta2) which is itself a fork of [BWTA](https://code.google.com/p/bwta), an add-on for [BWAPI](https://github.com/bwapi/bwapi) that analyzes the map and computes the regions, chokepoints, and base locations. 
+
+**This fork aims to update BWTA2 to compile in Visual Studio 2017.**
+
 The original BWTA is only aimed to analyze "normal" maps, i.e. ICCup maps or other competitive starcraft maps. So don't be surprised if it crashes or produces strange results for maps like [Crystallis](http://classic.battle.net/images/battle/scc/lp/bw02/cy.jpg) or other [money maps](http://starcraft.wikia.com/wiki/Money_maps).
 
 BWTA2 offers more functionalities (see **[Release Notes](https://bitbucket.org/auriarte/bwta2/wiki/Release%20Notes)**) and compatibility with BWAPI 4.
 
-**[Download](https://bitbucket.org/auriarte/bwta2/downloads)** the last version and follow the **[starting guide](https://bitbucket.org/auriarte/bwta2/wiki/Getting%20Started)**
+**You can download the latest library files from the releases page.**
 
 ## Citing this work ##
 
